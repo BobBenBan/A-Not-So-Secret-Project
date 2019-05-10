@@ -56,6 +56,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Inputs.cs" />
+    <Compile Include="Config\Loading.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\Global\Caches.cs" />
     <Compile Include="Scenes\Global\Global.cs" />
