@@ -37,7 +37,7 @@ public class WorldObject : RigidBody
 //        }
 
         colShape.Transform = MeshInstance.Transform;
-        colShape.Shape = Caches.GetOrCreateShape(MeshInstance.Mesh, IsTrimesh);
+        colShape.Shape = MeshInstance.Mesh.GetCachedShape(IsTrimesh);
         if (LifeTime > 0)
             this.CreateAndConnectTimer(nameof(FreeSelf)).Start(LifeTime);
     }

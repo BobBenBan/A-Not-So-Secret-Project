@@ -15,7 +15,9 @@ namespace MusicMachine.Test
 public class MidiFileTest
 {
     public static readonly string FilePath =
-        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Midi.midi");
+        Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(),
+            "Midi.midi");
 
     [SetUp]
     public static void MakeMidiFile()
@@ -45,10 +47,15 @@ public class MidiFileTest
         Console.WriteLine($"Made file at {FilePath}");
     }
 
+    public static MidiFile GetMidiFile()
+    {
+        return MidiFile.Read(FilePath);
+    }
+
     [Test]
     public static void ReadMidiFile()
     {
-        var midiFile = MidiFile.Read(FilePath);
+        var midiFile = GetMidiFile();
         foreach (var trackChunk in midiFile.GetTrackChunks())
         {
             foreach (var timedObject in trackChunk.Events)

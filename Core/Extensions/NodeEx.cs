@@ -6,12 +6,12 @@ public static class NodeEx
 {
     public static Timer CreateAndConnectTimer(
         this Node node, string method,
-        bool physics = true, bool oneshot = true
+        bool physics = true, bool oneShot = true
     )
     {
         var timer = new Timer
         {
-            OneShot = oneshot,
+            OneShot = oneShot,
             ProcessMode = physics
                 ? Timer.TimerProcessMode.Physics
                 : Timer.TimerProcessMode.Idle

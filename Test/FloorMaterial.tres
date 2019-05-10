@@ -29,3 +29,4 @@ normal_scale = 1.57
 normal_texture = SubResource( 4 )
 anisotropy_enabled = true
 anisotropy = 0.0
+

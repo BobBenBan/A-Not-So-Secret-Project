@@ -1,11 +1,10 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Test/TestScene.cs" type="Script" id=1]
 [ext_resource path="res://TEst/Sunset.tres" type="Environment" id=2]
 [ext_resource path="res://Scenes/Player/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Objects/WorldObject.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Test/FloorMaterial.tres" type="Material" id=5]
-[ext_resource path="res://Scenes/Objects/Teapot.tscn" type="PackedScene" id=6]
 
 [sub_resource type="PhysicsMaterial" id=1]
 friction = 0.4
@@ -51,7 +50,7 @@ environment = ExtResource( 2 )
 transform = Transform( -0.972964, 0, 0.230955, 0, 1, 0, -0.230955, 0, -0.972964, 0, 1.94089, 0 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
-transform = Transform( 0.770935, -0.636499, 0.0230079, -0.547262, -0.643505, 0.535169, -0.325829, -0.425172, -0.844432, 5.75243, 17.8084, -51.4644 )
+transform = Transform( 0.422635, -0.764381, -0.486932, -0.547262, -0.643505, 0.535169, -0.722416, 0.0402981, -0.690284, 5.75243, 17.8084, -51.4644 )
 light_energy = 0.42
 light_bake_mode = 2
 shadow_enabled = true
@@ -73,7 +72,7 @@ mesh = SubResource( 2 )
 material/0 = ExtResource( 5 )
 
 [node name="Boxm1" type="MeshInstance" parent="."]
-transform = Transform( 0.986848, 0.161288, 0.0107894, -0.161393, 0.986843, 0.00966452, -0.00908871, -0.0112787, 0.999895, 5.31364, 0.461629, -7.70063 )
+transform = Transform( 0.986848, 0.161288, 0.0107894, -0.161393, 0.986843, 0.00966452, -0.00908871, -0.0112787, 0.999895, 44.0775, 0.461629, 5.68045 )
 use_in_baked_light = true
 mesh = SubResource( 4 )
 material/0 = null
@@ -107,10 +106,9 @@ max_distance = 1.0
 extents = Vector3( 50, 5, 50 )
 enable_shadows = true
 
-[node name="Teapot" parent="." instance=ExtResource( 6 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.30453, 0 )
-collision_layer = 1
-continuous_cd = false
+[node name="LaunchPoint" type="RayCast" parent="."]
+transform = Transform( -4.08909e-008, 0.507458, 0.861676, 2.25625e-008, 0.861676, -0.507458, -1, -1.30883e-009, -4.66842e-008, 43.7712, 3.12911, 7.92468 )
+
 [connection signal="body_exited" from="." to="." method="OnBodyExited"]
 
 [editable path="Floor"]

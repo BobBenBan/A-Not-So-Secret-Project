@@ -20,7 +20,12 @@ public static class StructEx
         dict.Remove(key);
         return o;
     }
-
-    public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key) => dict.ContainsKey(key) ? dict[key] : default;
+    public static IList<T> Swap<T>(this IList<T> list, int a, int b)
+    {
+        var tmp = list[a];
+        list[a] = list[b];
+        list[b] = tmp;
+        return list;
+    }
 }
 }

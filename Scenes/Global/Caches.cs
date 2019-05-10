@@ -40,4 +40,9 @@ public class Caches : Node
         return o;
     }
 }
+
+public static class CachesEx
+{
+    public static Shape GetCachedShape(this Mesh mesh, bool isTrimesh) => Caches.GetOrCreateShape(mesh, isTrimesh);
+}
 }

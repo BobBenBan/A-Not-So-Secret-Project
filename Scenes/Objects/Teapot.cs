@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using MusicMachine.Scenes.Sound;
 
@@ -6,8 +7,8 @@ namespace MusicMachine.Scenes
 public class Teapot : WorldObject
 {
     private MultipleAudioStreamPlayer _streamPlayer;
-    private float _pitch = 1;
-
+    public float Pitch = 1;
+    public float ConstantVol = float.NaN;
     public override void _Ready()
     {
         base._Ready();
@@ -20,7 +21,7 @@ public class Teapot : WorldObject
 
         _streamPlayer =
             GetNode<MultipleAudioStreamPlayer>("MultipleAudioStreamPlayer");
-        _pitch = (float) GD.RandRange(0.5, 2);
+        Pitch = (float) GD.RandRange(0.5, 2);
         Connect("body_entered", this, nameof(OnBodyEntered));
 //        Connect("body_shape_exited", this, nameof(OnBodyExited));
     }
@@ -45,9 +46,14 @@ public class Teapot : WorldObject
 
     private void OnCollision(float approxForce)
     {
-        approxForce = Mathf.Clamp(approxForce, 0, 22);
+        if (float.IsNaN(ConstantVol))
+        {
+            approxForce = Mathf.Clamp(approxForce, 0, 22);
 //        Print(_pitch);
-        _streamPlayer.PlayInstance(-60 + approxForce, _pitch);
+            _streamPlayer.PlayInstance(-60 + approxForce, Pitch);
+        }
+        else
+            _streamPlayer.PlayInstance(ConstantVol, Pitch);
     }
 }
 }

@@ -4,9 +4,10 @@ namespace MusicMachine.Test
 {
 public class TestOnly : Node
 {
-    public override void _Ready()
+    public override void _EnterTree()
     {
-        //do tests;
+        AnimationTest.WhereDoesItInsert();
+        GetTree().Quit();
     }
 }
 }
