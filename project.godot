@@ -16,13 +16,17 @@ _global_script_class_icons={
 [application]
 
 config/name="MusicMachine"
-run/main_scene="res://TestMaterial/TestScene.tscn"
-config/icon="res://icon.png"
+run/main_scene="res://Test/TestScene.tscn"
+config/icon="res://Resources/Images/icon.png"
 
 [autoload]
 
-Preload="*res://Scripts/Global/Preload.gd"
-SceneStart="*res://Scripts/Global/Global.cs"
+Global="*res://Scenes/Global/Global.cs"
+Caches="*res://Scenes/Global/Caches.cs"
+
+[editor_plugins]
+
+enabled=PoolStringArray(  )
 
 [input]
 
@@ -94,7 +98,7 @@ action_secondary={
 
 [mono]
 
-debugger_agent/wait_timeout=5000
+debugger_agent/wait_timeout=4000
 
 [physics]
 
@@ -106,4 +110,4 @@ common/enable_object_picking=false
 
 [rendering]
 
-environment/default_environment="res://TestMaterial/default_env.tres"
+environment/default_environment="res://Test/DefaultEnv.tres"

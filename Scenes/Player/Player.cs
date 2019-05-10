@@ -1,7 +1,6 @@
 using Godot;
 using MusicMachine.Config;
 using MusicMachine.Extensions;
-using MusicMachine.Util;
 
 namespace MusicMachine.Scenes
 {
@@ -19,17 +18,17 @@ public class Player : KinematicBody
 
     public Transform CameraLocation => _roll.GlobalTransform;
 
-    [Export(PropertyHint.Range,"0,5")] public float MouseSensitivity = 0.15F;
-    [Export(PropertyHint.Range,"0,5")] public float DoubleTapTime = 0.3f;
-    [Export(PropertyHint.Range,"0,90")] public float MaxSlopeDegrees = 45;
+    [Export(PropertyHint.Range, "0,5")] public float MouseSensitivity = 0.15F;
+    [Export(PropertyHint.Range, "0,5")] public float DoubleTapTime = 0.3f;
+    [Export(PropertyHint.Range, "0,90")] public float MaxSlopeDegrees = 45;
     [Export] public bool CanFly = true;
-    [Export(PropertyHint.Range,"0,30")] public float SlowSpeed = 2;
-    [Export(PropertyHint.Range,"0,30")] public float WalkSpeed = 6;
-    [Export(PropertyHint.Range,"0,30")] public float RunSpeed = 10;
-    [Export(PropertyHint.Range,"0,30")] public float JumpSpeed = 5;
-    [Export(PropertyHint.Range,"0,30")] public float FlyVerticalSpeed = 6;
-    [Export(PropertyHint.Range,"0,30")] public float Acceleration = 8f;
-    [Export(PropertyHint.Range,"0,30")] public float Deceleration = 16f;
+    [Export(PropertyHint.Range, "0,30")] public float SlowSpeed = 2;
+    [Export(PropertyHint.Range, "0,30")] public float WalkSpeed = 6;
+    [Export(PropertyHint.Range, "0,30")] public float RunSpeed = 10;
+    [Export(PropertyHint.Range, "0,30")] public float JumpSpeed = 5;
+    [Export(PropertyHint.Range, "0,30")] public float FlyVerticalSpeed = 6;
+    [Export(PropertyHint.Range, "0,30")] public float Acceleration = 8f;
+    [Export(PropertyHint.Range, "0,30")] public float Deceleration = 16f;
 
     [Export]
     public Vector3 Gravity
@@ -42,7 +41,7 @@ public class Player : KinematicBody
         }
     }
 
-    [Export(PropertyHint.Range,"0,30")] public float MaxGravityVelocity = 20;
+    [Export(PropertyHint.Range, "0,30")] public float MaxGravityVelocity = 20;
     [Export] public Vector3 SpawnPoint = Vector3.Inf;
 
     public bool Enabled
@@ -54,8 +53,8 @@ public class Player : KinematicBody
                 : Input.MouseMode.Visible);
     }
 
-    public Delegates.ProcessAction PrimaryAction;
-    public Delegates.ProcessAction SecondaryAction;
+    public Delegates.AsProcess Primary;
+    public Delegates.AsProcess Secondary;
 
     //TODO: BETTER GRAVITY
     private void ProcessMovement(float delta)
@@ -139,9 +138,9 @@ public class Player : KinematicBody
     private void ProcessActions(float delta)
     {
         if (Inputs.PlayerPrimaryActin.JustPressed())
-            PrimaryAction?.Invoke(delta);
-        if (Inputs.PlayerSecondaryAction.JustPressed())
-            SecondaryAction?.Invoke(delta);
+            Primary?.Invoke(delta);
+        if (Inputs.PlayerSecondaryInputAction.JustPressed())
+            Secondary?.Invoke(delta);
     }
 
     public override void _Ready()

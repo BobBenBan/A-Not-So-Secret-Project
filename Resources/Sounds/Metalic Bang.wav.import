@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Metalic Bang.wav-8e19f1907b42beff86a6d45e0e961e35.sample"
+
+[deps]
+
+source_file="res://Resources/Sounds/Metalic Bang.wav"
+dest_files=[ "res://.import/Metalic Bang.wav-8e19f1907b42beff86a6d45e0e961e35.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

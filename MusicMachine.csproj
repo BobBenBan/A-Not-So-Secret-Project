@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0BAB86EC-6836-4708-A97E-57FC6FB2558B}</ProjectGuid>
+    <ProjectGuid>{A8A8E5BB-13ED-408B-BC36-DCE720D3E1D3}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <OutputPath>.mono/temp/bin/$(Configuration)</OutputPath>
+    <OutputPath>.mono\temp\bin\$(Configuration)</OutputPath>
     <RootNamespace>MusicMachine</RootNamespace>
     <AssemblyName>MusicMachine</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <BaseIntermediateOutputPath>.mono/temp/obj</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)/$(Configuration)</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>.mono\temp\obj</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,33 +39,34 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GodotSharp">
-      <HintPath>$(ProjectDir)/.mono/assemblies/GodotSharp.dll</HintPath>
+      <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="GodotSharpEditor" Condition=" '$(Configuration)' == 'Tools' ">
-      <HintPath>$(ProjectDir)/.mono/assemblies/GodotSharpEditor.dll</HintPath>
+      <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharpEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\Global\Caches.cs" />
+    <Compile Include="Scenes\Global\Global.cs" />
+    <Compile Include="Scenes\Objects\Teapot.cs" />
     <Compile Include="Scenes\Objects\WorldObject.cs" />
-    <Compile Include="Scenes\Player\Hold.cs" />
     <Compile Include="Scenes\Player\Player.cs" />
-    <Compile Include="Scripts\Config\Action.cs" />
-    <Compile Include="Scripts\Config\Inputs.cs" />
-    <Compile Include="Scripts\Extensions\NodeEx.cs" />
-    <Compile Include="Scripts\Extensions\ObjectEx.cs" />
-    <Compile Include="Scripts\Extensions\SpatialEx.cs" />
-    <Compile Include="Scripts\Extensions\VectorEx.cs" />
-    <Compile Include="Scripts\Global\Global.cs" />
-    <Compile Include="Scripts\Util\Delegates.cs" />
-    <Compile Include="Scripts\Util\DoubleTapDetector.cs" />
-    <Compile Include="TestMaterial\TestScene.cs" />
+    <Compile Include="Scenes\Sound\MultipleAudioStreamPlayer.cs" />
+    <Compile Include="Test\TestOnly.cs" />
+    <Compile Include="Test\TestScene.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Scenes\Objects" />
+    <Content Include="Scenes\Sound\MultipleAudioStreamPlayer.tscn" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Core\Core.csproj">
+      <Project>{3a1ab7dc-a9fd-44c4-b802-7ac6e6ddac73}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

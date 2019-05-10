@@ -1,24 +1,49 @@
 using Godot;
 using MusicMachine.Extensions;
+using MusicMachine.Scenes.Global;
 
-namespace MusicMachine.Scenes.Objects
+
+namespace MusicMachine.Scenes
 {
 public class WorldObject : RigidBody
 {
-    [Export] public bool Trimesh { get; set; } = false;
-    [Export] public float LifeTime = 0;
+    [Export] public bool IsTrimesh { get; private set; }
+
+    [Export(PropertyHint.Range, "0,300")] public float LifeTime { get; private set; } = 0;
+
+    protected MeshInstance MeshInstance;
 
     public override void _Ready()
     {
-        GetNode<Spatial>("CollisionShape").Transform =
-            GetNode<Spatial>("MeshInstance").Transform;
-        var timer = GetNode<Timer>("LifeTimer");
-        if (LifeTime > 0)
+        TryCreateMesh();
+    }
+
+    private void TryCreateMesh()
+    {
+        var colShape = GetNode<CollisionShape>("CollisionShape");
+        if (colShape.Shape != null) return;
+        MeshInstance = GetNode<MeshInstance>("MeshInstance");
+        if (MeshInstance.Mesh == null)
         {
-            timer.Start(LifeTime);
+            GD.PushWarning(
+                $"WorldObject ({Name}) instantiated with no mesh, deleting self");
+            QueueFree();
+            return;
         }
+//        if (Mode == ModeEnum.Static && !IsTrimesh)
+//        {
+//            GD.PushWarning($"WorldObject ({Name}) static body is not trimesh, doing Trimesh anyways");
+//            IsTrimesh = true;
+//        }
 
+        colShape.Transform = MeshInstance.Transform;
+        colShape.Shape = Caches.GetOrCreateShape(MeshInstance.Mesh, IsTrimesh);
+        if (LifeTime > 0)
+            this.CreateAndConnectTimer(nameof(FreeSelf)).Start(LifeTime);
+    }
 
+    public override void _PhysicsProcess(float delta)
+    {
     }
 
     public void LaunchFrom(Spatial spatial, Vector3 translation,
@@ -45,12 +70,15 @@ public class WorldObject : RigidBody
             new Vector3(0, 0, velocity), new Vector3());
     }
 
-    public void SimpleLaunchFrom(Transform transform, float offset,
-        float velocity)
+    public void SimpleLaunchFrom(Transform transform, float offset, float velocity)
     {
         LaunchFrom(transform, new Vector3(0, 0, offset), new Vector3(),
             new Vector3(0, 0, velocity), new Vector3());
     }
-    private void OnTimeout(){QueueFree();}
+
+    private void FreeSelf()
+    {
+        QueueFree();
+    }
 }
 }
