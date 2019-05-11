@@ -1,6 +1,6 @@
 using Godot;
 
-namespace MusicMachine.Extensions
+namespace MusicMachine
 {
 public static class VectorEx
 {

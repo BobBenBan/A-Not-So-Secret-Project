@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Diagnostics;
-using Godot;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Music;
@@ -35,6 +33,7 @@ public class MidiFileToTrackTest
                 Console.WriteLine(pair);
             }
         }
+
         stopwatch.Stop();
         Console.WriteLine($"Took {stopwatch.ElapsedMilliseconds} milliseconds");
     }

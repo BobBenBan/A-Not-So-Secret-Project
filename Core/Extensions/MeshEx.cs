@@ -1,10 +1,10 @@
-using System;
 using Godot;
 
-namespace MusicMachine.Extensions
+namespace MusicMachine
 {
 public static class MeshEx
 {
-    public static Shape CreateShape(this Mesh mesh, bool isTrimesh) => isTrimesh ? mesh.CreateTrimeshShape() : mesh.CreateConvexShape();
+    public static Shape CreateShape(this Mesh mesh, bool isTrimesh) =>
+        isTrimesh ? mesh.CreateTrimeshShape() : mesh.CreateConvexShape();
 }
 }

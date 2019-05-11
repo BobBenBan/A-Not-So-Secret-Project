@@ -1,7 +1,6 @@
 using System;
 using Godot;
 using Godot.Collections;
-using MusicMachine.Extensions;
 
 namespace MusicMachine.Scenes.Global
 {

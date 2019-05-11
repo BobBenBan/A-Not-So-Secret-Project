@@ -1,13 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Windows.Forms.VisualStyles;
-using Godot;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Extensions;
 using MusicMachine.Util;
 
 namespace MusicMachine.Music
@@ -23,6 +17,7 @@ namespace MusicMachine.Music
 /// playback, where the track time is physics ticks.
 /// Please do not store the obtained list. It may change.
 /// </remarks>
+[Obsolete]
 public class Track<TEvent>
 {
     private SortedDictionary<int, List<TEvent>> _track = new SortedDictionary<int, List<TEvent>>();
@@ -138,7 +133,9 @@ public class Track<TEvent>
     {
         using (var enumerator = _track.GetEnumerator())
         {
-            do if (!enumerator.MoveNext()) yield break;
+            do
+                if (!enumerator.MoveNext())
+                    yield break;
             while (enumerator.Current.Key < from);
 
             //cur.Key >= from;
@@ -175,6 +172,7 @@ public class Track<TEvent>
                     yield return enumerator.Current;
                     if (!enumerator.MoveNext()) break;
                 }
+
                 i++;
             }
         }

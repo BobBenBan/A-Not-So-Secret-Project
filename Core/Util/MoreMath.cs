@@ -11,7 +11,7 @@ public static class MoreMath
 
     public static int RoundToInt(this double d)
     {
-        return (int)Math.Round(d);
+        return (int) Math.Round(d);
     }
 }
 }

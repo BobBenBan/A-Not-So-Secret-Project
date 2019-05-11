@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Godot;
-using MusicMachine.Extensions;
 using MusicMachine.Music;
 
 namespace MusicMachine.Scenes.Music
@@ -41,8 +40,8 @@ public class TrackPlayer<TEvent> : Node
 
     public TrackPlayer()
     {
-
     }
+
     public override void _Ready()
     {
         _timer = this.CreateAndConnectTimer(nameof(StepTick), true, false);
@@ -76,7 +75,7 @@ public class TrackPlayer<TEvent> : Node
     private void StepTick()
     {
         if (!_playing) _timer.Stop();
-            Tick = _trackEnum.Current.Key;
+        Tick = _trackEnum.Current.Key;
         if (_trackEnum.Current.Value != null)
             foreach (var @event in _trackEnum.Current.Value) //do stuff to events
                 action(Tick, @event);

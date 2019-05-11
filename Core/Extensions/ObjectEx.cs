@@ -1,6 +1,6 @@
 using Godot;
 
-namespace MusicMachine.Extensions
+namespace MusicMachine
 {
 public static class ObjectEx
 {
@@ -14,6 +14,7 @@ public static class ObjectEx
         obj.Call(method, args);
         return true;
     }
+
     public static bool CallOrNull(this Object obj, string method, out object result,
         params object[] args)
     {

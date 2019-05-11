@@ -1,7 +1,6 @@
 using Godot;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Extensions;
 using MusicMachine.Music;
 using MusicMachine.Scenes;
 using MusicMachine.Scenes.Music;
@@ -42,7 +41,7 @@ public class TestScene : Area
                 {
                     foreach (var note in list.Value)
                     {
-                        note.NoteNumberTimes512 = (ushort) (note.NoteNumberTimes512 - 512*2);
+                        note.NoteNumberTimes512 = (ushort) (note.NoteNumberTimes512 - 512 * 2);
                     }
                 }
 

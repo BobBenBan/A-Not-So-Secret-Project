@@ -1,15 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Windows.Forms;
 
-namespace MusicMachine.Extensions
+namespace MusicMachine
 {
 public static class StructEx
 {
     public static TValue GetElsePut<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, Func<TValue> ifAbsent)
     {
-        if(!dict.TryGetValue(key, out var val)) val = dict[key] = ifAbsent();
+        if (!dict.TryGetValue(key, out var val)) val = dict[key] = ifAbsent();
         return val;
     }
 
@@ -20,6 +18,7 @@ public static class StructEx
         dict.Remove(key);
         return o;
     }
+
     public static IList<T> Swap<T>(this IList<T> list, int a, int b)
     {
         var tmp = list[a];

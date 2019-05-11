@@ -1,9 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Net.Mime;
 using System.Reflection;
-using System.Windows.Forms;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.MusicTheory;
 using Melanchall.DryWetMidi.Smf;

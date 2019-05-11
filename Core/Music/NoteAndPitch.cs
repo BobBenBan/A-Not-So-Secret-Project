@@ -1,10 +1,6 @@
 using System;
-using System.Windows.Forms;
-using Godot;
 using Melanchall.DryWetMidi.Common;
-using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Util;
-using Note = Melanchall.DryWetMidi.MusicTheory.Note;
 
 namespace MusicMachine.Music
 {

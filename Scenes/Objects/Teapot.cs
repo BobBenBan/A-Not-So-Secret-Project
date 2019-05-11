@@ -1,6 +1,5 @@
-using System;
 using Godot;
-using MusicMachine.Scenes.Sound;
+using MusicMachine.Scenes.Music;
 
 namespace MusicMachine.Scenes
 {
@@ -9,6 +8,7 @@ public class Teapot : WorldObject
     private MultipleAudioStreamPlayer _streamPlayer;
     public float Pitch = 1;
     public float ConstantVol = float.NaN;
+
     public override void _Ready()
     {
         base._Ready();
@@ -34,7 +34,7 @@ public class Teapot : WorldObject
 //            ", localShape: ", localShape);
 //    }
 
-    private void OnBodyEntered (Node node)
+    private void OnBodyEntered(Node node)
     {
 //        Print("ENTERED: BodyID: ", bodyId, ", Node: ", node, ", bodyShape: ", bodyShape,
 //            ", localShape: ", localShape);
