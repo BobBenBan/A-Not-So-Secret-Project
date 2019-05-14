@@ -235,10 +235,6 @@ public class Track<TTime, TEvent> : IEnumerable<Track<TTime, TEvent>.TrackElemen
                 else yield break;
             } while (curEnum.Time.CompareTo(start) < 0); //find first >= start, if exists.
 
-            void TryStep(ref TTime curTime)
-            {
-            }
-
             for (var curTime = start;;)
             {
                 if (curEnum.Time.CompareTo(curTime) <= 0) //cur <= time;

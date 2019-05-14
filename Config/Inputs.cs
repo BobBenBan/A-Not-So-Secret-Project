@@ -15,7 +15,7 @@ public static class Inputs
 
     public static readonly DoubleTapDetector PlayerDoubleJump = new DoubleTapDetector(PlayerJump);
 
-    public static readonly InputAction PlayerPrimaryActin = "action_main";
+    public static readonly InputAction PlayerPrimaryAction = "action_main";
     public static readonly InputAction PlayerSecondaryInputAction = "action_secondary";
 }
 }

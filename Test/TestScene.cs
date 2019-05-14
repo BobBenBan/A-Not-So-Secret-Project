@@ -29,8 +29,7 @@ public class TestScene : Area
         _launchPoint = GetNode<RayCast>("LaunchPoint");
 //        MidiFileTest.MakeMidiFile();
 //        var midiFile = MidiFileTest.GetMidiFile();
-        var midiFile = MidiFile.Read("D:/CodeyStuffs/GodotStuff/A-Not-So-Secret-Project/Resources/midi.mid");
-
+        var midiFile = MidiFile.Read(ProjectSettings.GlobalizePath("res://Resources/midi.mid"));
         var tempoMap = midiFile.GetTempoMap();
         var track = new Track<int,Note>();
         var ct = 0;

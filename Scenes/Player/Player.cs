@@ -160,7 +160,7 @@ public class Player : KinematicBody
 
     private void ProcessActions(float delta)
     {
-        if (Inputs.PlayerPrimaryActin.JustPressed())
+        if (Inputs.PlayerPrimaryAction.JustPressed())
             Primary?.Invoke(delta);
         if (Inputs.PlayerSecondaryInputAction.JustPressed())
             Secondary?.Invoke(delta);
