@@ -43,7 +43,7 @@ public class Player : KinematicBody
     [Export(PropertyHint.Range, "0,30")] public float MaxGravityVelocity = 20;
     [Export] public Vector3 SpawnPoint = Vector3.Inf;
 
-    public bool Enabled
+    private bool EffectiveEnabled
     {
         get => Input.GetMouseMode() == Input.MouseMode.Captured;
         set =>
@@ -52,16 +52,40 @@ public class Player : KinematicBody
                 : Input.MouseMode.Visible);
     }
 
+    private bool _enabled = true;
+    private bool _inFocus = false;
+
+    private bool InFocus
+    {
+        set
+        {
+            _inFocus = value;
+            EffectiveEnabled = _inFocus && _enabled;
+        }
+    }
+
+    private bool Enabled
+    {
+        get => _enabled;
+        set
+        {
+            _enabled = value;
+            EffectiveEnabled = _inFocus && _enabled;
+        }
+    }
+
     public Delegates.AsProcess Primary;
     public Delegates.AsProcess Secondary;
 
+
     //TODO: BETTER GRAVITY
+
     private void ProcessMovement(float delta)
     {
         //Enable/disable
         if (Inputs.PlayerCancelCursor.JustPressed()) Enabled = !Enabled;
         var targetVel = new Vector3();
-        if (Enabled)
+        if (EffectiveEnabled)
         {
             //calculate input movement
             var inputMove = new Vector2();
@@ -148,14 +172,14 @@ public class Player : KinematicBody
         _roll = _pitch.GetNode<Spatial>("Roll");
         _camera = _roll.GetNode<Camera>("Camera");
         _rayCast = _roll.GetNode<RayCast>("RayCast");
-        Enabled = true;
+        _enabled = true;
         if (SpawnPoint == Vector3.Inf) SpawnPoint = Translation;
     }
 
     public override void _Input(InputEvent inputEvent)
     {
         if (!(inputEvent is InputEventMouseMotion move) ||
-            !Enabled) return;
+            !EffectiveEnabled) return;
         _pitch.RotateX(
             Mathf.Deg2Rad(move.Relative.y * MouseSensitivity)); // ^ Y -> X
         RotateY(Mathf.Deg2Rad(move.Relative.x * -MouseSensitivity));
@@ -167,6 +191,19 @@ public class Player : KinematicBody
     private void OnWorldExit()
     {
         Translation = SpawnPoint;
+    }
+
+    public override void _Notification(int what)
+    {
+        switch (what)
+        {
+            case MainLoop.NotificationWmFocusIn:
+                InFocus = true;
+                break;
+            case MainLoop.NotificationWmFocusOut:
+                InFocus = false;
+                break;
+        }
     }
 }
 }
