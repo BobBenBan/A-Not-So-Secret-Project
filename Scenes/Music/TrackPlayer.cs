@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Godot;
 using MusicMachine.Music;
 
@@ -8,32 +9,23 @@ public class TrackPlayer<TEvent> : Node
 {
     public delegate void EventAction(int tick, TEvent @event);
 
-    public Track<TEvent> Track { get; set; }
-    public EventAction action = (i, ev) => GD.Print($"{i}: {ev.ToString()}");
+    public Track<int, TEvent> Track { get; set; }
+    public EventAction Action = (i, ev) => GD.Print($"{i}: {ev.ToString()}");
     public int Tick;
 
-    private IEnumerator<KeyValuePair<int, List<TEvent>>> _trackEnum;
-    private Timer _timer;
-    private bool _playing;
+    private IEnumerator<List<Track<int, TEvent>.TrackElement>> _trackEnum;
 
     public bool Playing
     {
-        get => _playing;
+        get => IsPhysicsProcessing();
         private set
         {
-            if (value == _playing) return;
-            if (value)
-            {
-                if (_trackEnum == null) return;
-                _timer.Start();
-            }
-            else _timer.Stop();
-
-            _playing = value;
+            if (value == IsPhysicsProcessing() || value && _trackEnum == null) return;
+            SetPhysicsProcess(value);
         }
     }
 
-    public TrackPlayer(Track<TEvent> track)
+    public TrackPlayer(Track<int, TEvent> track)
     {
         Track = track;
     }
@@ -44,8 +36,7 @@ public class TrackPlayer<TEvent> : Node
 
     public override void _Ready()
     {
-        _timer = this.CreateAndConnectTimer(nameof(StepTick), true, false);
-        _timer.SetWaitTime(1f / 60);
+        SetPhysicsProcess(false);
     }
 
     public void Play(int tick = 0)
@@ -58,7 +49,7 @@ public class TrackPlayer<TEvent> : Node
 
         _trackEnum?.Dispose();
         Tick = tick;
-        _trackEnum = Track.Iterate(tick).GetEnumerator();
+        _trackEnum = Track.IterateTrack(tick, i => i + 1).GetEnumerator();
         Playing = true;
     }
 
@@ -72,14 +63,19 @@ public class TrackPlayer<TEvent> : Node
         Playing = false;
     }
 
-    private void StepTick()
+    public void Toggle()
     {
-        if (!_playing) _timer.Stop();
-        Tick = _trackEnum.Current.Key;
-        if (_trackEnum.Current.Value != null)
-            foreach (var @event in _trackEnum.Current.Value) //do stuff to events
-                action(Tick, @event);
+        Playing = !Playing;
+    }
 
+    public override void _PhysicsProcess(float delta)
+    {
+        var current = _trackEnum.Current;
+        if (current != null)
+            foreach (var element in current)
+            foreach (var @event in element.Events)
+                Action(Tick, @event);
+        Tick++;
         if (!_trackEnum.MoveNext()) Stop();
     }
 

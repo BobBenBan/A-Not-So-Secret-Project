@@ -4,6 +4,7 @@ using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Music;
 using MusicMachine.Scenes;
 using MusicMachine.Scenes.Music;
+using Note = MusicMachine.Music.Note;
 
 namespace MusicMachine.Test
 {
@@ -14,7 +15,7 @@ public class TestScene : Area
     private Node _objects;
 
     private RayCast _launchPoint;
-    private TrackPlayer<PitchedNote> _trackPlayer;
+    private TrackPlayer<Note> _trackPlayer;
 
     private readonly PackedScene _obj =
         ResourceLoader.Load<PackedScene>("res://Scenes/Objects/Teapot.tscn");
@@ -31,33 +32,35 @@ public class TestScene : Area
         var midiFile = MidiFile.Read("D:/CodeyStuffs/GodotStuff/A-Not-So-Secret-Project/Resources/midi.mid");
 
         var tempoMap = midiFile.GetTempoMap();
-        var track = new NoteTrack();
+        var track = new Track<int,Note>();
         var ct = 0;
         foreach (var chunk in midiFile.GetTrackChunks())
         {
             var thisNoteTrack = chunk.GetNotes().MakeNoteTrack(tempoMap);
-            if (ct == 0) //transpose;
-                foreach (var list in thisNoteTrack.ContentIterate())
+          //  if (ct == 1) //transpose;
+                foreach (var list in thisNoteTrack.IterateElements())
                 {
-                    foreach (var note in list.Value)
+                    for (var index = 0; index < list.Events.Count; index++)
                     {
-                        note.NoteNumberTimes512 = (ushort) (note.NoteNumberTimes512 - 512 * 2);
+                        var note = list.Events[index];
+                        note.ActingNoteNumber -= 4;
+                        list.Events[index] = note;
                     }
                 }
 
-            track.AddAll(track.ContentIterate());
-            ct++;
+            track.AddRange(thisNoteTrack);
+            //ct++;
         }
 
         _trackPlayer =
-            new TrackPlayer<PitchedNote>(midiFile.GetNotes().MakeNoteTrack(tempoMap));
+            new TrackPlayer<Note>(track);
         AddChild(_trackPlayer);
         var animation = new Animation();
         animation.AddTrack(Animation.TrackType.Animation);
-        _trackPlayer.action = LaunchAMusicalPot;
+        _trackPlayer.Action = LaunchAMusicalPot;
     }
 
-    private void LaunchAMusicalPot(int tick, PitchedNote note)
+    private void LaunchAMusicalPot(int tick, Note note)
     {
         var obj = (Teapot) _obj.Instance();
         var transform = _launchPoint.Transform;

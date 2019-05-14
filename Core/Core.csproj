@@ -62,14 +62,14 @@
         <Compile Include="Extensions\SpatialEx.cs" />
         <Compile Include="Extensions\StructEx.cs" />
         <Compile Include="Extensions\VectorEx.cs" />
-        <Compile Include="Music\NoteAndPitch.cs" />
+        <Compile Include="Music\Note.cs" />
         <Compile Include="Music\Track.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Test\MidiFileTest.cs" />
         <Compile Include="Test\MidiFileToTrackTest.cs" />
         <Compile Include="Util\InputAction.cs" />
         <Compile Include="Util\DoubleTapDetector.cs" />
-        <Compile Include="Util\MoreMath.cs" />
+        <Compile Include="Util\Mathm.cs" />
     </ItemGroup>
     <ItemGroup>
         <None Include="packages.config" />

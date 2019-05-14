@@ -1,3 +1,4 @@
+using System;
 using Godot;
 
 namespace MusicMachine.Scenes.Global

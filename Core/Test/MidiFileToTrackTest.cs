@@ -28,7 +28,7 @@ public class MidiFileToTrackTest
             //to be replaced with manageTimedEvents
             Console.WriteLine($"Track chunk {trackChunk}");
             var noteTrack = trackChunk.GetNotes().MakeNoteTrack(tempoMap);
-            foreach (var pair in noteTrack.Events())
+            foreach (var pair in noteTrack.IterateEvents())
             {
                 Console.WriteLine(pair);
             }

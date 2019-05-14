@@ -9,6 +9,7 @@
 .idea/**/dictionaries
 .idea/**/shelf
 .idea/**/contentModel.xml
+.idea/**/.name
 
 # Sensitive or high-churn files
 .idea/**/dataSources/

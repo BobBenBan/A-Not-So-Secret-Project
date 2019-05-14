@@ -108,7 +108,6 @@ enable_shadows = true
 
 [node name="LaunchPoint" type="RayCast" parent="."]
 transform = Transform( -4.08909e-008, 0.507458, 0.861676, 2.25625e-008, 0.861676, -0.507458, -1, -1.30883e-009, -4.66842e-008, 43.7712, 3.12911, 7.92468 )
-
 [connection signal="body_exited" from="." to="." method="OnBodyExited"]
 
 [editable path="Floor"]

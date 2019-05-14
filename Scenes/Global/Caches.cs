@@ -15,6 +15,16 @@ public class Caches : Node
 
     private static Caches _instance;
 
+    public static Caches Instance
+    {
+        get
+        {
+            if (_instance == null)
+                throw new InvalidOperationException("No Caches Singleton Instantiated!");
+            return _instance;
+        }
+    }
+
     public override void _EnterTree()
     {
         if (_instance != null)
@@ -31,9 +41,7 @@ public class Caches : Node
 
     public static Shape GetOrCreateShape(Mesh mesh, bool isTrimesh)
     {
-        if (_instance == null)
-            throw new InvalidOperationException("No Caches Singleton Instantiated!");
-        var shapeCache = isTrimesh ? _instance._trimeshShapeCache : _instance._convexShapeCaches;
+        var shapeCache = isTrimesh ? Instance._trimeshShapeCache : Instance._convexShapeCaches;
         if (!shapeCache.TryGetValue(mesh, out var o))
             o = shapeCache[mesh] = mesh.CreateShape(isTrimesh);
         return o;

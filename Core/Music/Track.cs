@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Util;
 
@@ -14,29 +16,64 @@ namespace MusicMachine.Music
 /// </summary>
 /// <remarks>
 /// Do not use this for midi-accurate timing; this is meant as an intermediary between midi-files and actual
-/// playback, where the track time is physics ticks.
+/// playback, where the track time is physics times.
 /// Please do not store the obtained list. It may change.
 /// </remarks>
-[Obsolete]
-public class Track<TEvent>
+public class Track<TTime, TEvent> : IEnumerable<Track<TTime, TEvent>.TrackElement>
+    where TTime : IComparable<TTime>
 {
-    private SortedDictionary<int, List<TEvent>> _track = new SortedDictionary<int, List<TEvent>>();
+    public struct TrackElement
+    {
+        public readonly KeyValuePair<TTime, List<TEvent>> Pair;
+        public TTime Time => Pair.Key;
+        public List<TEvent> Events => Pair.Value;
 
-    public List<TEvent> this[int tick]
+        private TrackElement(KeyValuePair<TTime, List<TEvent>> pair)
+        {
+            Pair = pair;
+        }
+
+        public static implicit operator TrackElement(KeyValuePair<TTime, List<TEvent>> pair) => new TrackElement(pair);
+    }
+
+    public struct TimeEventPair
+    {
+        public readonly KeyValuePair<TTime, TEvent> Pair;
+
+        public TTime Time => Pair.Key;
+
+        public TEvent Event => Pair.Value;
+
+        public TimeEventPair(KeyValuePair<TTime, TEvent> pair)
+        {
+            Pair = pair;
+        }
+
+        public TimeEventPair(TTime time, TEvent @event)
+        {
+            Pair = new KeyValuePair<TTime, TEvent>(time, @event);
+        }
+
+        public static implicit operator TimeEventPair(KeyValuePair<TTime, TEvent> pair) => new TimeEventPair(pair);
+    }
+
+    private SortedDictionary<TTime, List<TEvent>> _track = new SortedDictionary<TTime, List<TEvent>>();
+
+    public List<TEvent> this[TTime time]
     {
         get
         {
-            if (!_track.ContainsKey(tick)) _track.Add(tick, new List<TEvent>());
-            return _track[tick];
+            if (!_track.ContainsKey(time)) _track.Add(time, new List<TEvent>());
+            return _track[time];
         }
     }
 
     /// <summary>
-    /// Optimizes slightly by removing lists from the track that are empty.
+    /// Optimizes slightly by removing lists of events from the track that are empty.
     /// </summary>
-    public void DeleteEmpty()
+    public void RemoveEmpty()
     {
-        var toRemove = new List<int>();
+        var toRemove = new List<TTime>();
         foreach (var pair in _track)
         {
             if (pair.Value.Count == 0) toRemove.Add(pair.Key);
@@ -48,22 +85,22 @@ public class Track<TEvent>
     /// <summary>
     /// Gets the list of events at the current time; null if no events are found.
     /// </summary>
-    /// <param name="tick"></param>
+    /// <param name="time"></param>
     /// <returns></returns>
-    public IList<TEvent> GetOrNull(int tick)
+    public List<TEvent> GetOrNull(TTime time)
     {
-        if (!_track.ContainsKey(tick)) return null;
-        var o = _track[tick];
+        if (!_track.ContainsKey(time)) return null;
+        var o = _track[time];
         if (o.Count != 0) return o;
-        _track.Remove(tick);
+        _track.Remove(time);
         return null;
     }
 
     /// <summary>
     /// Clears all events at the current time.
     /// </summary>
-    /// <param name="tick"></param>
-    public void ClearAt(int tick) => _track.Remove(tick);
+    /// <param name="time"></param>
+    public void RemoveAt(TTime time) => _track.Remove(time);
 
     /// <summary>
     /// Clears the track.
@@ -71,19 +108,18 @@ public class Track<TEvent>
     public void Clear() => _track.Clear();
 
     /// <summary>
-    /// Shifts all events in this track by [ticks] ticks.
-    /// Also removes empty Lists of events.
+    /// Transforms all the time times in this track through the specified function.
     /// </summary>
-    /// <param name="ticks"></param>
-    public void Shift(int ticks)
+    /// <param name="times"></param>
+    public void TransformTimes(Func<TTime, TTime> func)
     {
         if (_track.Count <= 0) return;
-        var newTrack = new SortedDictionary<int, List<TEvent>>();
-        foreach (var el in _track)
+        var newTrack = new SortedDictionary<TTime, List<TEvent>>();
+        foreach (var pair in _track)
         {
-            if (el.Value.Count != 0)
+            if (pair.Value.Count != 0)
             {
-                newTrack.Add(el.Key + ticks, el.Value);
+                newTrack.Add(func(pair.Key), pair.Value);
             }
         }
 
@@ -92,65 +128,87 @@ public class Track<TEvent>
     }
 
     /// <summary>
-    /// Gets an enumerator of pairs of (track time, events at that time).
-    /// Will also iterate through track times with no events, represented by a event list of of null.
-    /// Starts at from, ends at to.
+    /// Transforms all keys in the track through the specified function.
     /// </summary>
-    /// <returns>An enumerator that does the above</returns>
-    public IEnumerable<KeyValuePair<int, List<TEvent>>> Iterate(int from, int to)
+    /// <param name="times"></param>
+    public void TransformEvents(Func<TEvent, TEvent> func)
     {
-        if (to < from) throw new ArgumentException("to < from");
-        var enumerator = _track.GetEnumerator();
-        KeyValuePair<int, List<TEvent>> cur;
-        do
+        if (_track.Count <= 0) return;
+        var newTrack = new SortedDictionary<TTime, List<TEvent>>();
+        foreach (var pair in _track)
         {
-            cur = !enumerator.MoveNext() ? new KeyValuePair<int, List<TEvent>>(int.MaxValue, null) : enumerator.Current;
-        } while (cur.Key < from);
-
-        //cur.Key >= from;
-        for (var i = from; i < to; i++)
-        {
-            if (i < cur.Key) yield return new KeyValuePair<int, List<TEvent>>(i, null);
-            else
-            {
-                yield return cur;
-                cur = !enumerator.MoveNext()
-                    ? new KeyValuePair<int, List<TEvent>>(int.MaxValue, null)
-                    : enumerator.Current;
-            }
+            if (pair.Value.Count == 0) continue;
+            for (var i = 0; i < pair.Value.Count; i++)
+                pair.Value[i] = func(pair.Value[i]);
+            newTrack.Add(pair.Key, pair.Value);
         }
 
-        enumerator.Dispose();
+        _track = newTrack;
     }
 
     /// <summary>
     /// Gets an enumerator of pairs of (track time, events at that time).
     /// Will also iterate through track times with no events, represented by a event list of of null.
-    /// Starts at from, ends at to.
+    /// Will continue to iterate even if the track has ended,
     /// </summary>
     /// <returns>An enumerator that does the above</returns>
-    public IEnumerable<KeyValuePair<int, List<TEvent>>> Iterate(int from)
+    public IEnumerable<List<TrackElement>> IterateTrack(TTime start, TTime end, Func<TTime, TTime> step)
     {
+        if (start == null) throw new ArgumentNullException(nameof(start));
+        if (end == null) throw new ArgumentNullException(nameof(end));
+        if (step == null) throw new ArgumentNullException(nameof(step));
+        if (end.CompareTo(start) < 0) throw new ArgumentException("to < from");
+
         using (var enumerator = _track.GetEnumerator())
         {
+            TrackElement? curEnum;
             do
-                if (!enumerator.MoveNext())
-                    yield break;
-            while (enumerator.Current.Key < from);
-
-            //cur.Key >= from;
-            for (var i = from;; i++)
             {
-                if (i < enumerator.Current.Key) yield return new KeyValuePair<int, List<TEvent>>(i, null);
-                else
+                curEnum = enumerator.MoveNext() ? enumerator.Current : (KeyValuePair<TTime, List<TEvent>>?) null;
+            } while (curEnum?.Time.CompareTo(start) < 0); //find first >= start;
+
+            for (var curTime = start; curTime.CompareTo(end) < 0;)
+            {
+                if (curEnum?.Time.CompareTo(curTime) <= 0) //cur <= time;
                 {
-                    yield return enumerator.Current;
-                    if (!enumerator.MoveNext()) break;
+                    //add until cur > from; which means inclusive;
+                    var o = new List<TrackElement>();
+                    do
+                    {
+                        if (curEnum?.Events.Count != 0)
+                            o.Add(curEnum.Value);
+                        curEnum = enumerator.MoveNext()
+                            ? enumerator.Current
+                            : (KeyValuePair<TTime, List<TEvent>>?) null;
+                    } while (curEnum?.Time.CompareTo(curTime) <= 0);
+
+                    yield return o.Count != 0 ? o : null;
                 }
+                else yield return null;
+
+                var newTime = step(curTime);
+                if (!(newTime.CompareTo(curTime) > 0))
+                    throw new OverflowException($"The stepped time {newTime} is not >= the past time {curTime}!");
+                curTime = newTime;
             }
         }
     }
 
+
+    /// <summary>
+    /// Gets an enumerator of pairs of (track time, events at that time).
+    /// Will also iterate through track times with no events, represented by a event list of of null.
+    /// Enumeration will end when there is nothing left in the track.
+    /// Starts at from, ends at to.
+    /// </summary>
+    /// <returns>An enumerator that does the above</returns>
+    public IEnumerable<List<TrackElement>> IterateTrack(TTime start, Func<TTime, TTime> step)
+    {
+        if (start == null) throw new ArgumentNullException(nameof(start));
+        if (step == null) throw new ArgumentNullException(nameof(step));
+        RemoveEmpty();
+        return TrackIterator(start, step);
+    }
 
     /// <summary>
     /// Gets an enumerator for pairs of track time to events of that time.
@@ -158,88 +216,124 @@ public class Track<TEvent>
     /// Starts at the lowest track time and ends with the highest.
     /// </summary>
     /// <returns>An enumerator that does the above</returns>
-    public IEnumerable<KeyValuePair<int, List<TEvent>>> Iterate()
+    public IEnumerable<List<TrackElement>> IterateTrack(Func<TTime, TTime> step)
+    {
+        RemoveEmpty();
+        if (_track.Count == 0) return new List<TrackElement>[0];
+        return TrackIterator(_track.First().Key, step);
+    }
+
+    private IEnumerable<List<TrackElement>> TrackIterator(TTime start, Func<TTime, TTime> step)
     {
         using (var enumerator = _track.GetEnumerator())
         {
-            if (!enumerator.MoveNext()) yield break;
-            var i = enumerator.Current.Key;
-            while (true)
+            TrackElement curEnum;
+            do
             {
-                if (i < enumerator.Current.Key) yield return new KeyValuePair<int, List<TEvent>>(i, null);
-                else
-                {
-                    yield return enumerator.Current;
-                    if (!enumerator.MoveNext()) break;
-                }
+                if (enumerator.MoveNext())
+                    curEnum = enumerator.Current;
+                else yield break;
+            } while (curEnum.Time.CompareTo(start) < 0); //find first >= start, if exists.
 
-                i++;
+            void TryStep(ref TTime curTime)
+            {
+            }
+
+            for (var curTime = start;;)
+            {
+                if (curEnum.Time.CompareTo(curTime) <= 0) //cur <= time;
+                {
+                    //add until cur > from; which means inclusive;
+                    var o = new List<TrackElement>();
+                    do
+                    {
+                        o.Add(curEnum);
+                        if (enumerator.MoveNext())
+                            curEnum = enumerator.Current;
+                        else
+                        {
+                            yield return o;
+                            yield break;
+                        }
+                    } while (curEnum.Time.CompareTo(curTime) <= 0);
+
+                    yield return o.Count != 0 ? o : null;
+                }
+                else yield return null;
+
+                var newTime = step(curTime);
+                if (!(newTime.CompareTo(curTime) > 0))
+                    throw new OverflowException($"The stepped time {newTime} is not >= the past time {curTime}!");
+                curTime = newTime;
             }
         }
     }
 
     /// <summary>
-    /// Gets an enumerator that returns KeyValuePairs of track time to a list of events at that time,
+    /// Gets an enumerator that returns KeyValuePairs of (track time) to (a list of events) at that time,
     /// only returning track times that have an event.
     /// </summary>
     /// <returns>The above enumeartor</returns>
-    public IEnumerable<KeyValuePair<int, List<TEvent>>> ContentIterate()
+    public IEnumerable<TrackElement> IterateElements()
     {
-        var enumerator = _track.GetEnumerator();
-        while (enumerator.MoveNext())
-            if (enumerator.Current.Value.Count != 0)
-                yield return enumerator.Current;
-
-        enumerator.Dispose();
+        using (var enumerator = _track.GetEnumerator())
+        {
+            while (enumerator.MoveNext())
+                if (enumerator.Current.Value.Count != 0)
+                    yield return enumerator.Current;
+        }
     }
 
     /// <summary>
     /// Gets an enumerator that returns KeyValuePairs of track time to Events, for every single event.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<KeyValuePair<int, TEvent>> Events()
+    public IEnumerable<TimeEventPair> IterateEvents()
     {
         foreach (var pair in _track)
         foreach (var @event in pair.Value)
-            yield return new KeyValuePair<int, TEvent>(pair.Key, @event);
+            yield return new TimeEventPair(pair.Key, @event);
     }
 
-    public void AddAll(IEnumerable<KeyValuePair<int, TEvent>> events)
+    IEnumerator<TrackElement> IEnumerable<TrackElement>.GetEnumerator() => IterateElements().GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => IterateElements().GetEnumerator();
+
+    /// <summary>
+    /// Adds a range of events, using TimeEventPair's
+    /// </summary>
+    /// <param name="events"></param>
+    public void AddRange(IEnumerable<TimeEventPair> events)
     {
         foreach (var pair in events)
-        {
-            this[pair.Key].Add(pair.Value);
-        }
+            this[pair.Time].Add(pair.Event);
     }
 
-    public void AddAll(IEnumerable<KeyValuePair<int, List<TEvent>>> events)
+    /// <summary>
+    /// Adds a range of events, using TrackElements.
+    /// </summary>
+    /// <param name="events"></param>
+    public void AddRange(IEnumerable<TrackElement> events)
     {
-        foreach (var pair in events)
-        {
-            foreach (var @event in pair.Value)
-            {
-                this[pair.Key].Add(@event);
-            }
-        }
+        foreach (var element in events)
+            this[element.Time].AddRange(element.Events);
     }
-}
-
-public class NoteTrack : Track<PitchedNote>
-{
 }
 
 public static class TrackBuildersEx
 {
+    [Obsolete]
     [Pure]
-    public static NoteTrack MakeNoteTrack(this IEnumerable<Note> notes, TempoMap tempoMap, int ticksPerSecond = 60)
+    public static Track<int, Note> MakeNoteTrack(this IEnumerable<Melanchall.DryWetMidi.Smf.Interaction.Note> notes,
+        TempoMap tempoMap, int timesPerSecond = 60)
     {
-        var track = new NoteTrack();
-        var microsecondsPerTick = 1e6 / ticksPerSecond;
+        var track = new Track<int, Note>();
+        var microsecondsPerTime = 1e6 / timesPerSecond;
         foreach (var note in notes)
         {
-            var tick = (note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / microsecondsPerTick).RoundToInt();
-            track[tick].Add(new PitchedNote(note.NoteNumber, note.Velocity,
-                (ushort) (note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / microsecondsPerTick)
+            var time = (note.TimeAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / microsecondsPerTime).RoundToInt();
+            track[time].Add(new Note(note.NoteNumber, note.Velocity,
+                (ushort) (note.LengthAs<MetricTimeSpan>(tempoMap).TotalMicroseconds / microsecondsPerTime)
                 .RoundToInt()));
         }
 
