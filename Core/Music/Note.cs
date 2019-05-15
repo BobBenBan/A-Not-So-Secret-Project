@@ -1,7 +1,7 @@
 using System;
 using Godot;
 using Melanchall.DryWetMidi.Common;
-using MusicMachine.Util;
+using MusicMachine.Programs;
 
 namespace MusicMachine.Music
 {
@@ -14,15 +14,12 @@ namespace MusicMachine.Music
 ///
 /// Set length to 0 to indicate no length (percussive note).
 /// </summary>
-//TODO: REFACTOR THE ush**t out of this
-//                  (ushort)
-public struct Note
+public class Note
 {
     private const int SevenBitMask = 0xFF;
     private const int MaxFourteenBitNumber = 0x3FFF;
     public const int A4Number = 69;
 
-    private short _pitchBendValue;
     public SevenBitNumber NoteNumber;
     public SevenBitNumber Velocity;
     public long Length;
@@ -30,33 +27,26 @@ public struct Note
     /// <summary>
     /// The MSB of the 14 bit pitch bend value.
     /// </summary>
-    public SevenBitNumber PitchBendCoarse
-    {
-        get => (SevenBitNumber) (_pitchBendValue >> 7);
-        set => _pitchBendValue = (short) (_pitchBendValue & SevenBitMask + value << 7);
-    }
+    public SevenBitNumber PitchBendCoarse { get; set; }
 
     /// <summary>
     /// The LSB of the 14 bit pitch bend value.
     /// </summary>
-    public SevenBitNumber PitchBendFine
-    {
-        get => (SevenBitNumber) (_pitchBendValue & SevenBitMask);
-        set => _pitchBendValue = (short) (_pitchBendValue & ~SevenBitMask + value);
-    }
+    public SevenBitNumber PitchBendFine { get; set; }
 
     /// <summary>
     /// The pitch bend value, as an 14 bit number.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">on set, if the supplied number does not fit in a 14 bit number</exception>
-    public short PitchBendValue
+    public ushort PitchBendValue
     {
-        get => _pitchBendValue;
+        get => DataTypesUtilities.Combine(PitchBendCoarse, PitchBendFine);
         set
         {
-            if (value < 0 || value > MaxFourteenBitNumber + 1) throw new ArgumentOutOfRangeException(nameof(value));
+            if (value > MaxFourteenBitNumber + 1) throw new ArgumentOutOfRangeException(nameof(value));
             if (value == MaxFourteenBitNumber + 1) value = MaxFourteenBitNumber; //corner case!
-            _pitchBendValue = value;
+            PitchBendCoarse = value.GetHead();
+            PitchBendFine = value.GetTail();
         }
     }
 
@@ -66,7 +56,7 @@ public struct Note
     public float PitchBendSemitones
     {
         get => (PitchBendValue - 8192) / 4096F;
-        set => PitchBendValue = (short) (int) Math.Round(value * 4096F + 8192);
+        set => PitchBendValue = (ushort) Math.Round(value * 4096F + 8192);
     }
 
     /// <summary>
@@ -105,9 +95,29 @@ public struct Note
         NoteNumber = (SevenBitNumber) noteNumber;
         Velocity = (SevenBitNumber) velocity;
         Length = length;
-        _pitchBendValue = 0;
         PitchBendCoarse = (SevenBitNumber) pitchBendCoarse;
         PitchBendFine = (SevenBitNumber) pitchBendFine;
+    }
+
+    /// <summary>
+    /// Create a note based on midi 7-bit values, and 14-bit value for pitch bend.
+    /// </summary>
+    /// <param name="noteNumber">the note number</param>
+    /// <param name="pitchBend">the value of the pitch bend</param>
+    /// <param name="velocity">the velocity</param>
+    /// <param name="length">the length (64-bit!)</param>
+    public Note(byte noteNumber = 0, ushort pitchBend = 64 * 128,
+        byte velocity = 0, long length = 0)
+    {
+        NoteNumber = (SevenBitNumber) noteNumber;
+        Velocity = (SevenBitNumber) velocity;
+        Length = length;
+        PitchBendValue = pitchBend;
+    }
+
+    public Note(Melanchall.DryWetMidi.Smf.Interaction.Note note, ushort pitchBend)
+        : this(note.NoteNumber, pitchBend, note.Velocity, note.Length)
+    {
     }
 
     /// <summary>
@@ -121,7 +131,6 @@ public struct Note
         Velocity = (SevenBitNumber) velocity;
         Length = length;
         NoteNumber = (SevenBitNumber) 0;
-        _pitchBendValue = 0;
         ActingNoteNumber = actingNoteNumber;
     }
 

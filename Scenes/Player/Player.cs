@@ -161,9 +161,16 @@ public class Player : KinematicBody
     private void ProcessActions(float delta)
     {
         if (Inputs.PlayerPrimaryAction.JustPressed())
+        {
+            InFocus = true;
             Primary?.Invoke(delta);
+        }
+
         if (Inputs.PlayerSecondaryInputAction.JustPressed())
+        {
+            InFocus = true;
             Secondary?.Invoke(delta);
+        }
     }
 
     public override void _Ready()

@@ -1,7 +1,7 @@
 using System.Diagnostics.Contracts;
 using Godot;
 
-namespace MusicMachine.Util
+namespace MusicMachine
 {
 public struct InputAction
 {

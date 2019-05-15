@@ -24,7 +24,7 @@ public class StateMalformedException : Exception
 public class ShouldNotHappenException : Exception
 {
     private const string DefaultMessage =
-        "This exception should never have been thrown! Go yell at the developers now!";
+        "This exception should never have been thrown! Go yell at the developers!";
 
     public ShouldNotHappenException() : this(DefaultMessage)
     {

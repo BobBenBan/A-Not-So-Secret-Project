@@ -3,7 +3,7 @@ using Godot;
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
-namespace MusicMachine.Scenes.Music
+namespace MusicMachine.Scenes
 {
 public class MultipleAudioStreamPlayer : Node
 {

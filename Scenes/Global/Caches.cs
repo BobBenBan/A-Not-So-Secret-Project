@@ -2,7 +2,7 @@ using System;
 using Godot;
 using Godot.Collections;
 
-namespace MusicMachine.Scenes.Global
+namespace MusicMachine.Scenes
 {
 public class Caches : Node
 {

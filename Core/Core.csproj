@@ -1,92 +1,96 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3A1AB7DC-A9FD-44C4-B802-7AC6E6DDAC73}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MusicMachine</RootNamespace>
+    <AssemblyName>Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GodotSharp, Version=1.0.7055.41579, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\.mono\assemblies\GodotSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Melanchall.DryWetMidi, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Melanchall.DryWetMidi.4.1.0\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GodotSharpEditor" Condition=" '$(Configuration)' == 'Tools' ">
+      <HintPath>$(ProjectDir)/../.mono/assemblies/GodotSharpEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Delegates.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="Music\Channel.cs" />
+    <Compile Include="Music\Note.cs" />
+    <Compile Include="Programs\Song.cs" />
+    <Compile Include="Programs\Track.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\Global.cs" />
+    <Compile Include="Scenes\ProgramPlayer.cs" />
+    <Compile Include="Scenes\Threads.cs" />
+    <Compile Include="Test\MidiFileTest.cs" />
+    <Compile Include="Test\MidiFileToTrackTest.cs" />
+    <Compile Include="Test\PseudoScratch.cs" />
+    <Compile Include="Test\TestException.cs" />
+    <Compile Include="Test\TrackTest.cs" />
+    <Compile Include="Util\Extentions.cs" />
+    <Compile Include="Util\InputAction.cs" />
+    <Compile Include="Util\DoubleTapDetector.cs" />
+    <Compile Include="Util\Mathm.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{3A1AB7DC-A9FD-44C4-B802-7AC6E6DDAC73}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>MusicMachine</RootNamespace>
-        <AssemblyName>Core</AssemblyName>
-        <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <LangVersion>latest</LangVersion>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="GodotSharp, Version=1.0.7055.41579, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\.mono\assemblies\GodotSharp.dll</HintPath>
-        </Reference>
-        <Reference Include="Melanchall.DryWetMidi, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\packages\Melanchall.DryWetMidi.4.1.0\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
-            <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
-            <Private>True</Private>
-        </Reference>
-        <Reference Include="GodotSharpEditor" Condition=" '$(Configuration)' == 'Tools' ">
-            <HintPath>$(ProjectDir)/../.mono/assemblies/GodotSharpEditor.dll</HintPath>
-            <Private>False</Private>
-        </Reference>
-        <Reference Include="System" />
-        <Reference Include="System.Windows.Forms" />
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="Delegates.cs" />
-        <Compile Include="Exceptions.cs" />
-        <Compile Include="Extensions\MeshEx.cs" />
-        <Compile Include="Extensions\NodeEx.cs" />
-        <Compile Include="Extensions\ObjectEx.cs" />
-        <Compile Include="Extensions\SpatialEx.cs" />
-        <Compile Include="Extensions\StructEx.cs" />
-        <Compile Include="Extensions\VectorEx.cs" />
-        <Compile Include="Music\Note.cs" />
-        <Compile Include="Music\Track.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Test\MidiFileTest.cs" />
-        <Compile Include="Test\MidiFileToTrackTest.cs" />
-        <Compile Include="Util\InputAction.cs" />
-        <Compile Include="Util\DoubleTapDetector.cs" />
-        <Compile Include="Util\Mathm.cs" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="packages.config" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-        <PropertyGroup>
-            <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
-        </PropertyGroup>
-        <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
-    </Target>
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
     </Target>
     <Target Name="AfterBuild">
     </Target>
     -->
-
 </Project>

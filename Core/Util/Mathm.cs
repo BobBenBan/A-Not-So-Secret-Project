@@ -1,6 +1,6 @@
 using System;
 
-namespace MusicMachine.Util
+namespace MusicMachine
 {
 public static class Mathm
 {
@@ -15,6 +15,7 @@ public static class Mathm
     public static int RoundToInt(this double d) => (int) Math.Round(d);
 
     public static int RoundToInt(this float d) => (int) Math.Round(d);
+    public static long RoundToLong(this double d) => (long) Math.Round(d);
 
 }
 }

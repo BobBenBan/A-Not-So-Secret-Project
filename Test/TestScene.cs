@@ -2,8 +2,9 @@ using Godot;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Music;
+using MusicMachine.Programs;
 using MusicMachine.Scenes;
-using MusicMachine.Scenes.Music;
+using static MusicMachine.Scenes.SimpleTrackPlayer<MusicMachine.Music.Note>;
 using Note = MusicMachine.Music.Note;
 
 namespace MusicMachine.Test
@@ -15,7 +16,7 @@ public class TestScene : Area
     private Node _objects;
 
     private RayCast _launchPoint;
-    private TrackPlayer<Note> _trackPlayer;
+    private SimpleTrackPlayer<Note> _simpleTrackPlayer;
 
     private readonly PackedScene _obj =
         ResourceLoader.Load<PackedScene>("res://Scenes/Objects/Teapot.tscn");
@@ -31,43 +32,46 @@ public class TestScene : Area
 //        var midiFile = MidiFileTest.GetMidiFile();
         var midiFile = MidiFile.Read(ProjectSettings.GlobalizePath("res://Resources/midi.mid"));
         var tempoMap = midiFile.GetTempoMap();
-        var track = new Track<int,Note>();
+        var track = new Track<Note>();
         var ct = 0;
         foreach (var chunk in midiFile.GetTrackChunks())
         {
             var thisNoteTrack = chunk.GetNotes().MakeNoteTrack(tempoMap);
-          //  if (ct == 1) //transpose;
-                foreach (var list in thisNoteTrack.IterateElements())
-                {
-                    for (var index = 0; index < list.Events.Count; index++)
-                    {
-                        var note = list.Events[index];
-                        note.ActingNoteNumber -= 4;
-                        list.Events[index] = note;
-                    }
-                }
+//          //  if (ct == 1) //transpose;
+//                foreach (var list in thisNoteTrack.IterateElements())
+//                {
+//                    for (var index = 0; index < list.Events.Count; index++)
+//                    {
+//                        var note = list.Events[index];
+//                        note.ActingNoteNumber -= 4;
+//                        list.Events[index] = note;
+//                    }
+//                }
 
             track.AddRange(thisNoteTrack);
             //ct++;
         }
 
-        _trackPlayer =
-            new TrackPlayer<Note>(track);
-        AddChild(_trackPlayer);
+        _simpleTrackPlayer = new SimpleTrackPlayer<Note>(track);
+        AddChild(_simpleTrackPlayer);
         var animation = new Animation();
         animation.AddTrack(Animation.TrackType.Animation);
-        _trackPlayer.Action = LaunchAMusicalPot;
+        _simpleTrackPlayer.Connect(nameof(EventAction), this, nameof(LaunchAMusicalPot));
     }
 
-    private void LaunchAMusicalPot(int tick, Note note)
+    private void LaunchAMusicalPot(object element)
     {
-        var obj = (Teapot) _obj.Instance();
-        var transform = _launchPoint.Transform;
-        transform.origin += new Vector3(0, 0, note.Pitch / 70);
-        obj.SimpleLaunchFrom(transform, 1, 10);
-        _objects.AddChild(obj, true);
-        obj.Pitch = note.Pitch / 440 * 1.2f;
-        obj.ConstantVol = -20;
+        GD.Print(element ?? "null");
+//        foreach (var note in element.Events)
+//        {
+//            var obj = (Teapot) _obj.Instance();
+//            var transform = _launchPoint.Transform;
+//            transform.origin += new Vector3(0, 0, note.Pitch / 70);
+//            obj.SimpleLaunchFrom(transform, 1, 10);
+//            _objects.AddChild(obj, true);
+//            obj.Pitch = note.Pitch / 440 * 1.2f;
+//            obj.ConstantVol = -20;
+//        }
     }
 
     public void OnAction(float delta)
@@ -79,8 +83,8 @@ public class TestScene : Area
 
     private void OnSecondary(float delta)
     {
-        if (!_trackPlayer.Playing) _trackPlayer.Play();
-        else _trackPlayer.Pause();
+        if (!_simpleTrackPlayer.IsPlaying) _simpleTrackPlayer.Play();
+        else _simpleTrackPlayer.Pause();
     }
 
     private void OnBodyExited(Node body)

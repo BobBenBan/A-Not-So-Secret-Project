@@ -1,4 +1,4 @@
-namespace MusicMachine.Util
+namespace MusicMachine
 {
 public class DoubleTapDetector
 {
