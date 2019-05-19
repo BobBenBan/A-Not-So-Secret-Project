@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -8,25 +7,13 @@ namespace MusicMachine.Test
 {
 public class PseudoScratch
 {
-    enum E
-    {
-        Bleh,
-        ksadjf,
-        KHDKJSDF,
-        IJDFISDKJF,
-        HelpUs
-    }
-
     [Test]
     public static void EnumName()
     {
         var random = new Randomizer(123);
         for (var i = 0; i < 20; i++)
-        {
             Console.WriteLine(random.NextEnum<E>().ToString());
-        }
     }
-
     private static IEnumerable<string> ForeverEnumerator()
     {
         try
@@ -40,7 +27,6 @@ public class PseudoScratch
             throw new TestException();
         }
     }
-
     [Test]
     public static void EnumFinallyTest()
     {
@@ -58,10 +44,18 @@ public class PseudoScratch
                 enumerator.Dispose();
             });
     }
-
     public static void Random()
     {
         var a = new SortedSet<int>();
+    }
+
+    private enum E
+    {
+        Bleh,
+        Ksadjf,
+        Khdkjsdf,
+        Ijdfisdkjf,
+        HelpUs
     }
 }
 }

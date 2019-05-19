@@ -8,9 +8,9 @@ public class AnimationTest
     public static void WillDeletingMiddleTrackShiftTracks()
     {
         var animation = new Animation();
-        var t1 = animation.AddTrack(Animation.TrackType.Animation);
-        var t2 = animation.AddTrack(Animation.TrackType.Value);
-        var t3 = animation.AddTrack(Animation.TrackType.Audio);
+        var t1        = animation.AddTrack(Animation.TrackType.Animation);
+        var t2        = animation.AddTrack(Animation.TrackType.Value);
+        var t3        = animation.AddTrack(Animation.TrackType.Audio);
         Assert.That(animation.TrackGetType(t1) == Animation.TrackType.Animation);
         Assert.That(animation.TrackGetType(t2) == Animation.TrackType.Value);
         Assert.That(animation.TrackGetType(t3) == Animation.TrackType.Audio);
@@ -20,13 +20,12 @@ public class AnimationTest
         Assert.That(animation.TrackGetType(t2) == Animation.TrackType.Value);
         Assert.That(animation.TrackGetType(t3) == Animation.TrackType.Audio);
     }
-
     public static void WhereDoesItInsert()
     {
         var animation = new Animation();
-        var t1 = animation.AddTrack(Animation.TrackType.Animation);
-        var t2 = animation.AddTrack(Animation.TrackType.Value);
-        var t3 = animation.AddTrack(Animation.TrackType.Audio, 0);
+        var t1        = animation.AddTrack(Animation.TrackType.Animation);
+        var t2        = animation.AddTrack(Animation.TrackType.Value);
+        var t3        = animation.AddTrack(Animation.TrackType.Audio, 0);
         animation.TrackGetType(1);
     }
 }

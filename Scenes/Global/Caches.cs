@@ -6,14 +6,14 @@ namespace MusicMachine.Scenes
 {
 public class Caches : Node
 {
+    private static Caches _instance;
+
     //Singleton, not Static: unique to each game instance.
     private readonly Dictionary<Mesh, Shape> _convexShapeCaches =
         new Dictionary<Mesh, Shape>();
 
     private readonly Dictionary<Mesh, Shape> _trimeshShapeCache =
         new Dictionary<Mesh, Shape>();
-
-    private static Caches _instance;
 
     public static Caches Instance
     {
@@ -24,21 +24,18 @@ public class Caches : Node
             return _instance;
         }
     }
-
     public override void _EnterTree()
     {
         if (_instance != null)
             throw new InvalidOperationException("Caches Singleton Created Twice!");
         _instance = this;
     }
-
     public override void _ExitTree()
     {
         _convexShapeCaches.Clear();
         _trimeshShapeCache.Clear();
         _instance = null;
     }
-
     public static Shape GetOrCreateShape(Mesh mesh, bool isTrimesh)
     {
         var shapeCache = isTrimesh ? Instance._trimeshShapeCache : Instance._convexShapeCaches;

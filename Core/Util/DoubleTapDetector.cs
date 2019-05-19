@@ -2,10 +2,12 @@ namespace MusicMachine
 {
 public class DoubleTapDetector
 {
-    private float _timeSinceLastPress;
     private readonly InputAction _inputAction;
-    public DoubleTapDetector(InputAction inputAction) => _inputAction = inputAction;
-
+    private float _timeSinceLastPress;
+    public DoubleTapDetector(InputAction inputAction)
+    {
+        _inputAction = inputAction;
+    }
     public bool DoubleTapped(float tapTime, float delta)
     {
         if (_inputAction.JustPressed())

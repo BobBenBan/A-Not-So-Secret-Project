@@ -10,9 +10,7 @@ public static class Inputs
     public static readonly InputAction PlayerSlow = "player_slow";
     public static readonly InputAction PlayerRun = "player_run";
     public static readonly InputAction PlayerCancelCursor = "player_cancel_cursor";
-
     public static readonly DoubleTapDetector PlayerDoubleJump = new DoubleTapDetector(PlayerJump);
-
     public static readonly InputAction PlayerPrimaryAction = "action_main";
     public static readonly InputAction PlayerSecondaryInputAction = "action_secondary";
 }

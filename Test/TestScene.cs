@@ -1,7 +1,6 @@
 using Godot;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Music;
 using MusicMachine.Programs;
 using MusicMachine.Scenes;
 using static MusicMachine.Scenes.SimpleTrackPlayer<MusicMachine.Music.Note>;
@@ -11,16 +10,13 @@ namespace MusicMachine.Test
 {
 public class TestScene : Area
 {
-    private Player _player;
-
-    private Node _objects;
-
-    private RayCast _launchPoint;
-    private SimpleTrackPlayer<Note> _simpleTrackPlayer;
-
     private readonly PackedScene _obj =
         ResourceLoader.Load<PackedScene>("res://Scenes/Objects/Teapot.tscn");
 
+    private RayCast _launchPoint;
+    private Node _objects;
+    private Player _player;
+    private SimpleTrackPlayer<Note> _simpleTrackPlayer;
     public override void _Ready()
     {
         _player = GetNode<Player>("Player");
@@ -32,8 +28,8 @@ public class TestScene : Area
 //        var midiFile = MidiFileTest.GetMidiFile();
         var midiFile = MidiFile.Read(ProjectSettings.GlobalizePath("res://Resources/midi.mid"));
         var tempoMap = midiFile.GetTempoMap();
-        var track = new Track<Note>();
-        var ct = 0;
+        var track    = new Track<Note>();
+        var ct       = 0;
         foreach (var chunk in midiFile.GetTrackChunks())
         {
             var thisNoteTrack = chunk.GetNotes().MakeNoteTrack(tempoMap);
@@ -58,7 +54,6 @@ public class TestScene : Area
         animation.AddTrack(Animation.TrackType.Animation);
         _simpleTrackPlayer.Connect(nameof(EventAction), this, nameof(LaunchAMusicalPot));
     }
-
     private void LaunchAMusicalPot(object element)
     {
         GD.Print(element ?? "null");
@@ -73,20 +68,19 @@ public class TestScene : Area
 //            obj.ConstantVol = -20;
 //        }
     }
-
     public void OnAction(float delta)
     {
         var obj = (WorldObject) _obj.Instance();
         obj.SimpleLaunchFrom(_player.CameraLocation, 1, 10);
         _objects.AddChild(obj, true);
     }
-
     private void OnSecondary(float delta)
     {
-        if (!_simpleTrackPlayer.IsPlaying) _simpleTrackPlayer.Play();
-        else _simpleTrackPlayer.Pause();
+        if (!_simpleTrackPlayer.IsPlaying)
+            _simpleTrackPlayer.Play();
+        else
+            _simpleTrackPlayer.Pause();
     }
-
     private void OnBodyExited(Node body)
     {
         if (!body.TryCall("OnWorldExit"))

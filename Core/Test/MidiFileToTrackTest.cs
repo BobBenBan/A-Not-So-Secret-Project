@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Music;
 using MusicMachine.Programs;
 using NUnit.Framework;
 
@@ -16,7 +15,6 @@ public class MidiFileToTrackTest
     {
         MidiFileTest.MakeMidiFile();
     }
-
     [Test]
     public static void MidiFileToTrack()
     {
@@ -30,9 +28,7 @@ public class MidiFileToTrackTest
             Console.WriteLine($"Track chunk {trackChunk}");
             var noteTrack = trackChunk.GetNotes().MakeNoteTrack(tempoMap);
             foreach (var @event in noteTrack.Events)
-            {
                 Console.WriteLine(@event);
-            }
         }
 
         stopwatch.Stop();

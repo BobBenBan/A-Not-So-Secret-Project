@@ -5,9 +5,8 @@ namespace MusicMachine.Scenes
 public class Teapot : WorldObject
 {
     private MultipleAudioStreamPlayer _streamPlayer;
-    public float Pitch = 1;
     public float ConstantVol = float.NaN;
-
+    public float Pitch = 1;
     public override void _Ready()
     {
         base._Ready();
@@ -25,24 +24,21 @@ public class Teapot : WorldObject
 //        Connect("body_shape_exited", this, nameof(OnBodyExited));
     }
 
-
 //    private void OnBodyExited(int bodyId, Node node, int bodyShape,
 //        int localShape)
 //    {
 //        Print("EXITED: BodyID: ", bodyId, ", Node: ", node, ", bodyShape: ", bodyShape,
 //            ", localShape: ", localShape);
 //    }
-
     private void OnBodyEntered(Node node)
     {
 //        Print("ENTERED: BodyID: ", bodyId, ", Node: ", node, ", bodyShape: ", bodyShape,
 //            ", localShape: ", localShape);
-        var impactVel = node is RigidBody body
-            ? LinearVelocity.DistanceSquaredTo(body.LinearVelocity)
-            : LinearVelocity.LengthSquared();
+        var impactVel = node is RigidBody body ?
+            LinearVelocity.DistanceSquaredTo(body.LinearVelocity) :
+            LinearVelocity.LengthSquared();
         OnCollision(impactVel);
     }
-
     private void OnCollision(float approxForce)
     {
         if (float.IsNaN(ConstantVol))
@@ -50,8 +46,7 @@ public class Teapot : WorldObject
             approxForce = Mathf.Clamp(approxForce, 0, 22);
 //        Print(_pitch);
             _streamPlayer.PlayInstance(-60 + approxForce, Pitch);
-        }
-        else
+        } else
             _streamPlayer.PlayInstance(ConstantVol, Pitch);
     }
 }

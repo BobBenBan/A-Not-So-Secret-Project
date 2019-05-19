@@ -9,7 +9,7 @@ public class SignalEmitter : Node
 
     public void Emit(Object anobj)
     {
-        EmitSignal(nameof(ASignal), new object[]{anobj});
+        EmitSignal(nameof(ASignal), anobj);
     }
 }
 }

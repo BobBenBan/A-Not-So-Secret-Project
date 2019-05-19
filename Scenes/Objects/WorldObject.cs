@@ -4,26 +4,22 @@ namespace MusicMachine.Scenes
 {
 public class WorldObject : RigidBody
 {
-    [Export] public bool IsTrimesh { get; private set; }
-
-    [Export(PropertyHint.Range, "0,300")] public float LifeTime { get; private set; } = 0;
-
     protected MeshInstance MeshInstance;
-
+    [Export] public bool IsTrimesh { get; private set; }
+    [Export(PropertyHint.Range, "0,300")] public float LifeTime { get; private set; } = 0;
     public override void _Ready()
     {
         TryCreateMesh();
     }
-
     private void TryCreateMesh()
     {
         var colShape = GetNode<CollisionShape>("CollisionShape");
-        if (colShape.Shape != null) return;
+        if (colShape.Shape != null)
+            return;
         MeshInstance = GetNode<MeshInstance>("MeshInstance");
         if (MeshInstance.Mesh == null)
         {
-            GD.PushWarning(
-                $"WorldObject ({Name}) instantiated with no mesh, deleting self");
+            GD.PushWarning($"WorldObject ({Name}) instantiated with no mesh, deleting self");
             QueueFree();
             return;
         }
@@ -38,41 +34,55 @@ public class WorldObject : RigidBody
         if (LifeTime > 0)
             this.CreateAndConnectTimer(nameof(FreeSelf)).Start(LifeTime);
     }
-
     public override void _PhysicsProcess(float delta)
     {
     }
-
-    public void LaunchFrom(Spatial spatial, Vector3 translation,
-        Vector3 rotation, Vector3 velocity, Vector3 angularVelocity)
+    public void LaunchFrom(
+        Spatial spatial,
+        Vector3 translation,
+        Vector3 rotation,
+        Vector3 velocity,
+        Vector3 angularVelocity)
     {
-        LaunchFrom(spatial.GetGlobalTransform(), translation, rotation,
-            velocity, angularVelocity);
+        LaunchFrom(
+            spatial.GetGlobalTransform(),
+            translation,
+            rotation,
+            velocity,
+            angularVelocity);
     }
-
-    public void LaunchFrom(Transform transform, Vector3 translation,
-        Vector3 rotation, Vector3 velocity, Vector3 angularVelocity)
+    public void LaunchFrom(
+        Transform transform,
+        Vector3 translation,
+        Vector3 rotation,
+        Vector3 velocity,
+        Vector3 angularVelocity)
     {
         transform = transform.Orthonormalized();
         transform.origin = transform.Xform(translation);
-        this.Transform = transform; //copy rotation too!
+        Transform = transform; //copy rotation too!
         this.RotateBy(rotation);
         LinearVelocity = transform.basis.Xform(velocity);
         AngularVelocity = transform.basis.Xform(angularVelocity);
     }
-
     public void SimpleLaunchFrom(Spatial spatial, float offset, float velocity)
     {
-        LaunchFrom(spatial, new Vector3(0, 0, offset), new Vector3(),
-            new Vector3(0, 0, velocity), new Vector3());
+        LaunchFrom(
+            spatial,
+            new Vector3(0, 0, offset),
+            new Vector3(),
+            new Vector3(0, 0, velocity),
+            new Vector3());
     }
-
     public void SimpleLaunchFrom(Transform transform, float offset, float velocity)
     {
-        LaunchFrom(transform, new Vector3(0, 0, offset), new Vector3(),
-            new Vector3(0, 0, velocity), new Vector3());
+        LaunchFrom(
+            transform,
+            new Vector3(0, 0, offset),
+            new Vector3(),
+            new Vector3(0, 0, velocity),
+            new Vector3());
     }
-
     private void FreeSelf()
     {
         QueueFree();

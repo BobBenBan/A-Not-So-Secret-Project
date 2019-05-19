@@ -13,29 +13,22 @@ public class Looper : Object
     public delegate void Process(long micros);
 
     public const string SignalName = nameof(System.Diagnostics.Process);
-
     private const long MinTicks = 50000; //50 millisecond, or 200 times a second.
     public static readonly Looper Instance = new Looper();
-
     private readonly Thread _thread;
-
     public int Running;
-
     private Looper()
     {
         _thread = new Thread(ThreadStart);
     }
-
     internal void Start()
     {
         _thread.Start();
     }
-
     internal void Stop()
     {
         _thread.Interrupt();
     }
-
     private void ThreadStart()
     {
         try
