@@ -43,7 +43,9 @@ public class MidiFileTest
         theFile.Write(FilePath, true);
         Console.WriteLine($"Made file at {FilePath}");
     }
+
     public static MidiFile GetMidiFile() => MidiFile.Read(FilePath);
+
     [Test]
     public static void ReadMidiFile()
     {

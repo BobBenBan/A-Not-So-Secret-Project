@@ -1,28 +1,24 @@
 using Godot;
-using MusicMachine.Resources;
+using Melanchall.DryWetMidi.Smf;
+using MusicMachine.Music;
 
 namespace MusicMachine.Test
 {
 public class TestOnly : Node
 {
-//    [Signal]
-//    public delegate void ASig(object r);
-    public override void _EnterTree()
+    private MidiSong _midiSong;
+    private MidiSongPlayer _midiPlayer;
+    public override void _Ready()
     {
-        var a = new SignalEmitter();
-        AddChild(a);
-        a.Connect(nameof(SignalEmitter.ASignal), this, nameof(ReceiveSignal));
-        a.Emit(new Ref());
-//        Connect(nameof(ASig), this, nameof(ReceiveSignal));
-//        EmitSignal(nameof(ASig),"hi");
-        GetTree().Quit();
+        var midiFile = MidiFile.Read(ProjectSettings.GlobalizePath("res://Resources/midi.mid"));
+        _midiSong = new MidiSong();
+        _midiSong.ReadMidiFile(midiFile);
+        _midiPlayer = new MidiSongPlayer(_midiSong) {SoundFontFile = "res://Resources/sf.sf2"};
+        AddChild(_midiPlayer);
     }
-    private static void ReceiveSignal(Object o)
+    private void OnPlayPressed()
     {
-        if (o != null)
-            GD.Print(o);
-        else
-            GD.Print("null");
+        _midiPlayer.Play();
     }
 }
 }

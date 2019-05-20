@@ -31,7 +31,9 @@ public class Player : KinematicBody
     [Export(PropertyHint.Range, "0,30")] public float SlowSpeed = 2;
     [Export] public Vector3 SpawnPoint = Vector3.Inf;
     [Export(PropertyHint.Range, "0,30")] public float WalkSpeed = 6;
+
     public Transform CameraLocation => _roll.GlobalTransform;
+
     [Export]
     public Vector3 Gravity
     {
@@ -42,11 +44,13 @@ public class Player : KinematicBody
             _gravity = value;
         }
     }
+
     private bool EffectiveEnabled
     {
         get => Input.GetMouseMode() == Input.MouseMode.Captured;
         set => Input.SetMouseMode(value ? Input.MouseMode.Captured : Input.MouseMode.Visible);
     }
+
     private bool InFocus
     {
         set
@@ -55,6 +59,7 @@ public class Player : KinematicBody
             EffectiveEnabled = _inFocus && _enabled;
         }
     }
+
     private bool Enabled
     {
         get => _enabled;

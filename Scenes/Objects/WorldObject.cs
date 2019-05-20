@@ -5,8 +5,11 @@ namespace MusicMachine.Scenes
 public class WorldObject : RigidBody
 {
     protected MeshInstance MeshInstance;
+
     [Export] public bool IsTrimesh { get; private set; }
+
     [Export(PropertyHint.Range, "0,300")] public float LifeTime { get; private set; } = 0;
+
     public override void _Ready()
     {
         TryCreateMesh();

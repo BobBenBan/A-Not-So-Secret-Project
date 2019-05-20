@@ -13,11 +13,12 @@ public static class StructEx
             val = dict[key] = ifAbsent();
         return val;
     }
-    public static TValue GetAndRemove<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+    public static bool TryGetAndRemove<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, out TValue value)
     {
-        var o = dict[key];
-        dict.Remove(key);
-        return o;
+        var b = dict.TryGetValue(key, out value);
+        if (b)
+            dict.Remove(key);
+        return b;
     }
     public static IList<T> Swap<T>(this IList<T> list, int a, int b)
     {
@@ -62,8 +63,28 @@ public static class StructEx
 
         return ~lower;
     }
-    public static bool IsEmpty<T>(this ICollection<T> collection) => collection.Count == 0;
-    public static bool NotEmpty<T>(this ICollection<T> collection) => collection.Count != 0;
+
+    public static bool IsEmpty<T>(this IReadOnlyCollection<T> collection) => collection.Count == 0;
+
+    public static bool NotEmpty<T>(this IReadOnlyCollection<T> collection) => collection.Count != 0;
+
+    public static IEnumerable<T> ListReverse<T>(this IList<T> list)
+    {
+        for (var i = list.Count - 1; i >= 0; i--)
+            yield return list[i];
+    }
+    public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
+    {
+        foreach (var item in enumeration)
+            action(item);
+    }
+    public static bool AddIfAbsent<T>(this ICollection<T> collection, T item)
+    {
+        var absent = !collection.Contains(item);
+        if (absent)
+            collection.Add(item);
+        return absent;
+    }
 }
 
 public static class VectorEx
@@ -119,6 +140,7 @@ public static class VectorEx
 public static class GodotEx
 {
     public static bool Is(this Object obj, string property) => obj.Get(property) as bool? ?? false;
+
     public static bool TryCall(
         this Object obj,
         string method,

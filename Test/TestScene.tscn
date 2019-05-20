@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Test/TestScene.cs" type="Script" id=1]
-[ext_resource path="res://TEst/Sunset.tres" type="Environment" id=2]
+[ext_resource path="res://Test/Sunset.tres" type="Environment" id=2]
 [ext_resource path="res://Scenes/Player/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Objects/WorldObject.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Test/FloorMaterial.tres" type="Material" id=5]

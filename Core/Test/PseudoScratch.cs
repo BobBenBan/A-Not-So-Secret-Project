@@ -7,7 +7,6 @@ namespace MusicMachine.Test
 {
 public class PseudoScratch
 {
-    [Test]
     public static void EnumName()
     {
         var random = new Randomizer(123);
@@ -44,18 +43,19 @@ public class PseudoScratch
                 enumerator.Dispose();
             });
     }
-    public static void Random()
+    public static void EnumCast()
     {
-        var a = new SortedSet<int>();
+        var e = (E) 9;
+        Console.Write(e.ToString());
     }
 
     private enum E
     {
-        Bleh,
-        Ksadjf,
-        Khdkjsdf,
-        Ijdfisdkjf,
-        HelpUs
+        EnumA = 1,
+        BEe = 2,
+        Cee = 4,
+        Dirt = 5,
+        EEt = 6
     }
 }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using MusicMachine.Programs;
+using MusicMachine.Music;
 using MusicMachine.Resources;
 
 namespace MusicMachine.Scenes
@@ -22,7 +22,9 @@ public class SimpleTrackPlayer<TEvent> : Node
     public SimpleTrackPlayer()
     {
     }
+
     public long Tick { get; private set; }
+
     [Export]
     public bool IsPlaying
     {
@@ -41,7 +43,9 @@ public class SimpleTrackPlayer<TEvent> : Node
                 Pause();
         }
     }
+
     private bool HasPlayer => _stepper != null;
+
     public void Play(long atTick = 0)
     {
         if (Track == null)
@@ -81,17 +85,21 @@ public class SimpleTrackPlayer<TEvent> : Node
     }
     public override void _PhysicsProcess(float delta)
     {
-        if (!_stepper.MoveNext())
-            Stop();
+        Step();
         while (_stepper.Current.HasValue)
         {
             var pair = _stepper.Current.Value;
             EmitSignal(nameof(EventAction), pair.Key, new Ref(pair.Value));
-            if (!_stepper.MoveNext())
-                Stop();
+            Step();
         }
 
         Tick++;
+
+        void Step()
+        {
+            if (!_stepper.MoveNext())
+                Stop();
+        }
     }
 }
 }

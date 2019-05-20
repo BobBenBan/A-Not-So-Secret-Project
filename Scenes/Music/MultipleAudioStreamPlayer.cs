@@ -7,8 +7,11 @@ namespace MusicMachine.Scenes
 public class MultipleAudioStreamPlayer : Node
 {
     private int _curStream;
+
     [Export] public AudioStream Stream { get; private set; }
+
     [Export] public uint MaxInstances { get; private set; } = 5;
+
     public override void _EnterTree()
     {
         for (var i = 0; i < MaxInstances; i++)

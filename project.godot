@@ -16,12 +16,12 @@ _global_script_class_icons={
 [application]
 
 config/name="MusicMachine"
-run/main_scene="res://Test/TestScene.tscn"
+run/main_scene="res://Test/TestOnly.tscn"
 config/icon="res://Resources/Images/icon.png"
 
 [autoload]
 
-Global="*res://Scenes/Global/Global.cs"
+Global="*res://Scenes/Global/GlobalNode.cs"
 Caches="*res://Scenes/Global/Caches.cs"
 
 [editor_plugins]

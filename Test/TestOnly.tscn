@@ -4,3 +4,11 @@
 
 [node name="TestOnly" type="Node"]
 script = ExtResource( 1 )
+
+[node name="Button" type="Button" parent="."]
+margin_left = 301.0
+margin_top = 101.0
+margin_right = 503.0
+margin_bottom = 197.0
+text = "DoAPlay"
+[connection signal="pressed" from="Button" to="." method="OnPlayPressed"]

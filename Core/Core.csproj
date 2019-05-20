@@ -57,30 +57,37 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Delegates.cs" />
-        <Compile Include="Exceptions.cs" />
         <Compile Include="Music\Channel.cs" />
-        <Compile Include="Music\Note.cs" />
-        <Compile Include="Programs\Song.cs" />
-        <Compile Include="Programs\Track.cs" />
+        <Compile Include="Music\ControlEvents.cs" />
+        <Compile Include="Music\MidiSongPlayer.cs" />
+        <Compile Include="Music\MidiSongStepper.cs" />
+        <Compile Include="Music\MidiSong.cs" />
+        <Compile Include="Music\Track.cs" />
+        <Compile Include="Music\ControlNumbers.cs" />
+        <Compile Include="Music\TrackBuilders.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Scenes\Global.cs" />
         <Compile Include="Scenes\ProgramPlayer.cs" />
         <Compile Include="Scenes\Threads.cs" />
+        <Compile Include="Test\Break.cs" />
         <Compile Include="Test\MidiFileTest.cs" />
         <Compile Include="Test\MidiFileToTrackTest.cs" />
         <Compile Include="Test\PseudoScratch.cs" />
         <Compile Include="Test\TestException.cs" />
         <Compile Include="Test\TrackTest.cs" />
+        <Compile Include="ThirdParty\Midi\ADSRPlayer.cs" />
+        <Compile Include="ThirdParty\Midi\Bank.cs" />
+        <Compile Include="ThirdParty\Midi\Midi.cs" />
+        <Compile Include="Util\EmptyArray.cs" />
+        <Compile Include="Util\FlatteningMultipleIterator.cs" />
         <Compile Include="Util\Extentions.cs" />
         <Compile Include="Util\InputAction.cs" />
         <Compile Include="Util\DoubleTapDetector.cs" />
         <Compile Include="Util\Mathm.cs" />
+        <Compile Include="Util\Wrapper.cs" />
     </ItemGroup>
     <ItemGroup>
         <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Extensions" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

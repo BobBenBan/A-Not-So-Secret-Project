@@ -24,6 +24,7 @@ public class Caches : Node
             return _instance;
         }
     }
+
     public override void _EnterTree()
     {
         if (_instance != null)

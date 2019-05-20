@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Programs;
+using MusicMachine.Music;
 using NUnit.Framework;
 
 namespace MusicMachine.Test

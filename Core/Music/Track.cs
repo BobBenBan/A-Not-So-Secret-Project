@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using Note = MusicMachine.Music.Note;
 
-namespace MusicMachine.Programs
+namespace MusicMachine.Music
 {
 /// <summary>
 ///     Represents events on a track in time.
@@ -26,6 +25,7 @@ public class Track<TEvent>
         : this($"Track of ({typeof(long).Name}, {typeof(TEvent).Name})")
     {
     }
+
     public IEnumerable<long> Times => _track.Keys;
 
     /// <summary>
@@ -38,6 +38,11 @@ public class Track<TEvent>
     /// </summary>
     public IEnumerable<TEvent> Events => _track.Values.SelectMany(x => x);
 
+    /// <summary>
+    /// Iterate elements in reverse of time.
+    /// </summary>
+    public IEnumerable<TEvent> EventsReversed => _track.Values.ListReverse().SelectMany(x => x);
+
     public IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>> Elements =>
         _track.Select(x => new KeyValuePair<long, IEnumerable<TEvent>>(x.Key, x.Value));
 
@@ -47,18 +52,24 @@ public class Track<TEvent>
             (pair, @event) => new KeyValuePair<long, TEvent>(pair.Key, @event));
 
     IEnumerable<long> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Keys => _track.Keys;
+
     IEnumerable<IEnumerable<TEvent>> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Values => _track.Values;
+
     IEnumerator<KeyValuePair<long, IEnumerable<TEvent>>> IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>>.
         GetEnumerator() =>
         Elements.GetEnumerator();
+
     public IEnumerator GetEnumerator() => Elements.GetEnumerator();
+
     bool IReadOnlyDictionary<long, IEnumerable<TEvent>>.ContainsKey(long time) => _track.ContainsKey(time);
+
     /// <summary>
     ///     Gets a list of all elements at the specified time.
     ///     May become invalidated later if elements at this time reach 0 at any point.
     /// </summary>
     /// <param name="time"></param>
     public IEnumerable<TEvent> this[long time] => _track[time];
+
     bool IReadOnlyDictionary<long, IEnumerable<TEvent>>.TryGetValue(long key, out IEnumerable<TEvent> value)
     {
         var b = _track.TryGetValue(key, out var v);
@@ -72,6 +83,7 @@ public class Track<TEvent>
     public int Count => _track.Count;
 
     private bool ContainsTime(long time) => _track.ContainsKey(time);
+
     /// <summary>
     ///     Adds an element to this track.
     /// </summary>
@@ -81,6 +93,11 @@ public class Track<TEvent>
     {
         GetListForAdd(time).Add(@event);
     }
+    /// <summary>
+    ///     Adds an element to this track.
+    /// </summary>
+    /// <param name="eventPair">The time and event to add at.</param>
+    public void Add(KeyValuePair<long, TEvent> eventPair) => Add(eventPair.Key, eventPair.Value);
     /// <summary>
     ///     Adds a series of events at a time.
     /// </summary>
@@ -99,14 +116,6 @@ public class Track<TEvent>
             } while (enumerator.MoveNext());
         }
     }
-    private List<TEvent> GetListForAdd(long time)
-    {
-        if (_track.TryGetValue(time, out var list))
-            return list;
-        list = new List<TEvent>();
-        _track.Add(time, list);
-        return list;
-    }
     /// <summary>
     ///     Adds a range of events via a series of KeyValuePairs of (time, to, a list of events).
     /// </summary>
@@ -115,6 +124,14 @@ public class Track<TEvent>
     {
         foreach (var pair in events)
             AddRange(pair.Key, pair.Value);
+    }
+    private List<TEvent> GetListForAdd(long time)
+    {
+        if (_track.TryGetValue(time, out var list))
+            return list;
+        list = new List<TEvent>();
+        _track.Add(time, list);
+        return list;
     }
     /// <summary>
     ///     Removes an event at the current time, if it exists.
@@ -343,7 +360,7 @@ public static class TrackBuildersEx
 {
     [Obsolete, Pure]
     public static Track<Note> MakeNoteTrack(
-        this IEnumerable<Melanchall.DryWetMidi.Smf.Interaction.Note> notes,
+        this IEnumerable<Note> notes,
         TempoMap tempoMap,
         int timesPerSecond = 60)
     {

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using MusicMachine.Programs;
+using MusicMachine.Music;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 

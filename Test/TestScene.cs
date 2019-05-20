@@ -1,10 +1,9 @@
 using Godot;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Programs;
+using MusicMachine.Music;
 using MusicMachine.Scenes;
-using static MusicMachine.Scenes.SimpleTrackPlayer<MusicMachine.Music.Note>;
-using Note = MusicMachine.Music.Note;
+using static MusicMachine.Scenes.SimpleTrackPlayer<Melanchall.DryWetMidi.Smf.Interaction.Note>;
 
 namespace MusicMachine.Test
 {

@@ -23,11 +23,11 @@ public class Looper : Object
     }
     internal void Start()
     {
-        _thread.Start();
+//        _thread.Start();
     }
     internal void Stop()
     {
-        _thread.Interrupt();
+//        _thread.Interrupt();
     }
     private void ThreadStart()
     {

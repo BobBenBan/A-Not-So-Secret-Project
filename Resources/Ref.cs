@@ -11,7 +11,9 @@ public class Ref : Object
     public Ref()
     {
     }
+
     public object Item { get; }
+
     public override string ToString() => Item.ToString();
 }
 }
