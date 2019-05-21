@@ -44,7 +44,7 @@ public class TrackBuilders
             Add(new BankSelectEvent(channel, value));
             break;
         case ControlNumbers.BankSelectLsb:
-            var bse = ((BankSelectEvent) track.EventsReversed.FirstOrDefault(x => x is BankSelectEvent b && !b.LSBset));
+            var bse = (BankSelectEvent) track.EventsReversed.FirstOrDefault(x => x is BankSelectEvent b && !b.LSBset);
             if (bse != null)
                 bse.LSB = value;
             break;

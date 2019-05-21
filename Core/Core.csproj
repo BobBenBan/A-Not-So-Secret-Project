@@ -67,8 +67,7 @@
         <Compile Include="Music\TrackBuilders.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Scenes\Global.cs" />
-        <Compile Include="Scenes\ProgramPlayer.cs" />
-        <Compile Include="Scenes\Threads.cs" />
+        <Compile Include="Scenes\AlternateProcess.cs" />
         <Compile Include="Test\Break.cs" />
         <Compile Include="Test\MidiFileTest.cs" />
         <Compile Include="Test\MidiFileToTrackTest.cs" />

@@ -19,7 +19,7 @@ public class Global : Node
 
         CenterScreen();
 
-        Looper.Instance.Start();
+        AlternateProcess.Start();
     }
     public override void _Notification(int what)
     {
@@ -28,7 +28,7 @@ public class Global : Node
     }
     private void OnQuit()
     {
-        Looper.Instance.Stop();
+        AlternateProcess.Stop();
     }
 }
 }

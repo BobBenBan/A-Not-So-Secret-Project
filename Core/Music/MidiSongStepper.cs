@@ -15,7 +15,7 @@ public class MidiSongStepper
 
     public event Action BeforeEvents;
 
-    private long _curMicros;
+    private long _curTicks;
     private bool _started;
     private TempoMap _tempoMap;
 
@@ -28,9 +28,9 @@ public class MidiSongStepper
             midiSong.Tracks.Select(x => x.IterateTrackSingleLists(start, Stepper))).GetEnumerator();
         _tempoMap = midiSong.TempoMap;
         _started = false;
-        _curMicros = start;
+        _curTicks = start;
     }
-    public void Stop()
+    public void Clear()
     {
         _stepper = null;
         _tempoMap = null;
@@ -38,26 +38,26 @@ public class MidiSongStepper
     }
     private long Stepper(long ignored)
     {
-        return TimeConverter.ConvertTo<MidiTimeSpan>(new MetricTimeSpan(_curMicros), _tempoMap);
+        return TimeConverter.ConvertTo<MidiTimeSpan>(new MetricTimeSpan((_curTicks + 5) / 10), _tempoMap);
     }
     public bool Step(float seconds)
     {
-        return StepMicros(seconds.SecondsToMicros());
+        return StepTicks((seconds * 10e6).RoundToLong());
     }
-    public bool StepMicros(long micros)
+    public bool StepTicks(long ticks)
     {
-        if (micros < 0)
+        if (ticks < 0)
             throw new InvalidOperationException();
         if (_stepper == null)
             return false;
         if (!_started)
             _started = true;
         else
-            _curMicros += micros;
+            _curTicks += ticks;
 
         if (!_stepper.MoveNext())
         { //ended
-            Stop();
+            Clear();
             return false;
         }
         Debug.Assert(_stepper.Current != null, "stepper.Current != null");

@@ -87,6 +87,8 @@ public class BankSelectEvent : TwoParamControlEvent
     public override SevenBitNumber ControlNumber { get; } = (SevenBitNumber) (byte) ControlNumbers.BankSelect;
 
     public override SevenBitNumber? ControlNumberLSB { get; } = (SevenBitNumber) (byte) ControlNumbers.BankSelectLsb;
+
+    public override string ToString() => $"Bank Select [{Channel}] ({Bank})";
 }
 
 public class VolumeChangeEvent : ControlEvent
@@ -106,6 +108,8 @@ public class VolumeChangeEvent : ControlEvent
     public override SevenBitNumber ControlNumber { get; } = (SevenBitNumber) (byte) ControlNumbers.Volume;
 
     public override SevenBitNumber? ControlNumberLSB { get; } = null;
+
+    public override string ToString() => $"Volume Change [{Channel}] ({Volume})";
 }
 
 public class ExpressionChangeEvent : ControlEvent
@@ -125,5 +129,7 @@ public class ExpressionChangeEvent : ControlEvent
     public override SevenBitNumber ControlNumber { get; } = (SevenBitNumber) (byte) ControlNumbers.Expression;
 
     public override SevenBitNumber? ControlNumberLSB { get; } = null;
+
+    public override string ToString() => $"Expression Change [{Channel}] ({Expression})";
 }
 }

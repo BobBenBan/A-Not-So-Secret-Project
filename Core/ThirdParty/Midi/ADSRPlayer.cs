@@ -78,14 +78,23 @@ public class AdsrPlayer : AudioStreamPlayer
 
     private int CalcMixRate() => (MixRate * (1 + PitchBend / 2)).RoundToInt();
 
+    public override void _Ready()
+    {
+        SetProcess(false);
+    }
+
     public void StartRelease() => _requestRelease = true;
 
     public override void _Process(float delta)
     {
+        DoProcess((delta * 10e6).RoundToLong());
+    }
+    public void DoProcess(long ticks)
+    {
         if (!Playing)
             return;
-        Timer += delta;
-        UsingTimer += delta;
+        Timer += ticks / 10e6f;
+        UsingTimer += ticks / 10e6f;
         var useState  = Releasing ? ReleaseState : AdsState;
         var allStates = useState.Length;
         var lastState = allStates - 1;

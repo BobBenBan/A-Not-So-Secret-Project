@@ -4,6 +4,7 @@ using Godot;
 using Godot.Collections;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
+using MusicMachine.Scenes;
 using MusicMachine.ThirdParty.Midi;
 
 namespace MusicMachine.Music
@@ -13,19 +14,19 @@ public class MidiSongPlayer : Node
 {
     private const byte DrumChannelNum = 0x09;
     private const int DrumBank = 128;
-    private const int NumChannels = 16;
+    public const int NumChannels = 16;
     private readonly Channel[] _channels = new Channel[NumChannels];
     private readonly MidiSong _song;
     private readonly MidiSongStepper _stepper = new MidiSongStepper();
-    private AdsrPlayer[] _players;
     private Bank _bank;
+    private AdsrPlayer[] _players;
+    private bool _ready;
+    [Export] public float AmpDB = 20;
     [Export] public string Bus = "master";
     [Export] public int MaxPolyphony = 128;
     [Export] public AudioStreamPlayer.MixTargetEnum MixTarget = AudioStreamPlayer.MixTargetEnum.Stereo;
-    [Export] public float AmpDB = 20;
-    [Export] public float VolumeDB = -10;
     [Export] public string SoundFontFile = "";
-    private bool _ready;
+    [Export] public float VolumeDB = -10;
     public MidiSongPlayer(MidiSong song)
     {
         _song = song;
@@ -39,6 +40,10 @@ public class MidiSongPlayer : Node
     }
 
     public bool Playing { get; private set; }
+
+    public IReadOnlyList<Channel> Channels => _channels;
+
+    public event Action OnStop = delegate { };
 
     public override void _Ready()
     {
@@ -54,9 +59,7 @@ public class MidiSongPlayer : Node
         _players = new AdsrPlayer[MaxPolyphony];
         for (var index = 0; index < _players.Length; index++)
         {
-            var player = new AdsrPlayer();
-            player.MixTarget = MixTarget;
-            player.Bus = Bus;
+            var player = new AdsrPlayer {MixTarget = MixTarget, Bus = Bus};
             AddChild(player, true);
             _players[index] = player;
         }
@@ -97,18 +100,28 @@ public class MidiSongPlayer : Node
     {
         if (!_ready)
             throw new InvalidOperationException();
-        StopAllNotes();
+        Stop();
         Playing = true;
         _stepper.BeginPlay(_song, atMidiTimeSpan);
-        SetProcess(true);
+        AlternateProcess.TickLoop += DoProcess;
+//        SetProcess(true);
     }
-    private void Stop()
+    public void Stop()
     {
-        _stepper.Stop();
+        if (!Playing)
+            return;
         Playing = false;
-        SetProcess(false);
+        _stepper.Clear();
+        StopAllNotes();
+        OnStop.Invoke();
+        AlternateProcess.TickLoop -= DoProcess;
+//        SetProcess(false);
     }
     public override void _Process(float delta)
+    {
+        DoProcess((delta * 10e6).RoundToLong());
+    }
+    private void DoProcess(long ticks)
     {
         if (_bank == null)
             return;
@@ -116,25 +129,24 @@ public class MidiSongPlayer : Node
             return;
         foreach (var channel in _channels)
             channel.ClearNotPlaying();
-        if (!_stepper.Step(delta))
+        if (!_stepper.StepTicks(ticks))
             Stop();
+        foreach (var player in _players)
+            player.DoProcess(ticks);
     }
     public void StopAllNotes()
     {
         foreach (var player in _players)
-        {
             player.Stop();
-        }
         foreach (var channel in _channels)
-        {
             channel.NotesOn.Clear();
-        }
     }
     private void OnEvent(long ignored, ChannelEvent @event)
     {
         //currently is verbatim. Will change.
         var channelNum = @event.Channel;
         var channel    = _channels[channelNum];
+        Console.WriteLine($"Event: {@event}");
         switch (@event)
         {
         case NoteOnEvent noteOnEvent:

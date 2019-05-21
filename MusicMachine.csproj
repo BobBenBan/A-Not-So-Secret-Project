@@ -69,6 +69,7 @@
         <Compile Include="Scenes\Player\Player.cs" />
         <Compile Include="Scenes\SimpleTrackPlayer.cs" />
         <Compile Include="Test\AnimationTest.cs" />
+        <Compile Include="Test\MidiPlayerDisplayer.cs" />
         <Compile Include="Test\TestOnly.cs" />
         <Compile Include="Test\TestScene.cs" />
     </ItemGroup>

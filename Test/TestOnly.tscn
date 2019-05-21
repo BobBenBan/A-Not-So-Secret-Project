@@ -10,5 +10,5 @@ margin_left = 301.0
 margin_top = 101.0
 margin_right = 503.0
 margin_bottom = 197.0
-text = "DoAPlay"
+text = "MIDI PLAYER TEST!!!!!"
 [connection signal="pressed" from="Button" to="." method="OnPlayPressed"]

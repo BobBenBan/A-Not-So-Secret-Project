@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using Melanchall.DryWetMidi.Common;
 using MusicMachine.ThirdParty.Midi;
@@ -10,7 +11,7 @@ public class Channel
     private readonly List<short> _cachedList = new List<short>();
     public ushort Bank;
     public float Expression = 1;
-    public readonly Dictionary<short, AdsrPlayer> NotesOn = new Dictionary<short, AdsrPlayer>();
+    public readonly ConcurrentDictionary<short, AdsrPlayer> NotesOn = new ConcurrentDictionary<short, AdsrPlayer>();
     public float PitchBend;
     public SevenBitNumber Program;
     public float Volume = 1;
@@ -21,7 +22,7 @@ public class Channel
             if (!pair.Value.Playing)
                 toRemove.Add(pair.Key);
         foreach (var i in toRemove)
-            NotesOn.Remove(i);
+            NotesOn.TryRemove(i, out _);
         toRemove.Clear();
     }
     public void UpdateVolume(float ampDb, float volumeDb)
