@@ -63,8 +63,6 @@
         <Compile Include="Resources\Ref.cs" />
         <Compile Include="Scenes\Global\Caches.cs" />
         <Compile Include="Scenes\Global\GlobalNode.cs" />
-        <Compile Include="Scenes\Music\MultipleAudioStreamPlayer.cs" />
-        <Compile Include="Scenes\Objects\Teapot.cs" />
         <Compile Include="Scenes\Objects\WorldObject.cs" />
         <Compile Include="Scenes\Player\Player.cs" />
         <Compile Include="Scenes\SimpleTrackPlayer.cs" />
@@ -83,7 +81,7 @@
         <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
-        <Content Include="Resources\midi.mid" />
+      <Folder Include="Scenes\Music" />
     </ItemGroup>
     <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

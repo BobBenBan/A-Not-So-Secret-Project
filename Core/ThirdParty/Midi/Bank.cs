@@ -9,8 +9,8 @@ namespace MusicMachine.ThirdParty.Midi
 {
 public class Bank : Wrapper<GDObject>
 {
-    private static readonly GDScript BankGd = GD.Load<GDScript>(Midi.Location + "Bank.gd");
-    private static readonly GDScript SoundFontGd = GD.Load<GDScript>(Midi.Location + "SoundFont.gd");
+    private static readonly GDScript BankGd = GD.Load<GDScript>(GdLocations.Location + "Bank.gd");
+    private static readonly GDScript SoundFontGd = GD.Load<GDScript>(GdLocations.Location + "SoundFont.gd");
     public Bank(string soundFontFile, Array<int> usedProgramNumbers)
     {
         if (soundFontFile == null)

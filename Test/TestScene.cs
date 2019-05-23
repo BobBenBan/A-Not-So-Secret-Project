@@ -7,9 +7,6 @@ namespace MusicMachine.Test
 {
 public class TestScene : Area
 {
-    private readonly PackedScene _obj =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Objects/Teapot.tscn");
-
     private Node _objects;
     private Player _player;
     private MidiPlayerDisplayer _displayer;
@@ -32,9 +29,6 @@ public class TestScene : Area
     }
     public void OnAction(float delta)
     {
-        var obj = (WorldObject) _obj.Instance();
-        obj.SimpleLaunchFrom(_player.CameraLocation, 1, 10);
-        _objects.AddChild(obj, true);
     }
     private void OnSecondary(float delta)
     {

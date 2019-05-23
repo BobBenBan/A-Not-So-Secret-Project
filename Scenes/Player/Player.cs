@@ -9,7 +9,7 @@ public class Player : KinematicBody
     private bool _enabled = true;
     private bool _flying;
     private Vector3 _gravity = new Vector3(0, -12f, 0);
-    private bool _inFocus;
+    private bool _inFocus = true;
     private Vector3 _outputVel;
     private Spatial _pitch;
     private RayCast _rayCast;
