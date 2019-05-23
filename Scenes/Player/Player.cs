@@ -173,7 +173,7 @@ public class Player : KinematicBody
         _roll = _pitch.GetNode<Spatial>("Roll");
         _camera = _roll.GetNode<Camera>("Camera");
         _rayCast = _roll.GetNode<RayCast>("RayCast");
-        _enabled = true;
+        Enabled = true;
         if (SpawnPoint == Vector3.Inf)
             SpawnPoint = Translation;
     }

@@ -12,6 +12,7 @@ public class MidiPlayerDisplayer : Spatial
     private readonly bool[] _cacheArr = new bool[128];
     private readonly Spatial _displayPoint;
     private readonly MidiSongPlayer _player;
+
     public MidiPlayerDisplayer(Spatial displayPoint, MidiSong midiSong, string soundFontFile)
     {
         _displayPoint = displayPoint;
@@ -21,15 +22,19 @@ public class MidiPlayerDisplayer : Spatial
         _player.OnStop += delegate { CallDeferred(nameof(Stop)); };
         AddChild(_player);
     }
+
     public override void _Ready()
     {
         SetProcess(false);
     }
+
     public void Play()
     {
+        Stop();
         _player.Play();
         SetProcess(true);
     }
+
     public void Stop()
     {
         foreach (var child in GetChildren())
@@ -39,7 +44,11 @@ public class MidiPlayerDisplayer : Spatial
         }
         _queuedPointers.Clear();
         _player.Stop();
+        foreach (var spatials in Pointers)
+            for (var index = 0; index < spatials.Length; index++)
+                spatials[index] = null;
     }
+
     public override void _Process(float _)
     {
         var channelHasPt = _cacheArr;
@@ -63,8 +72,8 @@ public class MidiPlayerDisplayer : Spatial
                 pointer.SetTranslation(
                     _displayPoint.Translation
                   + Vector3.Forward * channelNum / 3
-                  + Vector3.Right * player.Key * (1 + pitchBend / 2) / 10);
-                pointer.SetScale(new Vector3(1, 1, 1) * 2 * expression * volume * player.Value.Velocity / 150f);
+                  + Vector3.Right * (player.Key + pitchBend * MidiSong.MaxSemitonesPitchBend) / 10);
+                pointer.SetScale(new Vector3(1, 1, 1) * Mathf.Pow(2, player.Value.VolumeDb / 10 + 2));
                 channelHasPt[player.Key] = true;
             }
             for (var index = 0; index < _cacheArr.Length; index++)
@@ -79,6 +88,7 @@ public class MidiPlayerDisplayer : Spatial
             }
         }
     }
+
     private Spatial GetPointer()
     {
         if (_queuedPointers.Count != 0)

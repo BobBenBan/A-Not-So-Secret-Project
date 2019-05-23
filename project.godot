@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="MusicMachine"
-run/main_scene="res://Test/TestOnly.tscn"
+run/main_scene="res://Test/TestScene.tscn"
 config/icon="res://Resources/Images/icon.png"
 
 [autoload]

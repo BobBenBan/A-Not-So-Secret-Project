@@ -8,6 +8,7 @@ namespace MusicMachine.Music
 {
 public class MidiSong
 {
+    public const float MaxSemitonesPitchBend = 7;
     public readonly List<MidiTrack> Tracks =
         new List<MidiTrack>();
 

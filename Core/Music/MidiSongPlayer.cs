@@ -146,7 +146,7 @@ public class MidiSongPlayer : Node
         //currently is verbatim. Will change.
         var channelNum = @event.Channel;
         var channel    = _channels[channelNum];
-        Console.WriteLine($"Event: {@event}");
+//        Console.WriteLine($"Event: {@event}");
         switch (@event)
         {
         case NoteOnEvent noteOnEvent:
