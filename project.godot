@@ -37,7 +37,7 @@ Caches="*res://Scenes/Global/Caches.cs"
 
 [editor_plugins]
 
-enabled=PoolStringArray(  )
+enabled=PoolStringArray( "zylann.hterrain" )
 
 [input]
 

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Godot;
-using Godot.Collections;
-using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Scenes;
 using MusicMachine.ThirdParty.Midi;
@@ -29,7 +27,7 @@ public class MidiSongPlayer : Node
     [Export] public float VolumeDB = -10;
     public MidiSongPlayer(MidiSong song)
     {
-        _song = song;
+        _song            =  song;
         _stepper.OnEvent += OnEvent;
         for (var i = 0; i < _channels.Length; i++)
         {
@@ -69,27 +67,29 @@ public class MidiSongPlayer : Node
         if (_bank != null)
             return;
         var usedProgNums = new HashSet<int>();
-        foreach (var x in _song.Tracks)
-        foreach (var bankEvent in x.Events)
+        foreach (var track in _song.Tracks)
+        foreach (var bankEvent in track.Events)
+        {
+            var channelNum = track.Channel;
+            var channel    = _channels[channelNum];
             switch (bankEvent)
             {
             case ProgramChangeEvent pce:
             {
-                var bankProgNum = pce.ProgramNumber | (_channels[bankEvent.Channel].Bank << 7);
-                usedProgNums.Add(bankProgNum);
-                usedProgNums.Add(pce.ProgramNumber);
+                var progNum = pce.Program | (channel.Bank << 7);
+                usedProgNums.Add(progNum);
+                usedProgNums.Add(pce.Program);
                 break;
             }
             case BankSelectEvent bse:
-                if (bankEvent.Channel != DrumChannelNum)
-                    _channels[bankEvent.Channel].Bank = bse.Bank;
+                if (channelNum != DrumChannelNum)
+                    channel.Bank = bse.ApplyOn(channel.Bank);
+                else
+                    Console.WriteLine("Warning: Tried to change bank on drum channel, which makes no sense");
                 break;
             }
-        var usedProgNumArr = new Array<int>();
-        foreach (var programNum in usedProgNums)
-            usedProgNumArr.Add(programNum);
-
-        _bank = new Bank(SoundFontFile, usedProgNumArr);
+        }
+        _bank = new Bank(SoundFontFile, usedProgNums.ToGDArray());
     }
     public void Play<TTImeSpan>(TTImeSpan atTime)
         where TTImeSpan : ITimeSpan
@@ -141,7 +141,7 @@ public class MidiSongPlayer : Node
         foreach (var channel in _channels)
             channel.NotesOn.Clear();
     }
-    private void OnEvent(long ignored, ChannelEvent @event)
+    private void OnEvent(long ignored, IMusicEvent @event)
     {
         //currently is verbatim. Will change.
         var channelNum = @event.Channel;
@@ -197,7 +197,7 @@ public class MidiSongPlayer : Node
         }
         case ProgramChangeEvent programChangeEvent:
         {
-            channel.Program = programChangeEvent.ProgramNumber;
+            channel.Program = programChangeEvent.Program;
             break;
         }
         case PitchBendEvent pitchBendEvent:
@@ -224,12 +224,12 @@ public class MidiSongPlayer : Node
             if (player.Releasing && player.CurrentVolume < minVol)
             {
                 stoppedPlayer = player;
-                minVol = player.CurrentVolume;
+                minVol        = player.CurrentVolume;
             }
             if (player.UsingTimer > oldestTime)
             {
                 oldestPlayer = player;
-                oldestTime = player.UsingTimer;
+                oldestTime   = player.UsingTimer;
             }
         }
         return stoppedPlayer ?? oldestPlayer;

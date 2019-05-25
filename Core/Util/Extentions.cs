@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using Godot.Collections;
 using Object = Godot.Object;
 
 namespace MusicMachine
@@ -72,6 +73,10 @@ public static class StructEx
     {
         for (var i = list.Count - 1; i >= 0; i--)
             yield return list[i];
+    }
+    public static T ListLast<T>(this IList<T> list)
+    {
+        return list[list.Count - 1];
     }
     public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
     {
@@ -192,5 +197,16 @@ public static class GodotEx
     }
     public static Shape CreateShape(this Mesh mesh, bool isTrimesh) =>
         isTrimesh ? mesh.CreateTrimeshShape() : mesh.CreateConvexShape();
+    public static Array<T> ToGDArray<T>(this IEnumerable<T> elements)
+    {
+        var o = new Array<T>();
+        o.AddRange(elements);
+        return o;
+    }
+    public static void AddRange<T>(this Array<T> array, IEnumerable<T> elements)
+    {
+        foreach (var element in elements)
+            array.Add(element);
+    }
 }
 }

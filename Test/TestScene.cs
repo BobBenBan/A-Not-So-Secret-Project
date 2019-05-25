@@ -7,7 +7,6 @@ namespace MusicMachine.Test
 {
 public class TestScene : Area
 {
-    private Node _objects;
     private Player _player;
     private MidiPlayerDisplayer _displayer;
     public override void _Ready()
@@ -15,7 +14,7 @@ public class TestScene : Area
         _player = GetNode<Player>("Player");
         _player.Primary = OnAction;
         _player.Secondary = OnSecondary;
-        _objects = GetNode("Objects");
+        GetNode("Objects");
         var displayPoint = GetNode<Spatial>("DisplayPoint");
 
         const string midiLoc      = "res://Resources/Midi/starwars.mid";

@@ -2,16 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
 
 namespace MusicMachine.Music
 {
 public class MidiSongStepper
 {
-    private IEnumerator<IEnumerable<KeyValuePair<long, ChannelEvent>>> _stepper;
+    private IEnumerator<IEnumerable<KeyValuePair<long, IMusicEvent>>> _stepper;
 
-    public event Action<long, ChannelEvent> OnEvent;
+    public event Action<FBN, long, IMusicEvent> OnEvent;
 
     public event Action BeforeEvents;
 
@@ -24,17 +23,17 @@ public class MidiSongStepper
     public void BeginPlay(MidiSong midiSong, long start = 0)
     {
 //        Stop();
-        _stepper = new FlatteningMultipleIterator<KeyValuePair<long, ChannelEvent>>(
+        _stepper = new FlatteningMultipleIterator<KeyValuePair<long, IMusicEvent>>(
             midiSong.Tracks.Select(x => x.IterateTrackSingleLists(start, Stepper))).GetEnumerator();
         _tempoMap = midiSong.TempoMap;
-        _started = false;
+        _started  = false;
         _curTicks = start;
     }
     public void Clear()
     {
-        _stepper = null;
+        _stepper  = null;
         _tempoMap = null;
-        _started = false;
+        _started  = false;
     }
     private long Stepper(long ignored)
     {
