@@ -1,68 +1,97 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Melanchall.DryWetMidi.Smf.Interaction;
 
 namespace MusicMachine.Music
 {
 public class MidiSongStepper
 {
-    private IEnumerator<IEnumerable<KeyValuePair<long, IMusicEvent>>> _stepper;
+    private readonly List<KeyValuePair<FBN, Track<IMusicEvent>.Stepper>> _steppers =
+        new List<KeyValuePair<FBN, Track<IMusicEvent>.Stepper>>();
 
-    public event Action<FBN, long, IMusicEvent> OnEvent;
-
-    public event Action BeforeEvents;
-
+    private readonly List<KeyValuePair<long, IMusicEvent>> _tempList = new List<KeyValuePair<long, IMusicEvent>>();
+    private long? _curMidiTicks;
     private long _curTicks;
     private bool _started;
     private TempoMap _tempoMap;
 
-    public bool Playing => _stepper != null;
+    private long CurTicks
+    {
+        get => _curTicks;
+        set
+        {
+            _curMidiTicks = null;
+            _curTicks     = value;
+        }
+    }
+
+    public bool Playing => _steppers.Count > 0;
+
+    private long CurMidiTicks
+    {
+        get
+        {
+            if (_curMidiTicks == null)
+            {
+                _curMidiTicks = TimeConverter.ConvertTo<MidiTimeSpan>(
+                    new MetricTimeSpan((CurTicks + 5) / 10),
+                    _tempoMap);
+            }
+            // ReSharper disable once PossibleInvalidOperationException
+            return _curMidiTicks.Value;
+        }
+    }
+
+    public event Action<FBN, long, IMusicEvent> OnEvent;
 
     public void BeginPlay(MidiSong midiSong, long start = 0)
     {
-//        Stop();
-        _stepper = new FlatteningMultipleIterator<KeyValuePair<long, IMusicEvent>>(
-            midiSong.Tracks.Select(x => x.IterateTrackSingleLists(start, Stepper))).GetEnumerator();
+//        Clear();
+
         _tempoMap = midiSong.TempoMap;
         _started  = false;
-        _curTicks = start;
+        CurTicks  = start;
+        foreach (var track in midiSong.Tracks)
+        {
+            var stepper = track.GetStepper(start);
+            stepper.CurTimeInclusive = CurMidiTicks;
+            _steppers.Add(new KeyValuePair<FBN, Track<IMusicEvent>.Stepper>(track.Channel, stepper));
+        }
     }
+
     public void Clear()
     {
-        _stepper  = null;
+        _steppers.Clear();
         _tempoMap = null;
         _started  = false;
     }
-    private long Stepper(long ignored)
-    {
-        return TimeConverter.ConvertTo<MidiTimeSpan>(new MetricTimeSpan((_curTicks + 5) / 10), _tempoMap);
-    }
-    public bool Step(float seconds)
-    {
-        return StepTicks((seconds * 10e6).RoundToLong());
-    }
+
+    public bool Step(float seconds) => StepTicks((seconds * 10e6).RoundToLong());
+
     public bool StepTicks(long ticks)
     {
         if (ticks < 0)
-            throw new InvalidOperationException();
-        if (_stepper == null)
+            throw new InvalidOperationException("Attempted to step backwards...");
+        if (_steppers.Count == 0)
             return false;
         if (!_started)
             _started = true;
         else
-            _curTicks += ticks;
+            CurTicks += ticks;
 
-        if (!_stepper.MoveNext())
-        { //ended
-            Clear();
-            return false;
+        foreach (var stepperPair in _steppers)
+        {
+            var stepper = stepperPair.Value;
+            var channel = stepperPair.Key;
+            if (!stepper.StepToInclusive(CurMidiTicks))
+                continue;
+            if (OnEvent == null)
+                continue;
+            stepper.CopyCurrentTo(_tempList);
+            foreach (var eventPair in _tempList)
+                OnEvent(channel, eventPair.Key, eventPair.Value);
         }
-        Debug.Assert(_stepper.Current != null, "stepper.Current != null");
-        if (OnEvent != null)
-            foreach (var pair in _stepper.Current)
-                OnEvent?.Invoke(pair.Key, pair.Value);
+        _steppers.RemoveAll(x => x.Value.IsCurrentlyDone);
         return true;
     }
 }

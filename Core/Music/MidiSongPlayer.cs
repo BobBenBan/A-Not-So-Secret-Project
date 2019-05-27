@@ -25,6 +25,7 @@ public class MidiSongPlayer : Node
     [Export] public AudioStreamPlayer.MixTargetEnum MixTarget = AudioStreamPlayer.MixTargetEnum.Stereo;
     [Export] public string SoundFontFile = "";
     [Export] public float VolumeDB = -10;
+
     public MidiSongPlayer(MidiSong song)
     {
         _song            =  song;
@@ -32,8 +33,7 @@ public class MidiSongPlayer : Node
         for (var i = 0; i < _channels.Length; i++)
         {
             _channels[i] = new Channel();
-            if (i == DrumChannelNum)
-                _channels[i].Bank = DrumBank;
+            if (i == DrumChannelNum) _channels[i].Bank = DrumBank;
         }
     }
 
@@ -50,10 +50,10 @@ public class MidiSongPlayer : Node
         PrepareBank();
         _ready = true;
     }
+
     private void CreatePlayers()
     {
-        if (_players != null)
-            return;
+        if (_players != null) return;
         _players = new AdsrPlayer[MaxPolyphony];
         for (var index = 0; index < _players.Length; index++)
         {
@@ -62,10 +62,10 @@ public class MidiSongPlayer : Node
             _players[index] = player;
         }
     }
+
     private void PrepareBank()
     {
-        if (_bank != null)
-            return;
+        if (_bank != null) return;
         var usedProgNums = new HashSet<int>();
         foreach (var track in _song.Tracks)
         foreach (var bankEvent in track.Events)
@@ -91,25 +91,26 @@ public class MidiSongPlayer : Node
         }
         _bank = new Bank(SoundFontFile, usedProgNums.ToGDArray());
     }
+
     public void Play<TTImeSpan>(TTImeSpan atTime)
         where TTImeSpan : ITimeSpan
     {
         Play(TimeConverter.ConvertTo<MidiTimeSpan>(atTime, _song.TempoMap).TimeSpan);
     }
+
     public void Play(long atMidiTimeSpan = 0)
     {
-        if (!_ready)
-            throw new InvalidOperationException();
+        if (!_ready) throw new InvalidOperationException();
         Stop();
         Playing = true;
         _stepper.BeginPlay(_song, atMidiTimeSpan);
         AlternateProcess.TickLoop += DoProcess;
 //        SetProcess(true);
     }
+
     public void Stop()
     {
-        if (!Playing)
-            return;
+        if (!Playing) return;
         Playing = false;
         _stepper.Clear();
         StopAllNotes();
@@ -117,35 +118,30 @@ public class MidiSongPlayer : Node
         AlternateProcess.TickLoop -= DoProcess;
 //        SetProcess(false);
     }
+
     public override void _Process(float delta)
     {
         DoProcess((delta * 10e6).RoundToLong());
     }
+
     private void DoProcess(long ticks)
     {
-        if (_bank == null)
-            return;
-        if (!Playing)
-            return;
-        foreach (var channel in _channels)
-            channel.ClearNotPlaying();
-        if (!_stepper.StepTicks(ticks))
-            Stop();
-        foreach (var player in _players)
-            player.DoProcess(ticks);
+        if (_bank == null) return;
+        if (!Playing) return;
+        foreach (var channel in _channels) channel.ClearNotPlaying();
+        if (!_stepper.StepTicks(ticks)) Stop();
+        foreach (var player in _players) player.DoProcess(ticks);
     }
+
     public void StopAllNotes()
     {
-        foreach (var player in _players)
-            player.Stop();
-        foreach (var channel in _channels)
-            channel.NotesOn.Clear();
+        foreach (var player in _players) player.Stop();
+        foreach (var channel in _channels) channel.NotesOn.Clear();
     }
-    private void OnEvent(long ignored, IMusicEvent @event)
+
+    private void OnEvent(FBN channelNum, long ignored, IMusicEvent @event)
     {
-        //currently is verbatim. Will change.
-        var channelNum = @event.Channel;
-        var channel    = _channels[channelNum];
+        var channel = _channels[channelNum];
 //        Console.WriteLine($"Event: {@event}");
         switch (@event)
         {
@@ -155,28 +151,23 @@ public class MidiSongPlayer : Node
             //update??
             var preset     = _bank.GetPreset(channel.Program, channel.Bank);
             var instrument = preset[keyNum];
-            if (instrument == null)
-                return;
-            if (channel.NotesOn.TryGetValue(keyNum, out var stopPlayer))
-                stopPlayer.StartRelease();
+            if (instrument == null) return;
+            if (channel.NotesOn.TryGetValue(keyNum, out var stopPlayer)) stopPlayer.StartRelease();
 
             var player = GetIdlePlayer();
-            if (player == null)
-                return;
+            if (player == null) return;
             player.Velocity = noteOnEvent.Velocity;
             player.UpdateChannelVolume(AmpDB, VolumeDB, channel);
             player.PitchBend = channel.PitchBend;
             player.SetInstrument(instrument);
             player.Play();
-            if (channelNum != DrumChannelNum)
-                channel.NotesOn[keyNum] = player;
+            if (channelNum != DrumChannelNum) channel.NotesOn[keyNum] = player;
             break;
         }
         case NoteOffEvent noteOffEvent:
         {
             var keyNum = noteOffEvent.NoteNumber;
-            if (channel.NotesOn.TryGetAndRemove(keyNum, out var player))
-                player?.StartRelease();
+            if (channel.NotesOn.TryGetAndRemove(keyNum, out var player)) player?.StartRelease();
             break;
         }
         case VolumeChangeEvent volumeChangeEvent:
@@ -191,8 +182,7 @@ public class MidiSongPlayer : Node
         }
         case BankSelectEvent bankSelectEvent:
         {
-            if (channelNum != DrumChannelNum)
-                channel.Bank = bankSelectEvent.Bank;
+            if (channelNum != DrumChannelNum) channel.Bank = bankSelectEvent.Bank;
             break;
         }
         case ProgramChangeEvent programChangeEvent:
@@ -211,6 +201,7 @@ public class MidiSongPlayer : Node
             break;
         }
     }
+
     private AdsrPlayer GetIdlePlayer()
     {
         var        minVol        = 100f;
@@ -219,8 +210,7 @@ public class MidiSongPlayer : Node
         AdsrPlayer oldestPlayer  = null;
         foreach (var player in _players)
         {
-            if (!player.Playing)
-                return player;
+            if (!player.Playing) return player;
             if (player.Releasing && player.CurrentVolume < minVol)
             {
                 stoppedPlayer = player;

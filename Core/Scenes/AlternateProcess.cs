@@ -12,6 +12,11 @@ public class AlternateProcess : Object
     private static readonly AlternateProcess Instance = new AlternateProcess();
     private readonly Thread _thread;
 
+    private AlternateProcess()
+    {
+        _thread = new Thread(ThreadStart);
+    }
+
     public static event Action<long> TickLoop
     {
         add => Instance.Processes += value;
@@ -20,18 +25,16 @@ public class AlternateProcess : Object
 
     private event Action<long> Processes = delegate { };
 
-    private AlternateProcess()
-    {
-        _thread = new Thread(ThreadStart);
-    }
     internal static void Start()
     {
         Instance._thread.Start();
     }
+
     internal static void Stop()
     {
         Instance._thread.Interrupt();
     }
+
     private void ThreadStart()
     {
         try
@@ -47,8 +50,7 @@ public class AlternateProcess : Object
                 var theProcesses = Processes;
                 theProcesses?.Invoke(elapsedTicks);
             }
-        }
-        catch (ThreadInterruptedException)
+        } catch (ThreadInterruptedException)
         {
         }
     }

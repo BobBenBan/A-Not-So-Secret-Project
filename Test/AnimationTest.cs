@@ -20,6 +20,7 @@ public class AnimationTest
         Assert.That(animation.TrackGetType(t2) == Animation.TrackType.Value);
         Assert.That(animation.TrackGetType(t3) == Animation.TrackType.Audio);
     }
+
     public static void WhereDoesItInsert()
     {
         var animation = new Animation();

@@ -11,6 +11,10 @@ public class Bank : Wrapper<GDObject>
 {
     private static readonly GDScript BankGd = GD.Load<GDScript>(GdLocations.Location + "Bank.gd");
     private static readonly GDScript SoundFontGd = GD.Load<GDScript>(GdLocations.Location + "SoundFont.gd");
+
+    private readonly System.Collections.Generic.Dictionary<int, Preset> presetCache =
+        new System.Collections.Generic.Dictionary<int, Preset>();
+
     public Bank(string soundFontFile, Array<int> usedProgramNumbers)
     {
         if (soundFontFile == null)
@@ -26,9 +30,6 @@ public class Bank : Wrapper<GDObject>
         Self = bank;
     }
 
-    private System.Collections.Generic.Dictionary<int, Preset> presetCache =
-        new System.Collections.Generic.Dictionary<int, Preset>();
-
     public Preset GetPreset(byte program, ushort bank)
     {
         var val = (bank << 7) | program;
@@ -42,14 +43,13 @@ public class Bank : Wrapper<GDObject>
 public class Preset : Wrapper<Dictionary>
 {
     private readonly List<Instrument> _instruments = new List<Instrument>();
+
     internal Preset(Dictionary self)
     {
         Self = self;
         var gdInstruments = Self["instruments"];
         foreach (var instrument in (IEnumerable) gdInstruments)
-        {
             _instruments.Add(instrument != null ? new Instrument((Dictionary) instrument) : null);
-        }
     }
 
     public Instrument this[byte keyNumber] => _instruments[keyNumber];
@@ -59,10 +59,10 @@ public class Instrument : Wrapper<Dictionary>
 {
     internal Instrument(Dictionary self)
     {
-        Self = self;
-        MixRate = (float) Self["mix_rate"];
-        Stream = (AudioStreamSample) Self["stream"];
-        AdsState = State.Create(Self["ads_state"]);
+        Self         = self;
+        MixRate      = (float) Self["mix_rate"];
+        Stream       = (AudioStreamSample) Self["stream"];
+        AdsState     = State.Create(Self["ads_state"]);
         ReleaseState = State.Create(Self["release_state"]);
     }
 

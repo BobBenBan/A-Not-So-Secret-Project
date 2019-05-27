@@ -20,8 +20,11 @@ public class AdsrPlayer : AudioStreamPlayer
     }
 
     public float MaximumVolumeDb { get; set; } = -8;
+
     public SevenBitNumber Velocity { get; set; }
+
     private float MinimumVolumeDb { get; } = -108;
+
     public bool Releasing { get; private set; }
 
     public float PitchBend
@@ -35,10 +38,15 @@ public class AdsrPlayer : AudioStreamPlayer
     }
 
     private float MixRate { get; set; }
+
     public float UsingTimer { get; private set; }
+
     private float Timer { get; set; }
+
     public float CurrentVolume { get; private set; }
+
     private State[] AdsState => _instrument.AdsState;
+
     private State[] ReleaseState => _instrument.ReleaseState;
 
     public void SetInstrument(Instrument instrument)
@@ -46,18 +54,18 @@ public class AdsrPlayer : AudioStreamPlayer
         if (instrument == null)
             return;
         _instrument = instrument;
-        MixRate = instrument.MixRate;
-        Stream = (AudioStreamSample) instrument.Stream.Duplicate();
+        MixRate     = instrument.MixRate;
+        Stream      = (AudioStreamSample) instrument.Stream.Duplicate();
     }
 
     public new void Play(float fromPosition = 0)
     {
-        Releasing = false;
+        Releasing       = false;
         _requestRelease = false;
-        Timer = 0;
-        UsingTimer = 0;
-        CurrentVolume = AdsState[0].Volume;
-        Stream.MixRate = MixRate.RoundToInt();
+        Timer           = 0;
+        UsingTimer      = 0;
+        CurrentVolume   = AdsState[0].Volume;
+        Stream.MixRate  = MixRate.RoundToInt();
         base.Play(fromPosition);
         UpdateVolume();
 //        _debug = false;
@@ -81,7 +89,7 @@ public class AdsrPlayer : AudioStreamPlayer
     {
         if (!Playing)
             return;
-        Timer += ticks / 10e6f;
+        Timer      += ticks / 10e6f;
         UsingTimer += ticks / 10e6f;
         var useState  = Releasing ? ReleaseState : AdsState;
         var allStates = useState.Length;
@@ -109,9 +117,9 @@ public class AdsrPlayer : AudioStreamPlayer
         UpdateVolume();
         if (_requestRelease && !Releasing)
         {
-            Releasing = true;
+            Releasing     = true;
             CurrentVolume = ReleaseState[0].Volume;
-            Timer = 0;
+            Timer         = 0;
         }
     }
 

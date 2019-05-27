@@ -13,6 +13,7 @@ public class PseudoScratch
         for (var i = 0; i < 20; i++)
             Console.WriteLine(random.NextEnum<E>().ToString());
     }
+
     private static IEnumerable<string> ForeverEnumerator()
     {
         try
@@ -26,6 +27,7 @@ public class PseudoScratch
             throw new TestException();
         }
     }
+
     [Test]
     public static void EnumFinallyTest()
     {
@@ -43,6 +45,7 @@ public class PseudoScratch
                 enumerator.Dispose();
             });
     }
+
     public static void EnumCast()
     {
         var e = (E) 9;

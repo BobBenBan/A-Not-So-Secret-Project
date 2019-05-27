@@ -21,11 +21,13 @@ public class Global : Node
 
         AlternateProcess.Start();
     }
+
     public override void _Notification(int what)
     {
         if (what == MainLoop.NotificationWmQuitRequest)
             OnQuit();
     }
+
     private void OnQuit()
     {
         AlternateProcess.Stop();

@@ -8,6 +8,7 @@ public class Ref : Object
     {
         Item = item;
     }
+
     public Ref()
     {
     }

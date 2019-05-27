@@ -7,6 +7,7 @@ public struct FBN
 {
     public const byte MaxValue = 15;
     private byte _value;
+
     public FBN(byte value)
         : this()
     {
@@ -34,12 +35,13 @@ public struct FBN
 }
 
 /// <summary>
-/// Seven Bit Number with implicit conversion.
+///     Seven Bit Number with implicit conversion.
 /// </summary>
 public struct SBN
 {
     public const byte MaxValue = 127;
     private byte _value;
+
     public SBN(byte value)
         : this()
     {
@@ -67,7 +69,7 @@ public struct SBN
 }
 
 /// <summary>
-/// Wrapped 14 bit number.
+///     Wrapped 14 bit number.
 /// </summary>
 public struct FTBN
 {
@@ -94,6 +96,7 @@ public struct FTBN
     {
         Value = value;
     }
+
     public FTBN(SBN head, SBN tail)
     {
         Head = head;

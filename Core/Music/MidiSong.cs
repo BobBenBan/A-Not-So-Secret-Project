@@ -7,11 +7,8 @@ public class MidiSong
 {
     public const float MaxSemitonesPitchBend = 7;
     public const byte DrumChannel = 0x09;
-
-    public readonly List<MidiTrack> Tracks =
-        new List<MidiTrack>();
-
     private readonly TempoMapManager _tempoMapManager = new TempoMapManager();
+    public readonly List<MidiTrack> Tracks = new List<MidiTrack>();
 
     public TempoMap TempoMap => _tempoMapManager.TempoMap;
 
@@ -22,16 +19,18 @@ public class MidiSong
 }
 
 /// <summary>
-/// A label for a track that stores its time in units of MidiTicks.
+///     A label for a track that stores its time in units of MidiTicks.
 /// </summary>
 public class MidiTrack : Track<IMusicEvent>
 {
     public FBN Channel;
-    public bool IsDrumTrack => Channel == MidiSong.DrumChannel;
+
     public MidiTrack(FBN channel)
         : base($"MidiTrack Channel {channel}")
     {
         Channel = channel;
     }
+
+    public bool IsDrumTrack => Channel == MidiSong.DrumChannel;
 }
 }

@@ -65,7 +65,6 @@
         <Compile Include="Scenes\Global\GlobalNode.cs" />
         <Compile Include="Scenes\Objects\WorldObject.cs" />
         <Compile Include="Scenes\Player\Player.cs" />
-        <Compile Include="Scenes\SimpleTrackPlayer.cs" />
         <Compile Include="Test\AnimationTest.cs" />
         <Compile Include="Test\MidiPlayerDisplayer.cs" />
         <Compile Include="Test\TestOnly.cs" />
@@ -81,7 +80,7 @@
         <None Include="packages.config" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Scenes\Music" />
+        <Folder Include="Scenes\Music" />
     </ItemGroup>
     <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

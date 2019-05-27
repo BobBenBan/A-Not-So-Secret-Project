@@ -25,12 +25,12 @@ public abstract class NoteEvent : IMusicEvent
 //        _corresponding = null;                    //clear link
 //    }
     public SBN NoteNumber;
-
     public SBN Velocity;
-//    private NoteEvent _corresponding = null;
+
     protected NoteEvent()
     {
     }
+
     protected NoteEvent(SBN noteNumber, SBN velocity)
     {
         NoteNumber = noteNumber;
@@ -48,17 +48,13 @@ public class NoteOnEvent : NoteEvent
     public NoteOnEvent()
     {
     }
+
     public NoteOnEvent(SBN noteNumber, SBN velocity)
         : base(noteNumber, velocity)
     {
     }
 
     public override string ToString() => $"Note On (Num: {NoteNumber}, Vel: {Velocity})";
-
-    public NoteOnEvent(Melanchall.DryWetMidi.Smf.NoteOnEvent noteOnEvent)
-        : this(noteOnEvent.NoteNumber, noteOnEvent.Velocity)
-    {
-    }
 }
 
 public class NoteOffEvent : NoteEvent
@@ -75,29 +71,26 @@ public class NoteOffEvent : NoteEvent
     public NoteOffEvent()
     {
     }
+
     public NoteOffEvent(SBN noteNumber, SBN velocity)
         : base(noteNumber, velocity)
-    {
-    }
-    public NoteOffEvent(Melanchall.DryWetMidi.Smf.NoteOffEvent noteOffEvent)
-        : this(noteOffEvent.NoteNumber, noteOffEvent.Velocity)
     {
     }
 
     public override string ToString() => $"Note Off {{Num: {NoteNumber}, Vel: {Velocity})";
 
-    public static implicit operator NoteOffEvent(Melanchall.DryWetMidi.Smf.NoteOffEvent noteOffEvent)
-    {
-        return new NoteOffEvent(noteOffEvent.NoteNumber, noteOffEvent.Velocity);
-    }
+    public static implicit operator NoteOffEvent(Melanchall.DryWetMidi.Smf.NoteOffEvent noteOffEvent) =>
+        new NoteOffEvent(noteOffEvent.NoteNumber, noteOffEvent.Velocity);
 }
 
 public class PitchBendEvent : IMusicEvent
 {
     public FTBN PitchValue;
+
     public PitchBendEvent()
     {
     }
+
     public PitchBendEvent(FTBN pitchValue)
     {
         PitchValue = pitchValue;
@@ -106,30 +99,22 @@ public class PitchBendEvent : IMusicEvent
     public float AsRange => PitchValue / 8192 - 1;
 
     public override string ToString() => $"Pitch Bend ({PitchValue})";
-
-    public PitchBendEvent(Melanchall.DryWetMidi.Smf.PitchBendEvent pitchBendEvent)
-        : this(pitchBendEvent.PitchValue)
-    {
-    }
 }
 
 public class ProgramChangeEvent : IMusicEvent
 {
     public SBN Program;
+
     public ProgramChangeEvent(SBN program)
     {
         Program = program;
     }
+
     public ProgramChangeEvent()
     {
     }
 
     public override string ToString() => $"Program Change ({Program})";
-
-    public ProgramChangeEvent(Melanchall.DryWetMidi.Smf.ProgramChangeEvent programChangeEvent)
-        : this(programChangeEvent.ProgramNumber)
-    {
-    }
 }
 
 public abstract class ControlEvent : IMusicEvent
@@ -141,17 +126,16 @@ public abstract class ControlEvent : IMusicEvent
 
 public abstract class TwoParamControlEvent : ControlEvent
 {
-    public bool HeadSet => _head != null;
-
     private SBN? _head;
+    private SBN? _tail;
+
+    public bool HeadSet => _head != null;
 
     public SBN Head
     {
         get => _head ?? default;
         set => _head = value;
     }
-
-    private SBN? _tail;
 
     public bool TailSet => _tail != null;
 
@@ -180,27 +164,24 @@ public class BankSelectEvent : TwoParamControlEvent
         set => Combined = value;
     }
 
-    public FTBN ApplyOn(FTBN original)
-    {
-        return (ushort) (((HeadSet ? Head : original >> 7) << 7)
-                       | (TailSet ? Tail : original & SBN.MaxValue));
-    }
-
     public override SBN ControlNumber { get; } = (byte) ControlNumbers.BankSelect;
 
     public override SBN? ControlNumberLSB { get; } = (byte) ControlNumbers.BankSelectLsb;
+
+    public FTBN ApplyOn(FTBN original) =>
+        (ushort) (((HeadSet ? Head : original >> 7) << 7) | (TailSet ? Tail : original & SBN.MaxValue));
 
     public override string ToString() => $"Bank Select ({Bank})";
 }
 
 public class VolumeChangeEvent : ControlEvent
 {
-    public SBN Volume { get; set; }
-
     public VolumeChangeEvent(SBN volume)
     {
         Volume = volume;
     }
+
+    public SBN Volume { get; set; }
 
     public override SBN ControlNumber { get; } = (byte) ControlNumbers.Volume;
 
@@ -211,12 +192,12 @@ public class VolumeChangeEvent : ControlEvent
 
 public class ExpressionChangeEvent : ControlEvent
 {
-    public SBN Expression { get; set; }
-
     public ExpressionChangeEvent(SBN expression)
     {
         Expression = expression;
     }
+
+    public SBN Expression { get; set; }
 
     public override SBN ControlNumber { get; } = (byte) ControlNumbers.Expression;
 

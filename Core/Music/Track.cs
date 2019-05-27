@@ -9,9 +9,10 @@ namespace MusicMachine.Music
 ///     Represents events on a track in time.
 ///     This can indexed with track time, and will return a LIST of events at that track time.
 ///     Track time can be any number (negative or positive).
+///     Please be nice and don't try to cast the IReadOnlyLists into Lists then modify them.
+///     I could do a thing with a delegate but I don't wanna
 /// </summary>
-public class Track<TEvent>
-    : IReadOnlyDictionary<long, IEnumerable<TEvent>>
+public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
 {
     private SortedList<long, List<TEvent>> _track = new SortedList<long, List<TEvent>>();
     public string Name;
@@ -22,89 +23,48 @@ public class Track<TEvent>
     }
 
     public Track()
-        : this($"Track of ({typeof(long).Name}, {typeof(TEvent).Name})")
+        : this($"Track of {typeof(TEvent).Name}s")
     {
     }
 
-    public IEnumerable<long> Times
-    {
-        get { return _track.Keys; }
-    }
+    public IEnumerable<long> Times => _track.Keys;
 
     /// <summary>
     ///     Iterate through all the events in a track, in order of time, grouped in lists by the time they were at.
     /// </summary>
-    public IEnumerable<IReadOnlyList<TEvent>> EventLists
-    {
-        get { return _track.Values; }
-    }
+    public IEnumerable<IReadOnlyList<TEvent>> EventLists => _track.Values;
 
     /// <summary>
     ///     Iterate through all events in the track in order of time.
     /// </summary>
-    public IEnumerable<TEvent> Events
-    {
-        get { return _track.Values.SelectMany(x => x); }
-    }
+    public IEnumerable<TEvent> Events => _track.Values.SelectMany(x => x);
 
-    /// <summary>
-    /// Iterate elements in reverse of time.
-    /// </summary>
-    public IEnumerable<TEvent> EventsReversed
-    {
-        get { return _track.Values.ListReverse().SelectMany(x => x); }
-    }
+    public IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>> Elements =>
+        _track.Select(x => new KeyValuePair<long, IEnumerable<TEvent>>(x.Key, x.Value));
 
-    public IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>> Elements
-    {
-        get { return _track.Select(x => new KeyValuePair<long, IEnumerable<TEvent>>(x.Key, x.Value)); }
-    }
+    public IEnumerable<KeyValuePair<long, TEvent>> EventPairs =>
+        _track.SelectMany(pair => pair.Value, (pair, @event) => new KeyValuePair<long, TEvent>(pair.Key, @event));
 
-    public IEnumerable<KeyValuePair<long, TEvent>> EventPairs
-    {
-        get
-        {
-            return _track.SelectMany(
-                pair => pair.Value,
-                (pair, @event) => new KeyValuePair<long, TEvent>(pair.Key, @event));
-        }
-    }
+    private long LastTime => _track.Keys.ListLast();
 
-    IEnumerable<long> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Keys
-    {
-        get { return _track.Keys; }
-    }
+    IEnumerable<long> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Keys => _track.Keys;
 
-    IEnumerable<IEnumerable<TEvent>> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Values
-    {
-        get { return _track.Values; }
-    }
+    IEnumerable<IEnumerable<TEvent>> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Values => _track.Values;
 
     IEnumerator<KeyValuePair<long, IEnumerable<TEvent>>> IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>>.
-        GetEnumerator()
-    {
-        return Elements.GetEnumerator();
-    }
+        GetEnumerator() =>
+        Elements.GetEnumerator();
 
-    public IEnumerator GetEnumerator()
-    {
-        return Elements.GetEnumerator();
-    }
+    public IEnumerator GetEnumerator() => Elements.GetEnumerator();
 
-    bool IReadOnlyDictionary<long, IEnumerable<TEvent>>.ContainsKey(long time)
-    {
-        return _track.ContainsKey(time);
-    }
+    bool IReadOnlyDictionary<long, IEnumerable<TEvent>>.ContainsKey(long time) => _track.ContainsKey(time);
 
     /// <summary>
     ///     Gets a list of all elements at the specified time.
     ///     May become invalidated later if elements at this time reach 0 at any point.
     /// </summary>
     /// <param name="time"></param>
-    public IEnumerable<TEvent> this[long time]
-    {
-        get { return _track[time]; }
-    }
+    public IEnumerable<TEvent> this[long time] => _track[time];
 
     bool IReadOnlyDictionary<long, IEnumerable<TEvent>>.TryGetValue(long key, out IEnumerable<TEvent> value)
     {
@@ -116,15 +76,9 @@ public class Track<TEvent>
     /// <summary>
     ///     The number of separate times that have events.
     /// </summary>
-    public int Count
-    {
-        get { return _track.Count; }
-    }
+    public int Count => _track.Count;
 
-    private bool ContainsTime(long time)
-    {
-        return _track.ContainsKey(time);
-    }
+    private bool ContainsTime(long time) => _track.ContainsKey(time);
 
     /// <summary>
     ///     Adds an element to this track.
@@ -154,8 +108,7 @@ public class Track<TEvent>
     {
         using (var enumerator = events.GetEnumerator())
         {
-            if (!enumerator.MoveNext())
-                return;
+            if (!enumerator.MoveNext()) return;
             var list = GetListForAdd(time);
             do
             {
@@ -170,14 +123,12 @@ public class Track<TEvent>
     /// <param name="events"> a series of KeyValuePairs of (time, to, a list of events).</param>
     public void AddRange(IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>> events)
     {
-        foreach (var pair in events)
-            AddRange(pair.Key, pair.Value);
+        foreach (var pair in events) AddRange(pair.Key, pair.Value);
     }
 
     private List<TEvent> GetListForAdd(long time)
     {
-        if (_track.TryGetValue(time, out var list))
-            return list;
+        if (_track.TryGetValue(time, out var list)) return list;
         list = new List<TEvent>();
         _track.Add(time, list);
         return list;
@@ -192,12 +143,10 @@ public class Track<TEvent>
     public bool Remove(long time, TEvent @event)
     {
         var index = _track.IndexOfKey(time);
-        if (index < 0)
-            return false;
+        if (index < 0) return false;
         var list = _track.Values[index];
         var b    = list.Remove(@event);
-        if (b && list.IsEmpty())
-            _track.RemoveAt(index);
+        if (b && list.Count == 0) _track.RemoveAt(index);
         return b;
     }
 
@@ -211,10 +160,8 @@ public class Track<TEvent>
         for (var index = 0; index < _track.Values.Count; index++)
         {
             var list = _track.Values[index];
-            if (!list.Remove(@event))
-                continue;
-            if (list.IsEmpty())
-                _track.RemoveAt(index);
+            if (!list.Remove(@event)) continue;
+            if (list.Count == 0) _track.RemoveAt(index);
             return true;
         }
 
@@ -233,8 +180,7 @@ public class Track<TEvent>
         {
             var list = _track.Values[index];
             total += list.RemoveAll(match);
-            if (list.IsEmpty())
-                _track.RemoveAt(index);
+            if (list.Count == 0) _track.RemoveAt(index);
         }
 
         return total;
@@ -245,10 +191,7 @@ public class Track<TEvent>
     /// </summary>
     /// <param name="time">The time to remove.</param>
     /// <returns>If any events were removed.</returns>
-    public bool RemoveAt(long time)
-    {
-        return _track.Remove(time);
-    }
+    public bool RemoveAt(long time) => _track.Remove(time);
 
     /// <summary>
     ///     Clears the track of all events.
@@ -264,11 +207,9 @@ public class Track<TEvent>
     /// <param name="func">The function to transform times.</param>
     public void TransformTimes(Func<long, long> func)
     {
-        if (_track.Count <= 0)
-            return;
+        if (_track.Count <= 0) return;
         var newTrack = new SortedList<long, List<TEvent>>();
-        foreach (var pair in _track)
-            newTrack.Add(func(pair.Key), pair.Value);
+        foreach (var pair in _track) newTrack.Add(func(pair.Key), pair.Value);
         _track = newTrack;
     }
 
@@ -280,135 +221,219 @@ public class Track<TEvent>
     {
         foreach (var pair in _track)
         {
-            var list = pair.Value;
-            for (var i = 0; i < list.Count; i++)
-                list[i] = func(list[i]);
+            var list                                     = pair.Value;
+            for (var i = 0; i < list.Count; i++) list[i] = func(list[i]);
         }
     }
 
-    public IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> IterateTrackNullSep(
-        long startInclusive,
-        long endInclusive,
-        Func<long, long> step)
-    {
-        if (step == null)
-            throw new ArgumentNullException(nameof(step));
-        if (endInclusive < startInclusive)
-            throw new ArgumentException();
-        return DoNullSeparated(startInclusive, endInclusive, step);
-    }
+//    public IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> IterateTrackNullSep(
+//        long startInclusive,
+//        long endInclusive,
+//        Func<long, long> step)
+//    {
+//        if (step == null)
+//            throw new ArgumentNullException(nameof(step));
+//        if (endInclusive < startInclusive)
+//            throw new ArgumentException();
+//        return DoNullSeparated(startInclusive, endInclusive, step);
+//    }
+//
+//    public IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> IterateTrackNullSep(
+//        long startInclusive,
+//        Func<long, long> step) =>
+//        IterateTrackNullSep(startInclusive, LastTime, step);
+//
+//    public IEnumerable<KeyValuePair<long, TEvent>?> IterateTrackSingleNullSep(
+//        long startInclusive,
+//        long endInclusive,
+//        Func<long, long> step)
+//    {
+//        if (step == null)
+//            throw new ArgumentNullException(nameof(step));
+//        if (endInclusive < startInclusive)
+//            throw new ArgumentException();
+//        return FlattenNullSeps(DoNullSeparated(startInclusive, endInclusive, step));
+//    }
+//
+//    public IEnumerable<KeyValuePair<long, TEvent>?> IterateTrackSingleNullSep(
+//        long startInclusive,
+//        Func<long, long> step) =>
+//        IterateTrackSingleNullSep(startInclusive, LastTime, step);
+//
+//    private IEnumerable<IList<KeyValuePair<long, IReadOnlyList<TEvent>>>> IterateTrackLists(
+//        long startInclusive,
+//        long endInclusive,
+//        Func<long, long> step) =>
+//        CombineNullSep(IterateTrackNullSep(startInclusive, endInclusive, step));
+//
+//    private IEnumerable<IList<KeyValuePair<long, IReadOnlyList<TEvent>>>> IterateTrackLists(
+//        long startInclusive,
+//        Func<long, long> step) =>
+//        CombineNullSep(IterateTrackNullSep(startInclusive, LastTime, step));
+//
+//    public IEnumerable<IList<KeyValuePair<long, TEvent>>> IterateTrackSingleLists(
+//        long startInclusive,
+//        long endInclusive,
+//        Func<long, long> step) =>
+//        CombineNullSep(IterateTrackSingleNullSep(startInclusive, endInclusive, step));
+//
+//    public IEnumerable<IList<KeyValuePair<long, TEvent>>> IterateTrackSingleLists(
+//        long startInclusive,
+//        Func<long, long> step) =>
+//        IterateTrackSingleLists(startInclusive, LastTime, step);
+//
+//    private static IEnumerable<IList<T>> CombineNullSep<T>(IEnumerable<T?> nullSeparated)
+//        where T : struct
+//    {
+//        var curList = new List<T>();
+//        foreach (var pair in nullSeparated)
+//            if (pair.HasValue)
+//                curList.Add(pair.Value);
+//            else
+//            {
+//                yield return curList;
+//                curList.Clear();
+//            }
+////        if (curList.NotEmpty())
+////            yield return curList;
+//    }
+//
+//    private static IEnumerable<KeyValuePair<long, TEvent>?> FlattenNullSeps(
+//        IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> doNullSeparated)
+//    {
+//        foreach (var pair in doNullSeparated)
+//            if (pair.HasValue)
+//            {
+//                foreach (var @event in pair.Value.Value)
+//                    yield return new KeyValuePair<long, TEvent>(pair.Value.Key, @event);
+//            }
+//            else
+//                yield return null;
+//    }
+//
+//    private IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> DoNullSeparated(
+//        long start,
+//        long end,
+//        Func<long, long> step)
+//    {
+//        var idx = _track.Keys.BinarySearchIndexOf(start);
+//        if (idx >= 0)
+//            yield return new KeyValuePair<long, IReadOnlyList<TEvent>>(start, _track.Values[idx]);
+//        yield return null;
+//        idx = idx < 0 ? ~idx : idx + 1;
+//        var target = start;
+//        while (true)
+//        {
+//            var next = step(target);
+//            if (next < target)
+//                throw new InvalidOperationException($"next value {next} is less than target {target}");
+//            target = Math.Min(next, end);
+//
+//            for (; idx != _track.Count && _track.Keys[idx] <= target; idx++)
+//                yield return new KeyValuePair<long, IReadOnlyList<TEvent>>(_track.Keys[idx], _track.Values[idx]);
+//            yield return null;
+//            if (target == end)
+//                yield break;
+//        }
+//    }
+    public Stepper GetStepper(long startTime = 0) => new Stepper(this, startTime);
 
-    public IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> IterateTrackNullSep(
-        long startInclusive,
-        Func<long, long> step)
+    public class Stepper
     {
-        return IterateTrackNullSep(startInclusive, LastTime, step);
-    }
+        private readonly List<KeyValuePair<long, List<TEvent>>> _current = new List<KeyValuePair<long, List<TEvent>>>();
+        private readonly Track<TEvent> _owner;
+        private long _curTimeInclusive;
+        private int _idx = -1;
 
-    public IEnumerable<KeyValuePair<long, TEvent>?> IterateTrackSingleNullSep(
-        long startInclusive,
-        long endInclusive,
-        Func<long, long> step)
-    {
-        if (step == null)
-            throw new ArgumentNullException(nameof(step));
-        if (endInclusive < startInclusive)
-            throw new ArgumentException();
-        return FlattenNullSeps(DoNullSeparated(startInclusive, endInclusive, step));
-    }
-
-    public IEnumerable<KeyValuePair<long, TEvent>?> IterateTrackSingleNullSep(
-        long startInclusive,
-        Func<long, long> step)
-    {
-        return IterateTrackSingleNullSep(startInclusive, LastTime, step);
-    }
-
-    IEnumerable<IList<KeyValuePair<long, IReadOnlyList<TEvent>>>> IterateTrackLists(
-        long startInclusive,
-        long endInclusive,
-        Func<long, long> step)
-    {
-        return CombineNullSep(IterateTrackNullSep(startInclusive, endInclusive, step));
-    }
-
-    IEnumerable<IList<KeyValuePair<long, IReadOnlyList<TEvent>>>> IterateTrackLists(
-        long startInclusive,
-        Func<long, long> step)
-    {
-        return CombineNullSep(IterateTrackNullSep(startInclusive, LastTime, step));
-    }
-
-    public IEnumerable<IList<KeyValuePair<long, TEvent>>> IterateTrackSingleLists(
-        long startInclusive,
-        long endInclusive,
-        Func<long, long> step)
-    {
-        return CombineNullSep(IterateTrackSingleNullSep(startInclusive, endInclusive, step));
-    }
-
-    public IEnumerable<IList<KeyValuePair<long, TEvent>>> IterateTrackSingleLists(
-        long startInclusive,
-        Func<long, long> step)
-    {
-        return IterateTrackSingleLists(startInclusive, LastTime, step);
-    }
-
-    private static IEnumerable<IList<T>> CombineNullSep<T>(IEnumerable<T?> nullSeparated)
-        where T : struct
-    {
-        var curList = new List<T>();
-        foreach (var pair in nullSeparated)
-            if (pair.HasValue)
-            {
-                curList.Add(pair.Value);
-            } else
-            {
-                yield return curList;
-                curList.Clear();
-            }
-//        if (curList.NotEmpty())
-//            yield return curList;
-    }
-
-    private static IEnumerable<KeyValuePair<long, TEvent>?> FlattenNullSeps(
-        IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> doNullSeparated)
-    {
-        foreach (var pair in doNullSeparated)
-            if (pair.HasValue)
-            {
-                foreach (var @event in pair.Value.Value)
-                    yield return new KeyValuePair<long, TEvent>(pair.Value.Key, @event);
-            } else
-                yield return null;
-    }
-
-    private IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> DoNullSeparated(
-        long start,
-        long end,
-        Func<long, long> step)
-    {
-        var idx = _track.Keys.BinarySearchIndexOf(start);
-        if (idx >= 0)
-            yield return new KeyValuePair<long, IReadOnlyList<TEvent>>(start, _track.Values[idx]);
-        yield return null;
-        idx = idx < 0 ? ~idx : idx + 1;
-        var target = start;
-        while (true)
+        internal Stepper(Track<TEvent> owner, long startTimeInclusive)
         {
-            var next = step(target);
-            if (next < target)
-                throw new InvalidOperationException($"next value {next} is less than target {target}");
-            target = Math.Min(next, end);
+            _owner            = owner;
+            _curTimeInclusive = startTimeInclusive;
+        }
 
-            for (; idx != _track.Count && _track.Keys[idx] <= target; idx++)
-                yield return new KeyValuePair<long, IReadOnlyList<TEvent>>(_track.Keys[idx], _track.Values[idx]);
-            yield return null;
-            if (target == end)
-                yield break;
+        private SortedList<long, List<TEvent>> Track => _owner._track;
+
+        public long CurTimeInclusive
+        {
+            get => _curTimeInclusive;
+            set
+            {
+                _idx              = -1;
+                _curTimeInclusive = value;
+            }
+        }
+
+        public long CurTimeExclusive
+        {
+            get => _curTimeInclusive - 1;
+            set
+            {
+                _idx              = -1;
+                _curTimeInclusive = value + 1;
+            }
+        }
+
+        public bool IsCurrentlyDone => _idx >= Track.Count;
+
+        public bool StepToInclusive(long nextTimeInclusive)
+        {
+            if (nextTimeInclusive < _curTimeInclusive)
+                throw new ArgumentException("Attempted to step backwards", nameof(nextTimeInclusive));
+            if (_idx == -1)
+            {
+                _idx = Track.Keys.BinarySearchIndexOf(_curTimeInclusive);
+                if (_idx < 0) _idx = ~_idx;
+            }
+            else
+            {
+                _idx.Constrain(0, Track.Count - 1);
+                //linear search
+                if (Track.Keys[_idx] < _curTimeInclusive)
+                {
+                    do
+                    {
+                        _idx++;
+                    } while (_idx < Track.Count && Track.Keys[_idx] < _curTimeInclusive);
+                }
+                else
+                {
+                    while (_idx > 0 && Track.Keys[_idx - 1] > _curTimeInclusive)
+                        _idx--;
+                }
+            }
+            _current.Clear();
+            if (_idx >= Track.Count) return false;
+            while (_idx < Track.Keys.Count && Track.Keys[_idx] <= nextTimeInclusive)
+            {
+                _current.Add(new KeyValuePair<long, List<TEvent>>(Track.Keys[_idx], Track.Values[_idx]));
+                _idx++;
+            }
+            _curTimeInclusive = nextTimeInclusive;
+            return true;
+        }
+
+        public bool StepTo(long nextTimeExclusive) => StepToInclusive(nextTimeExclusive - 1);
+
+        public void CopyCurrentTo(List<KeyValuePair<long, IReadOnlyList<TEvent>>> list)
+        {
+            list.Clear();
+            foreach (var pair in _current)
+                list.Add(new KeyValuePair<long, IReadOnlyList<TEvent>>(pair.Key, pair.Value));
+        }
+
+        public void CopyCurrentTo(List<KeyValuePair<long, TEvent>> list)
+        {
+            list.Clear();
+            foreach (var pair in _current)
+            foreach (var @event in pair.Value)
+                list.Add(new KeyValuePair<long, TEvent>(pair.Key, @event));
+        }
+
+        public void CopyCurrentTo(List<TEvent> list)
+        {
+            list.Clear();
+            foreach (var pair in _current) list.AddRange(pair.Value);
         }
     }
-
-    public long LastTime => _track.Keys.ListLast();
 }
 }

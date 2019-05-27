@@ -8,10 +8,9 @@ namespace MusicMachine.Music
 {
 public static class MidiConverter
 {
-    //TODO
     /// <summary>
-    /// Creates a midi song from a midi, including most channel events, and tempo map.
-    /// More events to be supported at a later date.
+    ///     Creates a midi song from a midi, including most channel events, and tempo map.
+    ///     More events to be supported at a later date.
     /// </summary>
     /// <param name="file"></param>
     /// <exception cref="NotSupportedException"></exception>
@@ -26,6 +25,7 @@ public static class MidiConverter
         song.Tracks.AddRange(tracks);
         return song;
     }
+
     public static IEnumerable<MidiTrack> ChannelEventsToTracks(IEnumerable<TimedEvent> events)
     {
         var tracks = new MidiTrack[16];
@@ -46,15 +46,16 @@ public static class MidiConverter
         }
         return tracks.Where(x => x != null);
     }
+
     private static IMusicEvent TryConvertToMusicEvent(ChannelEvent @event)
     {
         switch (@event)
         {
         case ControlChangeEvent cce:                           return ConvertControlChange(cce);
-        case Melanchall.DryWetMidi.Smf.NoteOnEvent noe:        return new NoteOnEvent(noe);
-        case Melanchall.DryWetMidi.Smf.NoteOffEvent noe:       return new NoteOffEvent(noe);
-        case Melanchall.DryWetMidi.Smf.PitchBendEvent pbe:     return new PitchBendEvent(pbe);
-        case Melanchall.DryWetMidi.Smf.ProgramChangeEvent pce: return new ProgramChangeEvent(pce);
+        case Melanchall.DryWetMidi.Smf.NoteOnEvent noe:        return new NoteOnEvent(noe.NoteNumber, noe.Velocity);
+        case Melanchall.DryWetMidi.Smf.NoteOffEvent noe:       return new NoteOffEvent(noe.NoteNumber, noe.Velocity);
+        case Melanchall.DryWetMidi.Smf.PitchBendEvent pbe:     return new PitchBendEvent(pbe.PitchValue);
+        case Melanchall.DryWetMidi.Smf.ProgramChangeEvent pce: return new ProgramChangeEvent(pce.ProgramNumber);
         //todo, maybe??
         case NoteAftertouchEvent _:
         case ChannelAftertouchEvent _:
@@ -63,6 +64,7 @@ public static class MidiConverter
             return null;
         }
     }
+
     private static IMusicEvent ConvertControlChange(ControlChangeEvent changeEvent)
     {
         var controlValue = changeEvent.ControlValue;

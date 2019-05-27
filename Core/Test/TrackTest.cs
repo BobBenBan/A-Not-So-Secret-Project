@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using MusicMachine.Music;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -33,108 +33,53 @@ public class TrackTest
             SparseTrack.Add(key, item);
         }
     }
+
     private static readonly Track<string> DenseTrack = new Track<string>();
     private static readonly Dictionary<long, List<string>> DenseKnown = new Dictionary<long, List<string>>();
     private static readonly Track<string> SparseTrack = new Track<string>();
     private static readonly Dictionary<long, List<string>> SparseKnown = new Dictionary<long, List<string>>();
+
     private static void DoIterateTest(Track<string> track, Dictionary<long, List<string>> known)
     {
-        foreach (var el in track.Elements)
-        {
-            Assert.IsTrue(known.ContainsKey(el.Key));
-            Assert.AreEqual(known[el.Key], el.Value);
-        }
-
-        foreach (var el in track.EventPairs)
-        {
-            Assert.IsTrue(known.ContainsKey(el.Key));
-            Assert.IsTrue(known[el.Key].Contains(el.Value));
-        }
-
         known = new Dictionary<long, List<string>>(known);
-        var random = new Randomizer(234);
-
-        for (var j = 0; j < 500; j++)
+        var random  = new Randomizer(234);
+        var curList = new List<KeyValuePair<long, IReadOnlyList<string>>>();
+        for (var j = 0; j < 200; j++)
         {
-            var start = 30 + random.NextShort(400);
-            var end   = start * 5 + random.NextShort(3000);
-            var step  = 1 + random.NextShort(30);
-            var cur   = start;
-            var cnt   = 0;
-            using (var pairs = track.IterateTrackNullSep(start, end, i => i + step).GetEnumerator())
+            var start = -100 + random.NextShort(400);
+
+            var stepper = track.GetStepper(start);
+            var cur     = start;
+            var cnt     = 0;
+            while (true)
             {
-                while (pairs.MoveNext())
+                var next = cur + random.NextShort(70);
+                if (!stepper.StepToInclusive(next))
                 {
-                    var from = Math.Max(start, cur - step + 1);
-                    var to   = Math.Min(end, cur);
-                    while (pairs.Current.HasValue)
-                    {
-                        var pair = pairs.Current.Value;
-                        Assert.That(pair.Key, Is.InRange(from, to));
-                        Assert.IsTrue(known.ContainsKey(pair.Key));
-                        Assert.AreEqual(known[pair.Key], pair.Value);
-
-                        pairs.MoveNext();
-                    }
-                    cur += step;
-                    if (cnt++ > 6000)
-                        break;
+                    Assert.Greater(cur, track.Times.Last());
+                    break;
                 }
+                stepper.CopyCurrentTo(curList);
+                for (var i = cur; i <= next; i++)
+                {
+                    var knownHasKey = known.ContainsKey(i);
+                    var trackIndex  = curList.FindIndex(x => x.Key == i);
+                    Assert.AreEqual(knownHasKey, trackIndex >= 0);
+                    if (!knownHasKey)
+                        continue;
+                    Assert.AreEqual(known[i], curList[trackIndex].Value);
+                    curList.RemoveAt(trackIndex);
+                }
+                Assert.IsEmpty(curList);
+                cur = next + 1;
+                if (cnt++ > 8000)
+                    break;
             }
         }
     }
+
     [Test]
-    public static void OverFlowTest()
-    {
-        var random    = new Randomizer(345);
-        var willThrow = false;
-
-        long ThrowOrNot(long i)
-        {
-            if (random.NextShort(6000) >= 0)
-                return i + 1 + random.NextShort(50);
-            willThrow = true;
-            return i;
-        }
-
-        try
-        {
-            foreach (var el in DenseTrack.IterateTrackSingleLists(0, 1233456, ThrowOrNot))
-            {
-            }
-        }
-        catch (OverflowException)
-        {
-            Assert.True(willThrow);
-        }
-    }
-    [Test]
-    public static void TestCopyAndTrim()
-    {
-        var randomizer = new Randomizer(123);
-        var toRemove   = new List<long>();
-        var cnt        = SparseTrack.Count;
-        foreach (var time in SparseTrack.Times)
-        {
-            if (randomizer.NextShort(10) >= 1)
-                continue;
-            toRemove.Add(time);
-            cnt--;
-        }
-
-        var newTrack = new Track<string>();
-        newTrack.AddRange(SparseTrack.Elements);
-
-        foreach (var i in toRemove)
-        {
-            Console.WriteLine($"Removing {i}");
-            newTrack.RemoveAt(i);
-        }
-
-        Assert.AreEqual(cnt, newTrack.Count);
-    }
-    [Test]
-    public static void TestEnumerators()
+    public static void TestStepper()
     {
         DoIterateTest(SparseTrack, SparseKnown);
         DoIterateTest(DenseTrack,  DenseKnown);

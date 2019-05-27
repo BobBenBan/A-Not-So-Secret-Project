@@ -14,6 +14,7 @@ public static class StructEx
             val = dict[key] = ifAbsent();
         return val;
     }
+
     public static bool TryGetAndRemove<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, out TValue value)
     {
         var b = dict.TryGetValue(key, out value);
@@ -21,6 +22,7 @@ public static class StructEx
             dict.Remove(key);
         return b;
     }
+
     public static IList<T> Swap<T>(this IList<T> list, int a, int b)
     {
         var tmp = list[a];
@@ -28,6 +30,7 @@ public static class StructEx
         list[b] = tmp;
         return list;
     }
+
     public static bool TryFind<T>(this IEnumerable<T> list, out T value, Predicate<T> match)
     {
         if (match == null)
@@ -42,6 +45,7 @@ public static class StructEx
         value = default;
         return false;
     }
+
     public static int BinarySearchIndexOf<T>(this IList<T> list, T value, IComparer<T> comparer = null)
     {
         if (list == null)
@@ -65,24 +69,20 @@ public static class StructEx
         return ~lower;
     }
 
-    public static bool IsEmpty<T>(this IReadOnlyCollection<T> collection) => collection.Count == 0;
-
-    public static bool NotEmpty<T>(this IReadOnlyCollection<T> collection) => collection.Count != 0;
-
     public static IEnumerable<T> ListReverse<T>(this IList<T> list)
     {
         for (var i = list.Count - 1; i >= 0; i--)
             yield return list[i];
     }
-    public static T ListLast<T>(this IList<T> list)
-    {
-        return list[list.Count - 1];
-    }
+
+    public static T ListLast<T>(this IList<T> list) => list[list.Count - 1];
+
     public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
     {
         foreach (var item in enumeration)
             action(item);
     }
+
     public static bool AddIfAbsent<T>(this ICollection<T> collection, T item)
     {
         var absent = !collection.Contains(item);
@@ -90,50 +90,50 @@ public static class StructEx
             collection.Add(item);
         return absent;
     }
+
+    public static TValue GetOrPutNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        where TValue : new()
+    {
+        if (dictionary.TryGetValue(key, out var value))
+            return value;
+        value = new TValue();
+        dictionary.Add(key, value);
+        return value;
+    }
 }
 
 public static class VectorEx
 {
-    public static Vector3 ClampX(
-        this Vector3 @this,
-        float min,
-        float max)
+    public static Vector3 ClampX(this Vector3 @this, float min, float max)
     {
         @this.x = Mathf.Clamp(@this.x, min, max);
         return @this;
     }
-    public static Vector3 ClampY(
-        this Vector3 @this,
-        float min,
-        float max)
+
+    public static Vector3 ClampY(this Vector3 @this, float min, float max)
     {
         @this.y = Mathf.Clamp(@this.y, min, max);
         return @this;
     }
-    public static Vector3 ClampZ(
-        this Vector3 @this,
-        float min,
-        float max)
+
+    public static Vector3 ClampZ(this Vector3 @this, float min, float max)
     {
         @this.z = Mathf.Clamp(@this.z, min, max);
         return @this;
     }
-    public static Vector2 ClampX(
-        this Vector2 @this,
-        float min,
-        float max)
+
+    public static Vector2 ClampX(this Vector2 @this, float min, float max)
     {
         @this.x = Mathf.Clamp(@this.x, min, max);
         return @this;
     }
-    public static Vector2 ClampY(
-        this Vector2 @this,
-        float min,
-        float max)
+
+    public static Vector2 ClampY(this Vector2 @this, float min, float max)
     {
         @this.y = Mathf.Clamp(@this.y, min, max);
         return @this;
     }
+
     public static void RotateBy(this Spatial spatial, Vector3 rot)
     {
         spatial.RotateX(rot.x);
@@ -146,21 +146,15 @@ public static class GodotEx
 {
     public static bool Is(this Object obj, string property) => obj.Get(property) as bool? ?? false;
 
-    public static bool TryCall(
-        this Object obj,
-        string method,
-        params object[] args)
+    public static bool TryCall(this Object obj, string method, params object[] args)
     {
         if (!obj.HasMethod(method))
             return false;
         obj.Call(method, args);
         return true;
     }
-    public static bool TryCall(
-        this Object obj,
-        out object o,
-        string method,
-        params object[] args)
+
+    public static bool TryCall(this Object obj, out object o, string method, params object[] args)
     {
         if (!obj.HasMethod(method))
         {
@@ -171,21 +165,15 @@ public static class GodotEx
         o = obj.Call(method, args);
         return true;
     }
-    public static bool CallOrNull(
-        this Object obj,
-        string method,
-        out object result,
-        params object[] args)
+
+    public static bool CallOrNull(this Object obj, string method, out object result, params object[] args)
     {
         var o = obj.HasMethod(method);
         result = o ? obj.Call(method, args) : null;
         return o;
     }
-    public static Timer CreateAndConnectTimer(
-        this Node node,
-        string method,
-        bool physics = true,
-        bool oneShot = true)
+
+    public static Timer CreateAndConnectTimer(this Node node, string method, bool physics = true, bool oneShot = true)
     {
         var timer = new Timer
         {
@@ -195,14 +183,17 @@ public static class GodotEx
         timer.Connect("timeout", node, method);
         return timer;
     }
+
     public static Shape CreateShape(this Mesh mesh, bool isTrimesh) =>
         isTrimesh ? mesh.CreateTrimeshShape() : mesh.CreateConvexShape();
+
     public static Array<T> ToGDArray<T>(this IEnumerable<T> elements)
     {
         var o = new Array<T>();
         o.AddRange(elements);
         return o;
     }
+
     public static void AddRange<T>(this Array<T> array, IEnumerable<T> elements)
     {
         foreach (var element in elements)

@@ -5,19 +5,20 @@ using System.Linq;
 namespace MusicMachine
 {
 /// <summary>
-/// Combines a series of Enumerables of Enumerables, into a single Enumerable of Enumerables.
-/// I hope that make sense.
-///
-/// The IEnumerables returned by this are TEMPORARY. Please note.
+///     Combines a series of Enumerables of Enumerables, into a single Enumerable of Enumerables.
+///     I hope that make sense.
+///     The IEnumerables returned by this are TEMPORARY. Please note.
 /// </summary>
 /// <typeparam name="TEvent"></typeparam>
 public struct FlatteningMultipleIterator<TEvent> : IEnumerable<IEnumerable<TEvent>>
 {
-    private IEnumerable<IEnumerable<IEnumerable<TEvent>>> enumerofEnumerOfEnumerables; //not a mouthful at all.
+    private readonly IEnumerable<IEnumerable<IEnumerable<TEvent>>> enumerofEnumerOfEnumerables; //not a mouthful at all.
+
     public FlatteningMultipleIterator(IEnumerable<IEnumerable<IEnumerable<TEvent>>> enumerables)
     {
         enumerofEnumerOfEnumerables = enumerables;
     }
+
     public IEnumerator<IEnumerable<TEvent>> GetEnumerator()
     {
         var enumerators = enumerofEnumerOfEnumerables.Select(x => x.GetEnumerator()).ToList();
@@ -40,7 +41,8 @@ public struct FlatteningMultipleIterator<TEvent> : IEnumerable<IEnumerable<TEven
             {
                 yield return curBatch;
                 curBatch.Clear();
-            } else
+            }
+            else
                 break;
         }
     }
