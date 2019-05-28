@@ -12,16 +12,17 @@ namespace MusicMachine
 /// <typeparam name="TEvent"></typeparam>
 public struct FlatteningMultipleIterator<TEvent> : IEnumerable<IEnumerable<TEvent>>
 {
-    private readonly IEnumerable<IEnumerable<IEnumerable<TEvent>>> enumerofEnumerOfEnumerables; //not a mouthful at all.
+    private readonly IEnumerable<IEnumerable<IEnumerable<TEvent>>>
+        _enumerofEnumerOfEnumerables; //not a mouthful at all.
 
     public FlatteningMultipleIterator(IEnumerable<IEnumerable<IEnumerable<TEvent>>> enumerables)
     {
-        enumerofEnumerOfEnumerables = enumerables;
+        _enumerofEnumerOfEnumerables = enumerables;
     }
 
     public IEnumerator<IEnumerable<TEvent>> GetEnumerator()
     {
-        var enumerators = enumerofEnumerOfEnumerables.Select(x => x.GetEnumerator()).ToList();
+        var enumerators = _enumerofEnumerOfEnumerables.Select(x => x.GetEnumerator()).ToList();
 
         var curBatch = new List<TEvent>();
         while (true)
@@ -41,8 +42,7 @@ public struct FlatteningMultipleIterator<TEvent> : IEnumerable<IEnumerable<TEven
             {
                 yield return curBatch;
                 curBatch.Clear();
-            }
-            else
+            } else
                 break;
         }
     }

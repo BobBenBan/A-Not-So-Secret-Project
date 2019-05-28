@@ -18,7 +18,8 @@ public class WorldObject : RigidBody
     private void TryCreateMesh()
     {
         var colShape = GetNode<CollisionShape>("CollisionShape");
-        if (colShape.Shape != null) return;
+        if (colShape.Shape != null)
+            return;
         MeshInstance = GetNode<MeshInstance>("MeshInstance");
         if (MeshInstance.Mesh == null)
         {
@@ -34,7 +35,8 @@ public class WorldObject : RigidBody
 
         colShape.Transform = MeshInstance.Transform;
         colShape.Shape     = MeshInstance.Mesh.GetCachedShape(IsTrimesh);
-        if (LifeTime > 0) this.CreateAndConnectTimer(nameof(FreeSelf)).Start(LifeTime);
+        if (LifeTime > 0)
+            this.CreateAndConnectTimer(nameof(FreeSelf)).Start(LifeTime);
     }
 
     public override void _PhysicsProcess(float delta)

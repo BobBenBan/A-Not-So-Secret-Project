@@ -12,7 +12,6 @@ public class Player : KinematicBody
     private bool _inFocus = true;
     private Vector3 _outputVel;
     private Spatial _pitch;
-    private RayCast _rayCast;
     private Spatial _roll;
     private bool _running;
     private Vector3 _up = new Vector3(0, 1, 0);
@@ -74,16 +73,21 @@ public class Player : KinematicBody
     private void ProcessMovement(float delta)
     {
         //Enable/disable
-        if (Inputs.PlayerCancelCursor.JustPressed()) Enabled = !Enabled;
-        var targetVel                                        = new Vector3();
+        if (Inputs.PlayerCancelCursor.JustPressed())
+            Enabled = !Enabled;
+        var targetVel = new Vector3();
         if (EffectiveEnabled)
         {
             //calculate input movement
             var inputMove = new Vector2();
-            if (Inputs.PlayerMoveForward.Pressed()) inputMove.y++;
-            if (Inputs.PlayerMoveBackward.Pressed()) inputMove.y--;
-            if (Inputs.PlayerMoveLeft.Pressed()) inputMove.x--;
-            if (Inputs.PlayerMoveRight.Pressed()) inputMove.x++;
+            if (Inputs.PlayerMoveForward.Pressed())
+                inputMove.y++;
+            if (Inputs.PlayerMoveBackward.Pressed())
+                inputMove.y--;
+            if (Inputs.PlayerMoveLeft.Pressed())
+                inputMove.x--;
+            if (Inputs.PlayerMoveRight.Pressed())
+                inputMove.x++;
             inputMove = inputMove.Normalized();
 
             //calculate movement component of target vel
@@ -98,9 +102,11 @@ public class Player : KinematicBody
             var jumpPressed    = Inputs.PlayerJump.Pressed();
             var isOnFloor      = IsOnFloor();
 
-            if (CanFly && Inputs.PlayerDoubleJump.DoubleTapped(DoubleTapTime, delta)) _flying = !_flying;
+            if (CanFly && Inputs.PlayerDoubleJump.DoubleTapped(DoubleTapTime, delta))
+                _flying = !_flying;
 
-            if (isOnFloor) _flying = false;
+            if (isOnFloor)
+                _flying = false;
             //speed
             var slow = slowPressed && !_flying;
             _running = !slow && runningPressed && (_running || _flying || isOnFloor);
@@ -112,10 +118,12 @@ public class Player : KinematicBody
             if (_flying)
             {
                 if (jumpPressed)
-                    targetVel.y                   += FlyVerticalSpeed / WalkSpeed;
-                else if (slowPressed) targetVel.y -= FlyVerticalSpeed / WalkSpeed;
+                    targetVel.y += FlyVerticalSpeed / WalkSpeed;
+                else if (slowPressed)
+                    targetVel.y -= FlyVerticalSpeed / WalkSpeed;
             }
-            else if (jumpPressed && isOnFloor) _outputVel.y += JumpSpeed;
+            else if (jumpPressed && isOnFloor)
+                _outputVel.y += JumpSpeed;
 
             targetVel *= speed;
         }
@@ -130,7 +138,8 @@ public class Player : KinematicBody
 
         var accel = (targetVel - actualVel).Dot(actualVel) > 0 ? Acceleration : Deceleration;
         actualVel = actualVel.LinearInterpolate(targetVel, accel * delta);
-        if (!_flying) actualVel.y = _outputVel.y;
+        if (!_flying)
+            actualVel.y = _outputVel.y;
 
         _outputVel = MoveAndSlide(actualVel, _up, true, 2, Mathf.Deg2Rad(MaxSlopeDegrees));
     }
@@ -158,17 +167,18 @@ public class Player : KinematicBody
 
     public override void _Ready()
     {
-        _pitch   = GetNode<Spatial>("Pitch");
-        _roll    = _pitch.GetNode<Spatial>("Roll");
-        _camera  = _roll.GetNode<Camera>("Camera");
-        _rayCast = _roll.GetNode<RayCast>("RayCast");
-        Enabled  = true;
-        if (SpawnPoint == Vector3.Inf) SpawnPoint = Translation;
+        _pitch  = GetNode<Spatial>("Pitch");
+        _roll   = _pitch.GetNode<Spatial>("Roll");
+        _camera = _roll.GetNode<Camera>("Camera");
+        _roll.GetNode<RayCast>("RayCast");
+        if (SpawnPoint == Vector3.Inf)
+            SpawnPoint = Translation;
     }
 
     public override void _Input(InputEvent inputEvent)
     {
-        if (!(inputEvent is InputEventMouseMotion move) || !EffectiveEnabled) return;
+        if (!(inputEvent is InputEventMouseMotion move) || !EffectiveEnabled)
+            return;
         _pitch.RotateX(Mathf.Deg2Rad(move.Relative.y * MouseSensitivity)); // ^ Y -> X
         RotateY(Mathf.Deg2Rad(move.Relative.x * -MouseSensitivity));
         //Rotate z?? future?
@@ -187,6 +197,7 @@ public class Player : KinematicBody
         {
         case MainLoop.NotificationWmFocusIn:
             InFocus = true;
+            Enabled = true;
             break;
         case MainLoop.NotificationWmFocusOut:
             InFocus = false;

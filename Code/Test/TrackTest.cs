@@ -18,7 +18,7 @@ public class TrackTest
             var key  = random.NextShort(1500);
             var item = random.GetString(3, "ABCDEF");
             if (!DenseKnown.ContainsKey(key))
-                DenseKnown.Add(key, new List<string>());
+                DenseKnown[key] = new List<string>();
             DenseKnown[key].Add(item);
             DenseTrack.Add(key, item);
         }
@@ -28,7 +28,7 @@ public class TrackTest
             var key  = random.NextShort(6000);
             var item = random.GetString(3, "ABCDEF");
             if (!SparseKnown.ContainsKey(key))
-                SparseKnown.Add(key, new List<string>());
+                SparseKnown[key] = new List<string>();
             SparseKnown[key].Add(item);
             SparseTrack.Add(key, item);
         }

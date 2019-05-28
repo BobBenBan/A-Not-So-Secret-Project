@@ -16,14 +16,16 @@ public class Caches : Node
     {
         get
         {
-            if (_instance == null) throw new InvalidOperationException("No Caches Singleton Instantiated!");
+            if (_instance == null)
+                throw new InvalidOperationException("No Caches Singleton Instantiated!");
             return _instance;
         }
     }
 
     public override void _EnterTree()
     {
-        if (_instance != null) throw new InvalidOperationException("Caches Singleton Created Twice!");
+        if (_instance != null)
+            throw new InvalidOperationException("Caches Singleton Created Twice!");
         _instance = this;
     }
 
@@ -38,7 +40,8 @@ public class Caches : Node
     {
         var shapeCache =
             isTrimesh ? Instance._trimeshShapeCache : Instance._convexShapeCaches;
-        if (!shapeCache.TryGetValue(mesh, out var o)) o = shapeCache[mesh] = mesh.CreateShape(isTrimesh);
+        if (!shapeCache.TryGetValue(mesh, out var o))
+            o = shapeCache[mesh] = mesh.CreateShape(isTrimesh);
         return o;
     }
 }

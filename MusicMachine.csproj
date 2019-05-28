@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,9 +8,10 @@
         <OutputPath>.mono\temp\bin\$(Configuration)</OutputPath>
         <RootNamespace>MusicMachine</RootNamespace>
         <AssemblyName>MusicMachine</AssemblyName>
-        <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
         <BaseIntermediateOutputPath>.mono\temp\obj</BaseIntermediateOutputPath>
         <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
+        <LangVersion>7.3</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DebugSymbols>true</DebugSymbols>
@@ -57,30 +57,50 @@
         <Reference Include="System" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Config\Inputs.cs" />
-        <Compile Include="Config\Loading.cs" />
+        <Compile Include="Code\Config\Inputs.cs" />
+        <Compile Include="Code\Config\Loading.cs" />
+        <Compile Include="Code\Delegates.cs" />
+        <Compile Include="Code\Music\MidiConstants.cs" />
+        <Compile Include="Code\Music\MidiInstTrack.cs" />
+        <Compile Include="Code\Music\InstrumentTrackEvents.cs" />
+        <Compile Include="Code\Music\InstrumentTrackState.cs" />
+        <Compile Include="Code\Music\MidiConverter.cs" />
+        <Compile Include="Code\Music\MidiConverter2.cs" />
+        <Compile Include="Code\Music\PlayingState.cs" />
+        <Compile Include="Code\Music\Song.cs" />
+        <Compile Include="Code\Music\SongPlayer.cs" />
+        <Compile Include="Code\Music\SongStepper.cs" />
+        <Compile Include="Code\Music\Track.cs" />
+        <Compile Include="Code\Scenes\AlternateProcess.cs" />
+        <Compile Include="Code\Scenes\Global.cs" />
+        <Compile Include="Code\Test\PseudoScratch.cs" />
+        <Compile Include="Code\Test\TestException.cs" />
+        <Compile Include="Code\Test\TrackTest.cs" />
+        <Compile Include="Code\ThirdParty\GDLocations.cs" />
+        <Compile Include="Code\ThirdParty\Midi\ADSRPlayer.cs" />
+        <Compile Include="Code\ThirdParty\Midi\Bank.cs" />
+        <Compile Include="Code\Util\DoubleTapDetector.cs" />
+        <Compile Include="Code\Util\EmptyArray.cs" />
+        <Compile Include="Code\Util\Extentions.cs" />
+        <Compile Include="Code\Util\FlatteningMultipleIterator.cs" />
+        <Compile Include="Code\Util\InputAction.cs" />
+        <Compile Include="Code\Util\Mathm.cs" />
+        <Compile Include="Code\Util\Numbers.cs" />
+        <Compile Include="Code\Util\Pair.cs" />
+        <Compile Include="Code\Util\Wrapper.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Resources\Ref.cs" />
         <Compile Include="Scenes\Global\Caches.cs" />
         <Compile Include="Scenes\Global\GlobalNode.cs" />
+        <Compile Include="Scenes\Objects\Pointer.cs" />
         <Compile Include="Scenes\Objects\WorldObject.cs" />
         <Compile Include="Scenes\Player\Player.cs" />
         <Compile Include="Test\AnimationTest.cs" />
-        <Compile Include="Test\MidiPlayerDisplayer.cs" />
+        <Compile Include="Test\PlayerDisplayer.cs" />
         <Compile Include="Test\TestOnly.cs" />
         <Compile Include="Test\TestScene.cs" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="Core\Core.csproj">
-            <Project>{3a1ab7dc-a9fd-44c4-b802-7ac6e6ddac73}</Project>
-            <Name>Core</Name>
-        </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
         <None Include="packages.config" />
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Scenes\Music" />
     </ItemGroup>
     <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

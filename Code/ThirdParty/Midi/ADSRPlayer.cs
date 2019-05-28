@@ -32,7 +32,7 @@ public class AdsrPlayer : AudioStreamPlayer
         get => _pitchBend;
         set
         {
-            PitchScale = Mathf.Pow(2, value * MidiSong.MaxSemitonesPitchBend / 12);
+            PitchScale = Mathf.Pow(2, value * Song.MaxSemitonesPitchBend / 12);
             _pitchBend = value;
         }
     }
@@ -128,9 +128,9 @@ public class AdsrPlayer : AudioStreamPlayer
         VolumeDb = Mathf.Lerp(MinimumVolumeDb, MaximumVolumeDb, CurrentVolume);
     }
 
-    public void UpdateChannelVolume(float ampDb, float baseVolumeDb, Channel channel)
+    public void UpdateChannelVolume(float ampDb, float baseVolumeDb, PlayingState state)
     {
-        var noteVol = channel.Volume * channel.Expression * Velocity / 127f;
+        var noteVol = state.Volume * state.Expression * Velocity / 127f;
         MaximumVolumeDb = noteVol * ampDb - ampDb + baseVolumeDb;
     }
 }

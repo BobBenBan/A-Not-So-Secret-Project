@@ -50,7 +50,8 @@ public class AlternateProcess : Object
                 var theProcesses = Processes;
                 theProcesses?.Invoke(elapsedTicks);
             }
-        } catch (ThreadInterruptedException)
+        }
+        catch (ThreadInterruptedException)
         {
         }
     }

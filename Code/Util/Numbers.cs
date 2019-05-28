@@ -1,12 +1,17 @@
 using System;
 using Melanchall.DryWetMidi.Common;
 
-namespace MusicMachine.Music
+// ReSharper disable InconsistentNaming
+namespace MusicMachine
 {
-public struct FBN
+public struct FBN : IFormattable, IComparable<FBN>, IEquatable<FBN>
 {
     public const byte MaxValue = 15;
     private byte _value;
+
+    public override bool Equals(object obj) => obj is FBN other && Equals(other);
+
+    public override int GetHashCode() => _value.GetHashCode();
 
     public FBN(byte value)
         : this()
@@ -25,6 +30,12 @@ public struct FBN
         }
     }
 
+    public string ToString(string format, IFormatProvider formatProvider) => Value.ToString(format, formatProvider);
+
+    public int CompareTo(FBN other) => Value.CompareTo(other.Value);
+
+    public bool Equals(FBN other) => _value == other._value;
+
     public static implicit operator FBN(byte value) => new FBN(value);
 
     public static implicit operator byte(FBN value) => value.Value;
@@ -37,7 +48,7 @@ public struct FBN
 /// <summary>
 ///     Seven Bit Number with implicit conversion.
 /// </summary>
-public struct SBN
+public struct SBN : IFormattable, IComparable<SBN>, IEquatable<SBN>
 {
     public const byte MaxValue = 127;
     private byte _value;
@@ -47,6 +58,10 @@ public struct SBN
     {
         Value = value;
     }
+
+    public override bool Equals(object obj) => obj is SBN other && Equals(other);
+
+    public override int GetHashCode() => _value.GetHashCode();
 
     public byte Value
     {
@@ -59,6 +74,15 @@ public struct SBN
         }
     }
 
+    public string ToString(string format, IFormatProvider formatProvider) => Value.ToString(format, formatProvider);
+
+    public int CompareTo(SBN other) => Value.CompareTo(other.Value);
+
+    public bool Equals(SBN other)
+    {
+        return _value == other._value;
+    }
+
     public static implicit operator SBN(byte value) => new SBN(value);
 
     public static implicit operator byte(SBN value) => value.Value;
@@ -69,15 +93,19 @@ public struct SBN
 }
 
 /// <summary>
-///     Wrapped 14 bit number.
+///     Fourteen Bit Number, made from two SevenBitNumbers.
 /// </summary>
-public struct FTBN
+public struct FTBN : IFormattable, IComparable<FTBN>, IEquatable<FTBN>
 {
     public const ushort MaxValue = 0x3FFF;
 
     public SBN Head { get; set; }
 
     public SBN Tail { get; set; }
+
+    public override bool Equals(object obj) => obj is FTBN other && Equals(other);
+
+    public override int GetHashCode() => Value;
 
     public ushort Value
     {
@@ -106,5 +134,15 @@ public struct FTBN
     public static implicit operator FTBN(ushort value) => new FTBN(value);
 
     public static implicit operator ushort(FTBN value) => value.Value;
+
+    public string ToString(string format, IFormatProvider formatProvider) => Value.ToString(format, formatProvider);
+
+    public int CompareTo(FTBN other) => Value.CompareTo(other.Value);
+
+    public bool Equals(FTBN other)
+    {
+        return Head.Equals(other.Head)
+            && Tail.Equals(other.Tail);
+    }
 }
 }

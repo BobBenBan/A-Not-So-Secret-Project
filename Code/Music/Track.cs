@@ -17,14 +17,13 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     private SortedList<long, List<TEvent>> _track = new SortedList<long, List<TEvent>>();
     public string Name;
 
-    public Track(string name)
+    public Track()
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
     }
 
-    public Track()
-        : this($"Track of {typeof(TEvent).Name}s")
+    public Track(string name)
     {
+        Name = name;
     }
 
     public IEnumerable<long> Times => _track.Keys;
@@ -44,8 +43,6 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
 
     public IEnumerable<KeyValuePair<long, TEvent>> EventPairs =>
         _track.SelectMany(pair => pair.Value, (pair, @event) => new KeyValuePair<long, TEvent>(pair.Key, @event));
-
-    private long LastTime => _track.Keys.ListLast();
 
     IEnumerable<long> IReadOnlyDictionary<long, IEnumerable<TEvent>>.Keys => _track.Keys;
 
@@ -78,6 +75,8 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     /// </summary>
     public int Count => _track.Count;
 
+    public override string ToString() => Name;
+
     private bool ContainsTime(long time) => _track.ContainsKey(time);
 
     /// <summary>
@@ -94,7 +93,8 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     ///     Adds an element to this track.
     /// </summary>
     /// <param name="eventPair">The time and event to add at.</param>
-    public void Add(KeyValuePair<long, TEvent> eventPair)
+    public void Add<TOEvent>(KeyValuePair<long, TOEvent> eventPair)
+        where TOEvent : TEvent
     {
         Add(eventPair.Key, eventPair.Value);
     }
@@ -104,11 +104,13 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     /// </summary>
     /// <param name="time">The time to add at</param>
     /// <param name="events">The events</param>
-    public void AddRange(long time, IEnumerable<TEvent> events)
+    public void AddRange<OEvent>(long time, IEnumerable<OEvent> events)
+        where OEvent : TEvent
     {
         using (var enumerator = events.GetEnumerator())
         {
-            if (!enumerator.MoveNext()) return;
+            if (!enumerator.MoveNext())
+                return;
             var list = GetListForAdd(time);
             do
             {
@@ -117,18 +119,26 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
         }
     }
 
+    public void AddRange(IEnumerable<KeyValuePair<long, TEvent>> events)
+    {
+        foreach (var pair in events) Add(pair);
+    }
+
     /// <summary>
     ///     Adds a range of events via a series of KeyValuePairs of (time, to, a list of events).
     /// </summary>
     /// <param name="events"> a series of KeyValuePairs of (time, to, a list of events).</param>
-    public void AddRange(IEnumerable<KeyValuePair<long, IEnumerable<TEvent>>> events)
+    public void AddRange<OEvent>(IEnumerable<KeyValuePair<long, IEnumerable<OEvent>>> events)
+        where OEvent : TEvent
     {
-        foreach (var pair in events) AddRange(pair.Key, pair.Value);
+        foreach (var pair in events)
+            AddRange(pair.Key, pair.Value);
     }
 
     private List<TEvent> GetListForAdd(long time)
     {
-        if (_track.TryGetValue(time, out var list)) return list;
+        if (_track.TryGetValue(time, out var list))
+            return list;
         list = new List<TEvent>();
         _track.Add(time, list);
         return list;
@@ -143,12 +153,18 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     public bool Remove(long time, TEvent @event)
     {
         var index = _track.IndexOfKey(time);
-        if (index < 0) return false;
+        if (index < 0)
+            return false;
         var list = _track.Values[index];
         var b    = list.Remove(@event);
-        if (b && list.Count == 0) _track.RemoveAt(index);
+        if (b && list.Count == 0)
+            _track.RemoveAt(index);
         return b;
     }
+
+    public bool Remove<TOEvent>(KeyValuePair<long, TOEvent> pair)
+        where TOEvent : TEvent =>
+        Remove(pair.Key, pair.Value);
 
     /// <summary>
     ///     Searches for and removes the first event that equals the current event, if it exists.
@@ -160,9 +176,12 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
         for (var index = 0; index < _track.Values.Count; index++)
         {
             var list = _track.Values[index];
-            if (!list.Remove(@event)) continue;
-            if (list.Count == 0) _track.RemoveAt(index);
-            return true;
+            if (list.Remove(@event))
+            {
+                if (list.Count == 0)
+                    _track.RemoveAt(index);
+                return true;
+            }
         }
 
         return false;
@@ -176,13 +195,15 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     public int RemoveAll(Predicate<TEvent> match)
     {
         var total = 0;
-        for (var index = 0; index < _track.Values.Count; index++)
+        for (var index = 0; index < _track.Values.Count;)
         {
             var list = _track.Values[index];
             total += list.RemoveAll(match);
-            if (list.Count == 0) _track.RemoveAt(index);
+            if (list.Count == 0)
+                _track.RemoveAt(index);
+            else
+                index++;
         }
-
         return total;
     }
 
@@ -207,9 +228,11 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     /// <param name="func">The function to transform times.</param>
     public void TransformTimes(Func<long, long> func)
     {
-        if (_track.Count <= 0) return;
+        if (_track.Count <= 0)
+            return;
         var newTrack = new SortedList<long, List<TEvent>>();
-        foreach (var pair in _track) newTrack.Add(func(pair.Key), pair.Value);
+        foreach (var pair in _track)
+            newTrack.Add(func(pair.Key), pair.Value);
         _track = newTrack;
     }
 
@@ -221,122 +244,13 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
     {
         foreach (var pair in _track)
         {
-            var list                                     = pair.Value;
-            for (var i = 0; i < list.Count; i++) list[i] = func(list[i]);
+            var list = pair.Value;
+            for (var i = 0; i < list.Count; i++)
+                list[i] = func(list[i]);
         }
     }
 
-//    public IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> IterateTrackNullSep(
-//        long startInclusive,
-//        long endInclusive,
-//        Func<long, long> step)
-//    {
-//        if (step == null)
-//            throw new ArgumentNullException(nameof(step));
-//        if (endInclusive < startInclusive)
-//            throw new ArgumentException();
-//        return DoNullSeparated(startInclusive, endInclusive, step);
-//    }
-//
-//    public IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> IterateTrackNullSep(
-//        long startInclusive,
-//        Func<long, long> step) =>
-//        IterateTrackNullSep(startInclusive, LastTime, step);
-//
-//    public IEnumerable<KeyValuePair<long, TEvent>?> IterateTrackSingleNullSep(
-//        long startInclusive,
-//        long endInclusive,
-//        Func<long, long> step)
-//    {
-//        if (step == null)
-//            throw new ArgumentNullException(nameof(step));
-//        if (endInclusive < startInclusive)
-//            throw new ArgumentException();
-//        return FlattenNullSeps(DoNullSeparated(startInclusive, endInclusive, step));
-//    }
-//
-//    public IEnumerable<KeyValuePair<long, TEvent>?> IterateTrackSingleNullSep(
-//        long startInclusive,
-//        Func<long, long> step) =>
-//        IterateTrackSingleNullSep(startInclusive, LastTime, step);
-//
-//    private IEnumerable<IList<KeyValuePair<long, IReadOnlyList<TEvent>>>> IterateTrackLists(
-//        long startInclusive,
-//        long endInclusive,
-//        Func<long, long> step) =>
-//        CombineNullSep(IterateTrackNullSep(startInclusive, endInclusive, step));
-//
-//    private IEnumerable<IList<KeyValuePair<long, IReadOnlyList<TEvent>>>> IterateTrackLists(
-//        long startInclusive,
-//        Func<long, long> step) =>
-//        CombineNullSep(IterateTrackNullSep(startInclusive, LastTime, step));
-//
-//    public IEnumerable<IList<KeyValuePair<long, TEvent>>> IterateTrackSingleLists(
-//        long startInclusive,
-//        long endInclusive,
-//        Func<long, long> step) =>
-//        CombineNullSep(IterateTrackSingleNullSep(startInclusive, endInclusive, step));
-//
-//    public IEnumerable<IList<KeyValuePair<long, TEvent>>> IterateTrackSingleLists(
-//        long startInclusive,
-//        Func<long, long> step) =>
-//        IterateTrackSingleLists(startInclusive, LastTime, step);
-//
-//    private static IEnumerable<IList<T>> CombineNullSep<T>(IEnumerable<T?> nullSeparated)
-//        where T : struct
-//    {
-//        var curList = new List<T>();
-//        foreach (var pair in nullSeparated)
-//            if (pair.HasValue)
-//                curList.Add(pair.Value);
-//            else
-//            {
-//                yield return curList;
-//                curList.Clear();
-//            }
-////        if (curList.NotEmpty())
-////            yield return curList;
-//    }
-//
-//    private static IEnumerable<KeyValuePair<long, TEvent>?> FlattenNullSeps(
-//        IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> doNullSeparated)
-//    {
-//        foreach (var pair in doNullSeparated)
-//            if (pair.HasValue)
-//            {
-//                foreach (var @event in pair.Value.Value)
-//                    yield return new KeyValuePair<long, TEvent>(pair.Value.Key, @event);
-//            }
-//            else
-//                yield return null;
-//    }
-//
-//    private IEnumerable<KeyValuePair<long, IReadOnlyList<TEvent>>?> DoNullSeparated(
-//        long start,
-//        long end,
-//        Func<long, long> step)
-//    {
-//        var idx = _track.Keys.BinarySearchIndexOf(start);
-//        if (idx >= 0)
-//            yield return new KeyValuePair<long, IReadOnlyList<TEvent>>(start, _track.Values[idx]);
-//        yield return null;
-//        idx = idx < 0 ? ~idx : idx + 1;
-//        var target = start;
-//        while (true)
-//        {
-//            var next = step(target);
-//            if (next < target)
-//                throw new InvalidOperationException($"next value {next} is less than target {target}");
-//            target = Math.Min(next, end);
-//
-//            for (; idx != _track.Count && _track.Keys[idx] <= target; idx++)
-//                yield return new KeyValuePair<long, IReadOnlyList<TEvent>>(_track.Keys[idx], _track.Values[idx]);
-//            yield return null;
-//            if (target == end)
-//                yield break;
-//        }
-//    }
-    public Stepper GetStepper(long startTime = 0) => new Stepper(this, startTime);
+    public Stepper GetStepper(long startTime = long.MinValue) => new Stepper(this, startTime);
 
     public class Stepper
     {
@@ -382,7 +296,8 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
             if (_idx == -1)
             {
                 _idx = Track.Keys.BinarySearchIndexOf(_curTimeInclusive);
-                if (_idx < 0) _idx = ~_idx;
+                if (_idx < 0)
+                    _idx = ~_idx;
             }
             else
             {
@@ -402,7 +317,8 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
                 }
             }
             _current.Clear();
-            if (_idx >= Track.Count) return false;
+            if (_idx >= Track.Count)
+                return false;
             while (_idx < Track.Keys.Count && Track.Keys[_idx] <= nextTimeInclusive)
             {
                 _current.Add(new KeyValuePair<long, List<TEvent>>(Track.Keys[_idx], Track.Values[_idx]));
@@ -432,7 +348,8 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
         public void CopyCurrentTo(List<TEvent> list)
         {
             list.Clear();
-            foreach (var pair in _current) list.AddRange(pair.Value);
+            foreach (var pair in _current)
+                list.AddRange(pair.Value);
         }
     }
 }

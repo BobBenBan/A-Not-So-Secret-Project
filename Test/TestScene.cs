@@ -1,14 +1,17 @@
+using System.Linq;
 using Godot;
 using Melanchall.DryWetMidi.Smf;
 using MusicMachine.Music;
 using MusicMachine.Scenes;
+using NoteOnEvent = MusicMachine.Music.NoteOnEvent;
 
 namespace MusicMachine.Test
 {
 public class TestScene : Area
 {
-    private MidiPlayerDisplayer _displayer;
+    private PlayerDisplayer _displayer;
     private Player _player;
+    private long _startTime;
 
     public override void _Ready()
     {
@@ -21,9 +24,22 @@ public class TestScene : Area
         const string midiLoc      = "res://Resources/Midi/starwars.mid";
         const string soundFontLoc = "res://Resources/Midi/sf.sf2";
 
-        var midiSong = MidiFile.Read(ProjectSettings.GlobalizePath(midiLoc)).ToMidiSong();
-        _displayer = new MidiPlayerDisplayer(displayPoint, midiSong, soundFontLoc);
+        var song = MidiFile.Read(ProjectSettings.GlobalizePath(midiLoc)).ToSong();
+        _startTime = song.Tracks.SelectMany(x => x.EventPairs).First(x => x.Value is NoteOnEvent).Key;
+        _displayer = new PlayerDisplayer(displayPoint, song, soundFontLoc);
         AddChild(_displayer);
+//        foreach (var track in song.Tracks)
+//        {
+//            Console.WriteLine(track);
+//            Console.WriteLine($"  Num on events: {track.Events.OfType<NoteOffEvent>().Count()}");
+//        }
+//        //hardcode alert
+//        var analyzeTrack = song.Tracks[9];
+//        foreach (var pair in analyzeTrack.EventPairs)
+//        {
+//            Console.WriteLine(pair);
+//        }
+//        OnSecondary(0);
     }
 
     public void OnAction(float delta)
@@ -32,12 +48,13 @@ public class TestScene : Area
 
     private void OnSecondary(float delta)
     {
-        _displayer.Play();
+        _displayer.Play(_startTime);
     }
 
     private void OnBodyExited(Node body)
     {
-        if (!body.TryCall("OnWorldExit")) body.QueueFree();
+        if (!body.TryCall("OnWorldExit"))
+            body.QueueFree();
     }
 }
 }

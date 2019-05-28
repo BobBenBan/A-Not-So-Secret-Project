@@ -83,22 +83,34 @@ public static class StructEx
             action(item);
     }
 
-    public static bool AddIfAbsent<T>(this ICollection<T> collection, T item)
-    {
-        var absent = !collection.Contains(item);
-        if (absent)
-            collection.Add(item);
-        return absent;
-    }
-
-    public static TValue GetOrPutNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+    public static TValue GetOrAddNew<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         where TValue : new()
     {
         if (dictionary.TryGetValue(key, out var value))
             return value;
-        value = new TValue();
-        dictionary.Add(key, value);
+        value           = new TValue();
+        dictionary[key] = value;
         return value;
+    }
+
+    public static void FillWithNew<T>(this T[] arr)
+        where T : new()
+    {
+        for (var index = 0; index < arr.Length; index++)
+            arr[index] = new T();
+    }
+
+    public static void Fill<T>(this T[] arr, T item)
+    {
+        for (var index = 0; index < arr.Length; index++)
+            arr[index] = item;
+    }
+
+    public static void FillWith<T>(this T[] arr, Func<T> supplier)
+    {
+        if (supplier == null) throw new ArgumentNullException(nameof(supplier));
+        for (var index = 0; index < arr.Length; index++)
+            arr[index] = supplier();
     }
 }
 
@@ -187,7 +199,7 @@ public static class GodotEx
     public static Shape CreateShape(this Mesh mesh, bool isTrimesh) =>
         isTrimesh ? mesh.CreateTrimeshShape() : mesh.CreateConvexShape();
 
-    public static Array<T> ToGDArray<T>(this IEnumerable<T> elements)
+    public static Array<T> ToGdArray<T>(this IEnumerable<T> elements)
     {
         var o = new Array<T>();
         o.AddRange(elements);

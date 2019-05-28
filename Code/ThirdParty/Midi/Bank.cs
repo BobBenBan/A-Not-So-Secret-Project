@@ -12,7 +12,7 @@ public class Bank : Wrapper<GDObject>
     private static readonly GDScript BankGd = GD.Load<GDScript>(GdLocations.Location + "Bank.gd");
     private static readonly GDScript SoundFontGd = GD.Load<GDScript>(GdLocations.Location + "SoundFont.gd");
 
-    private readonly System.Collections.Generic.Dictionary<int, Preset> presetCache =
+    private readonly System.Collections.Generic.Dictionary<int, Preset> _presetCache =
         new System.Collections.Generic.Dictionary<int, Preset>();
 
     public Bank(string soundFontFile, Array<int> usedProgramNumbers)
@@ -33,8 +33,8 @@ public class Bank : Wrapper<GDObject>
     public Preset GetPreset(byte program, ushort bank)
     {
         var val = (bank << 7) | program;
-        if (!presetCache.TryGetValue(val, out var preset))
-            presetCache.Add(val, preset = new Preset((Dictionary) Self.Call("get_preset", program, bank)));
+        if (!_presetCache.TryGetValue(val, out var preset))
+            _presetCache[val] = preset = new Preset((Dictionary) Self.Call("get_preset", program, bank));
         Self.Call("get_preset", program, bank);
         return preset;
     }

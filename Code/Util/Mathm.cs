@@ -31,5 +31,25 @@ public static class Mathm
         else if (value > max)
             value = max;
     }
+
+    public static void MinWith(this ref long value, long min)
+    {
+        value = Math.Min(value, min);
+    }
+
+    public static void MaxWith(this ref long value, long max)
+    {
+        value = Math.Max(value, max);
+    }
+
+    public static void MinWith(this ref int value, int min)
+    {
+        value = Math.Min(value, min);
+    }
+
+    public static void MaxWith(this ref int value, int max)
+    {
+        value = Math.Max(value, max);
+    }
 }
 }

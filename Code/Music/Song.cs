@@ -1,14 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using Melanchall.DryWetMidi.Smf.Interaction;
 
 namespace MusicMachine.Music
 {
-public class MidiSong
+public class Song
 {
     public const float MaxSemitonesPitchBend = 7;
     public const byte DrumChannel = 0x09;
     private readonly TempoMapManager _tempoMapManager = new TempoMapManager();
-    public readonly List<MidiTrack> Tracks = new List<MidiTrack>();
+    public readonly List<MidiInstTrack> Tracks = new List<MidiInstTrack>();
 
     public TempoMap TempoMap => _tempoMapManager.TempoMap;
 
@@ -16,21 +17,11 @@ public class MidiSong
     {
         _tempoMapManager.ReplaceTempoMap(tempoMap);
     }
-}
 
-/// <summary>
-///     A label for a track that stores its time in units of MidiTicks.
-/// </summary>
-public class MidiTrack : Track<IMusicEvent>
-{
-    public FBN Channel;
-
-    public MidiTrack(FBN channel)
-        : base($"MidiTrack Channel {channel}")
+    public void RemoveEmptyTracks()
     {
-        Channel = channel;
+        Tracks.RemoveAll(track => !track.Events.Any(x => x is NoteOnEvent));
+        //remove redundant channel events???
     }
-
-    public bool IsDrumTrack => Channel == MidiSong.DrumChannel;
 }
 }

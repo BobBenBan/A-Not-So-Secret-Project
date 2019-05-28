@@ -6,20 +6,20 @@ namespace MusicMachine.Test
 {
 public class TestOnly : Node
 {
-    private MidiSong _midiSong;
-    private MidiSongPlayer _midiPlayer;
+    private SongPlayer _player;
+    private Song _song;
 
     public override void _Ready()
     {
         var midiFile = MidiFile.Read(ProjectSettings.GlobalizePath("res://Resources/Midi/pink.mid"));
-        _midiSong   = midiFile.ToMidiSong();
-        _midiPlayer = new MidiSongPlayer(_midiSong) {SoundFontFile = "res://Resources/Midi/sf.sf2"};
-        AddChild(_midiPlayer);
+        _song   = midiFile.ToSong();
+        _player = new SongPlayer(_song) {SoundFontFile = "res://Resources/Midi/sf.sf2"};
+        AddChild(_player);
     }
 
     private void OnPlayPressed()
     {
-        _midiPlayer.Play();
+        _player.Play();
     }
 }
 }
