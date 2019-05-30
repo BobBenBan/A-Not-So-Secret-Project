@@ -80,7 +80,7 @@ public class SongPlayer : Node
         Stop();
         Playing = true;
         _stepper.BeginPlay(_song, startMidiTicks);
-        AlternateProcess.TickLoop += DoProcess;
+        AlternateProcess.Loop += DoProcess;
 //        SetProcess(true);
     }
 
@@ -92,7 +92,7 @@ public class SongPlayer : Node
         _stepper.Clear();
         StopAllNotes();
         OnStop.Invoke();
-        AlternateProcess.TickLoop -= DoProcess;
+        AlternateProcess.Loop -= DoProcess;
 //        SetProcess(false);
     }
 
@@ -142,7 +142,6 @@ public class SongPlayer : Node
                 return;
             if (state.NotesOn.TryGetValue(keyNum, out var stopPlayer))
                 stopPlayer.StartRelease();
-
             var player = GetIdlePlayer();
             if (player == null)
                 return;
@@ -151,14 +150,14 @@ public class SongPlayer : Node
             player.PitchBend = state.PitchBend;
             player.SetInstrument(instrument);
             player.Play();
-            if (!track.IsDrumTrack)
-                state.NotesOn[keyNum] = player;
+//            if (!track.IsDrumTrack)
+            state.NotesOn[keyNum] = player;
             break;
         }
         case NoteOffEvent noteOffEvent:
         {
             var keyNum = noteOffEvent.NoteNumber;
-            if (state.NotesOn.TryGetAndRemove(keyNum, out var player))
+            if (!track.IsDrumTrack && state.NotesOn.TryGetAndRemove(keyNum, out var player))
                 player?.StartRelease();
             break;
         }
@@ -179,7 +178,7 @@ public class SongPlayer : Node
             break;
         }
         default:
-            Console.WriteLine($"Unprocessed Event: {@event}");
+            Console.WriteLine($"Ignored Event: {@event}");
             break;
         }
     }

@@ -1,257 +1,187 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Melanchall.DryWetMidi.Smf;
+using Melanchall.DryWetMidi.Smf.Interaction;
+
+// ReSharper disable RedundantCaseLabel
 namespace MusicMachine.Music
 {
-//public class MidiConverter
-//{
-//    public const byte DrumChannel = 0x09;
-//    public const int DrumBank = 128;
-//
-//    private readonly Dictionary<int, SortedList<FBN, InstrumentTrack>> _allTracks =
-//        new Dictionary<int, SortedList<FBN, InstrumentTrack>>();
-//
-//    private readonly HashSet<NoteOn> _cachedSet = new HashSet<NoteOn>();
-//    private readonly Channel[] _channels = new Channel[16];
-//
-//    public MidiConverter(MidiFile file)
-//    {
-//        for (var index = 0; index < _channels.Length; index++)
-//            _channels[index] = new Channel();
-//        _channels[DrumChannel].IsDrumTrack = true;
-//        ReadMidiFile(file);
-//    }
-//
-//    public Song Song { get; } = new Song();
-//
-//    private void ReadMidiFile(MidiFile file)
-//    {
-//        var tempoMap = file.GetTempoMap();
-//        if (!(tempoMap.TimeDivision is TicksPerQuarterNoteTimeDivision))
-//            throw new NotSupportedException("Only ticks per quarter note time division is supported.");
-//        Song.ReplaceTempoMap(tempoMap);
-//        ProcessMidiEvents(file.GetTimedEvents());
-//
-//
-//        //TrySquash();
-//        foreach (var trackSet in _allTracks.Values)
-//        {
-//            var number = 1;
-//            foreach (var track in trackSet.Values)
-//            {
-//                track.Name = track.IsDrumTrack ? //
-//                    $"Drum Track: Prog {track.Program}" :
-//                    $"Instrument Track: Bank {track.Bank} Prog {track.Program} #{number}";
-//                Song.Tracks.Add(track);
-//                number++;
-//            }
-//        }
-//        foreach (var track1 in Song.Tracks)
-//            track1.Clear();
-//        Song.RemoveEmptyTracks();
-//    }
-//
-//    private void ProcessMidiEvents(IEnumerable<TimedEvent> events)
-//    {
-//        foreach (var timedEvent in events)
-//        {
-//            if (!(timedEvent.Event is ChannelEvent channelEvent))
-//            {
-//                Console.WriteLine($"Ignored non-channel event: {timedEvent}");
-//                continue;
-//            }
-//            ProcessChannelEvent(channelEvent, timedEvent.Time);
-//        }
-//    }
-//
-//    private void ProcessChannelEvent(ChannelEvent @event, long time)
-//    {
-//        FBN channelNum = @event.Channel;
-//        var channel    = _channels[channelNum];
-//        switch (@event)
-//        {
-//        case Melanchall.DryWetMidi.Smf.PitchBendEvent pbe:
-//            channel.PitchBend = pbe.PitchValue;
-//            AddEventsToChannels(channelNum, time, new PitchBendEvent(pbe.PitchValue));
-//            break;
-//        case ProgramChangeEvent pce:
-//            channel.Program = pce.ProgramNumber;
-//            break;
-//        case ControlChangeEvent cce:
-//        {
-//            var controlValue = cce.ControlValue;
-//            var controlEnum  = (ControlNumbers) (byte) cce.ControlNumber;
-//            switch (controlEnum)
-//            {
-//            case ControlNumbers.BankSelect:
-//                channel.BankHead = controlValue;
-//                break;
-//            case ControlNumbers.BankSelectLsb:
-//                channel.BankTail = controlValue;
-//                break;
-//            case ControlNumbers.Volume:
-//                channel.Volume = controlValue;
-//                AddEventsToChannels(channelNum, time, new VolumeChangeEvent(controlValue));
-//                break;
-//            case ControlNumbers.Expression:
-//                channel.Expression = controlValue;
-//                AddEventsToChannels(channelNum, time, new ExpressionChangeEvent(controlValue));
-//                break;
-//            //todo, maybe?
-//            case ControlNumbers.Balance:
-//            case ControlNumbers.Pan:
-//            default:
-//                Console.WriteLine($"Ignored control change {controlEnum}: [{channelNum}] ({controlValue})");
-//                break;
-//            }
-//            break;
-//        }
-//        //TODO: Fix corner case note off on prev instrument after note on. PROBABLY switching to notes and events, not just timedEvents.
-//        //And channel simulation, not just guessing. Which will be fun.
-//        case Melanchall.DryWetMidi.Smf.NoteOffEvent noteOffEvent:
-//            AddNoteOffEvent(channelNum, time, new NoteOffEvent(noteOffEvent.NoteNumber, noteOffEvent.Velocity));
-//            break;
-//        case Melanchall.DryWetMidi.Smf.NoteOnEvent noteOnEvent:
-//        {
-//            //release old note if exists.
-//            AddNoteOffEvent(channelNum, time, new NoteOffEvent(noteOnEvent.NoteNumber, noteOnEvent.Velocity));
-//            var shouldAddInitEvents = GetOrMakeTrack(channelNum, out var track) || channel.HasPresetChanged();
-//            channel.ResetPresetChange();
-//            if (shouldAddInitEvents)
-//                AddInitEvents(track, time, channel);
-//            track.Add(time, new NoteOnEvent(noteOnEvent.NoteNumber, noteOnEvent.Velocity));
-//            channel.AddNoteOn(noteOnEvent.NoteNumber);
-//            break;
-//        }
-//        //todo, maybe??
-//        case NoteAftertouchEvent _:
-//        case ChannelAftertouchEvent _:
-//        default:
-//            Console.WriteLine($"Ignored channel Event: {@event}");
-//            break;
-//        }
-//    }
-//
-//    private void AddNoteOffEvent(FBN channelNum, long time, NoteOffEvent noteOffEvent)
-//    {
-//        var wasNoteOn = _channels[channelNum].NotesOn[noteOffEvent.NoteNumber];
-//        _channels[channelNum].NotesOn[noteOffEvent.NoteNumber] = null;
-//        if (wasNoteOn != null)
-//        {
-//            TryGetTrack(wasNoteOn.Value.CombinedPresetNum, channelNum)
-//              ?.Add(time, noteOffEvent);
-//        }
-//    }
-//
-//    private void AddEventsToChannels(FBN channelNum, long time, IInstTrackEvent @event)
-//    {
-//        var channel = _channels[channelNum];
-//        var set     = _cachedSet;
-//        set.Clear();
-//        set.Add(channel.GetNoteOn());
-//        foreach (var noteOn in channel.NotesOn)
-//            if (noteOn != null)
-//                set.Add(noteOn.Value);
-//        foreach (var noteOn in set)
-//            TryGetTrack(noteOn.CombinedPresetNum, channelNum)?.Add(time, @event);
-//    }
-//
-//    private InstrumentTrack TryGetTrack(int presetNum, FBN channelNum)
-//    {
-//        InstrumentTrack track = null;
-//        if (_allTracks.TryGetValue(presetNum, out var instrTracks))
-//            instrTracks.TryGetValue(channelNum, out track);
-//        return track;
-//    }
-//
-//    /// <summary>
-//    /// </summary>
-//    /// <param name="presetNum"></param>
-//    /// <param name="channelNum"></param>
-//    /// <param name="track"></param>
-//    /// <returns>True if new track was made</returns>
-//    private bool GetOrMakeTrack(FBN channelNum, out InstrumentTrack track)
-//    {
-//        var channel   = _channels[channelNum];
-//        var presetNum = channel.CombinedPresetNum;
-//        if (!_allTracks.TryGetValue(presetNum, out var instrTracks))
-//            _allTracks[presetNum] = instrTracks = new SortedList<FBN, InstrumentTrack>();
-//        if (instrTracks.TryGetValue(channelNum, out track))
-//            return false;
-//        instrTracks.Add(
-//            channelNum,
-//            track = new InstrumentTrack(channel.Bank, channel.Program, channel.IsDrumTrack));
-//        return true;
-//    }
-//
-//    private struct NoteOn
-//    {
-//        private readonly SBN _program;
-//        private readonly FTBN _bank;
-//
-//        public int CombinedPresetNum => (_bank << 7) | _program;
-//
-//        public NoteOn(SBN program, FTBN bank)
-//        {
-//            _program = program;
-//            _bank    = bank;
-//        }
-//
-//        public bool Equals(NoteOn other) => CombinedPresetNum == other.CombinedPresetNum;
-//
-//        public override bool Equals(object obj) => obj is NoteOn other && Equals(other);
-//
-//        public override int GetHashCode() => CombinedPresetNum;
-//    }
-//
-//    private class Channel
-//    {
-//        public readonly NoteOn?[] NotesOn = new NoteOn?[128];
-//        private FTBN _bank;
-//        private FTBN _lastBank;
-//        private SBN _lastProgram;
-//        public SBN Expression = SBN.MaxValue;
-//        public bool IsDrumTrack;
-//        public FTBN PitchBend = 8192;
-//        public SBN Program;
-//
-//        //
-//        public SBN Volume = SBN.MaxValue;
-//
-//        public SBN BankHead
-//        {
-//            get => _bank.Head;
-//            set => _bank.Head = value;
-//        }
-//
-//        public SBN BankTail
-//        {
-//            get => _bank.Tail;
-//            set => _bank.Tail = value;
-//        }
-//
-//        public FTBN Bank => IsDrumTrack ? (FTBN) DrumBank : _bank;
-//
-//        public int CombinedPresetNum => (Bank << 7) | Program;
-//
-//        public bool HasPresetChanged() => _lastProgram != Program || _lastBank != Bank;
-//
-//        public void ResetPresetChange()
-//        {
-//            _lastProgram = Program;
-//            _lastBank    = Bank;
-//        }
-//
-//        public NoteOn GetNoteOn() => new NoteOn(Program, Bank);
-//
-//        public void AddNoteOn(SBN noteNumber)
-//        {
-//            NotesOn[noteNumber] = GetNoteOn();
-//        }
-//    }
-//
-//    private static void AddInitEvents(InstrumentTrack track, long time, Channel channel)
-//    {
-//        track.Add(time, new VolumeChangeEvent(channel.Volume));
-//        track.Add(time, new ExpressionChangeEvent(channel.Expression));
-//        track.Add(time, new PitchBendEvent(channel.PitchBend));
-//    }
-//}
+public class MidiConverter2
+{
+    private readonly Track<IInstStateEvent> _stateChanges = new Track<IInstStateEvent>();
+    private readonly Dictionary<int, MidiInstTrack> _tracks = new Dictionary<int, MidiInstTrack>();
+
+    public MidiConverter2(MidiFile file)
+    {
+        ReadMidiFile(file);
+    }
+
+    public Song Song { get; } = new Song();
+
+    private void ReadMidiFile(MidiFile file)
+    {
+        var tempoMap = file.GetTempoMap();
+        if (!(tempoMap.TimeDivision is TicksPerQuarterNoteTimeDivision))
+            throw new NotSupportedException("Only ticks per quarter note time division is supported.");
+        Song.ReplaceTempoMap(tempoMap);
+        var eventsByChannel = from timedObj in file.GetTimedEventsAndNotes()
+                              let channel = timedObj is Note note ? note.Channel :
+                                                timedObj is TimedEvent te && te.Event is ChannelEvent ce ?
+                                                    ce.Channel : (FBN?) null
+                              where channel != null
+                              // ReSharper disable once PossibleInvalidOperationException
+                              group timedObj by channel.Value;
+        foreach (var channel in eventsByChannel) ProcessChannel(channel);
+    }
+
+    //todo, maybe: possible corner case note on only. But then, its an invalid midi file, so, yeaaah.
+    private void ProcessChannel(IGrouping<FBN, ITimedObject> channel)
+    {
+        _stateChanges.Clear(); //cached
+        _tracks.Clear();       // cached.
+        var preset = new Preset {IsDrumTrack = channel.Key == MidiConstants.DrumChannel};
+        foreach (var timedObject in channel)
+        {
+            if (timedObject is Note note) //GET TRACK, IF EXIST, ADD NOTE ON CURRENT PRESET.
+            {
+                if (!_tracks.TryGetValue(preset.CombinedPresetNum, out var track))
+                {
+                    _tracks[preset.CombinedPresetNum] = track = new MidiInstTrack(
+                                                            preset.Bank,
+                                                            preset.Program,
+                                                            preset.IsDrumTrack);
+                }
+                track.Add(note.Time,               new NoteOnEvent(note.NoteNumber, note.Velocity));
+                track.Add(note.Time + note.Length, new NoteOffEvent(note.NoteNumber, note.OffVelocity));
+                continue;
+            }
+            var convertedObj = ConvertEvent(((TimedEvent) timedObject).Event);
+            if (convertedObj == null) continue;
+            switch (convertedObj)
+            {
+            case IPresetChange presetChange:
+                presetChange.ApplyTo(ref preset);
+                break;
+            case IInstStateEvent stateEvent:
+                _stateChanges.Add(timedObject.Time, stateEvent);
+                break;
+            default: throw new Exception("This shouldn't happen! yell at them developers!");
+            }
+        }
+        foreach (var track in _tracks.Values)
+        {
+            track.AddRange(_stateChanges);
+            track.Clean();
+            track.Name = track.IsDrumTrack ? //
+                             $"Drum Track: Prog {track.Program}" :
+                             $"Instrument Track [{channel.Key}] Bank {track.Bank} Prog {track.Program} ";
+            Song.Tracks.Add(track);
+        }
+    }
+
+    private static object ConvertEvent(MidiEvent channelEvent)
+    {
+        if (!(channelEvent is ChannelEvent)) return null;
+        switch (channelEvent)
+        {
+        case Melanchall.DryWetMidi.Smf.NoteEvent _: return null; //ignore!!
+        case ProgramChangeEvent pce:
+            return new ProgramChangeMidiEvent(pce.ProgramNumber);
+        case Melanchall.DryWetMidi.Smf.PitchBendEvent pbe:
+            return new PitchBendEvent(pbe.PitchValue);
+        case ControlChangeEvent cce:
+        {
+            var controlEnum = (ControlNumbers) (byte) cce.ControlNumber;
+            switch (controlEnum)
+            {
+            case ControlNumbers.BankSelect:
+                return new BankMsbSelectEvent(cce.ControlValue);
+            case ControlNumbers.BankSelectLsb:
+                return new BankLsbSelectEvent(cce.ControlValue);
+            case ControlNumbers.Volume:
+                return new VolumeChangeEvent(cce.ControlValue);
+            case ControlNumbers.Expression:
+                return new ExpressionChangeEvent(cce.ControlValue);
+            case ControlNumbers.Balance:
+            case ControlNumbers.Pan:
+            default:
+                Console.WriteLine($"Ignored control change {controlEnum}: [{cce.Channel}] ({cce.ControlValue})");
+                return null;
+            }
+        }
+        //todo, maybe?
+        case NoteAftertouchEvent _:
+        case ChannelAftertouchEvent _:
+        default:
+            Console.WriteLine($"Ignored channel Event: {channelEvent}");
+            return null;
+        }
+    }
+
+    private struct Preset
+    {
+        public SBN Program;
+        public FTBN Bank;
+        public bool IsDrumTrack;
+        private FTBN _bank;
+
+        public int CombinedPresetNum => ((IsDrumTrack ? (FTBN) MidiConstants.DrumBank : _bank) << 7) | Program;
+    }
+
+    private interface IPresetChange
+    {
+        void ApplyTo(ref Preset preset);
+    }
+
+    private sealed class ProgramChangeMidiEvent : IPresetChange
+    {
+        public readonly SBN Program;
+
+        public ProgramChangeMidiEvent(SBN program)
+        {
+            Program = program;
+        }
+
+        public void ApplyTo(ref Preset preset)
+        {
+            preset.Program = Program;
+        }
+    }
+
+    private sealed class BankMsbSelectEvent : IPresetChange
+    {
+        public readonly SBN BankHead;
+
+        public BankMsbSelectEvent(SBN bankHead)
+        {
+            BankHead = bankHead;
+        }
+
+        public void ApplyTo(ref Preset preset)
+        {
+            preset.Bank.Head = BankHead;
+        }
+    }
+
+    private sealed class BankLsbSelectEvent : IPresetChange
+    {
+        public readonly SBN BankTail;
+
+        public BankLsbSelectEvent(SBN bankTail)
+        {
+            BankTail = bankTail;
+        }
+
+        public void ApplyTo(ref Preset preset)
+        {
+            preset.Bank.Tail = BankTail;
+        }
+    }
+}
+
+public static class MidiConverterEx
+{
+    public static Song ToSong(this MidiFile midiFile) => new MidiConverter2(midiFile).Song;
+}
 }

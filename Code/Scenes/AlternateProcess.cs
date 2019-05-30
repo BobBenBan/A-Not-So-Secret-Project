@@ -17,7 +17,7 @@ public class AlternateProcess : Object
         _thread = new Thread(ThreadStart);
     }
 
-    public static event Action<long> TickLoop
+    public static event Action<long> Loop
     {
         add => Instance.Processes += value;
         remove => Instance.Processes -= value;
