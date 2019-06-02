@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Godot;
 using Melanchall.DryWetMidi.Smf;
@@ -11,7 +12,7 @@ public class TestScene : Area
 {
     private PlayerDisplayer _displayer;
     private Player _player;
-    private long _startTime;
+    private Song _song;
 
     public override void _Ready()
     {
@@ -21,25 +22,16 @@ public class TestScene : Area
         GetNode("Objects");
         var displayPoint = GetNode<Spatial>("DisplayPoint");
 
-        const string midiLoc      = "res://Resources/Midi/starwars.mid";
-        const string soundFontLoc = "res://Resources/Midi/sf.sf2";
+        const string midiLoc      = "res://Resources/Midi/Fireflies.mid";
+        const string soundFontLoc = "res://Resources/Midi/Timbres Of Heaven GM_GS_XG_SFX V 3.4 Final.sf2";
 
-        var song = MidiFile.Read(ProjectSettings.GlobalizePath(midiLoc)).ToSong();
-        _startTime = song.Tracks.SelectMany(x => x.EventPairs).First(x => x.Value is NoteOnEvent).Key;
-        _displayer = new PlayerDisplayer(displayPoint, song, soundFontLoc);
+        _song      = MidiFile.Read(ProjectSettings.GlobalizePath(midiLoc)).ToSong();
+        _displayer = new PlayerDisplayer(displayPoint, _song, soundFontLoc);
         AddChild(_displayer);
-//        foreach (var track in song.Tracks)
-//        {
-//            Console.WriteLine(track);
-//            Console.WriteLine($"  Num on events: {track.Events.OfType<NoteOffEvent>().Count()}");
-//        }
-//        //hardcode alert
-//        var analyzeTrack = song.Tracks[9];
-//        foreach (var pair in analyzeTrack.EventPairs)
-//        {
-//            Console.WriteLine(pair);
-//        }
-//        OnSecondary(0);
+        foreach (var track in _song.Tracks)
+        {
+            Console.WriteLine(track);
+        }
     }
 
     public void OnAction(float delta)
@@ -48,7 +40,11 @@ public class TestScene : Area
 
     private void OnSecondary(float delta)
     {
-        _displayer.Play(_startTime);
+        _displayer.Play(
+            _song.Tracks.SelectMany(x => x.EventPairs)
+                 .First(x => x.Value is NoteOnEvent)
+                 .Key);
+//        GD.Print(_song.Tracks.SelectMany(x=>x.Events).Any(x=>x is PitchBendEvent));
     }
 
     private void OnBodyExited(Node body)

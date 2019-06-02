@@ -121,7 +121,8 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
 
     public void AddRange(IEnumerable<KeyValuePair<long, TEvent>> events)
     {
-        foreach (var pair in events) Add(pair);
+        foreach (var pair in events)
+            Add(pair);
     }
 
     /// <summary>
@@ -298,8 +299,7 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
                 _idx = Track.Keys.BinarySearchIndexOf(_curTimeInclusive);
                 if (_idx < 0)
                     _idx = ~_idx;
-            }
-            else
+            } else
             {
                 _idx.Constrain(0, Track.Count - 1);
                 //linear search
@@ -309,8 +309,7 @@ public class Track<TEvent> : IReadOnlyDictionary<long, IEnumerable<TEvent>>
                     {
                         _idx++;
                     } while (_idx < Track.Count && Track.Keys[_idx] < _curTimeInclusive);
-                }
-                else
+                } else
                 {
                     while (_idx > 0 && Track.Keys[_idx - 1] > _curTimeInclusive)
                         _idx--;

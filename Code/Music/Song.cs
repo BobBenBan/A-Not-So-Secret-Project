@@ -6,7 +6,7 @@ namespace MusicMachine.Music
 {
 public class Song
 {
-    public const float MaxSemitonesPitchBend = 7;
+    public const float MaxSemitonesPitchBend = 12;
     public const byte DrumChannel = 0x09;
     private readonly TempoMapManager _tempoMapManager = new TempoMapManager();
     public readonly List<MidiInstTrack> Tracks = new List<MidiInstTrack>();

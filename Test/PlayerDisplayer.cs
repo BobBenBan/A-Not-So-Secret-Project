@@ -28,7 +28,7 @@ public class PlayerDisplayer : Spatial
                 (float) GD.Randf(),
                 (float) (0.8 + GD.Randf() * 0.6),
                 (float) (0.4 + GD.Randf() * 0.6),
-                0.7f));
+                0.5f));
         _pointers = new Pointer[song.Tracks.Count][];
         for (var index = 0; index < _pointers.Length; index++)
             _pointers[index] = new Pointer[128];

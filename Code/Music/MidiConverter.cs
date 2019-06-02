@@ -15,6 +15,13 @@ public class MidiConverter2
     public MidiConverter2(MidiFile file)
     {
         ReadMidiFile(file);
+        foreach (var track in Song.Tracks)
+        {
+            track.Name = track.IsDrumTrack ? $"Drum Track: Prog {track.Program}" :
+                typeof(InstrumentNames).IsEnumDefined(track.CombinedPresetNum) ?
+                    $"Instrument Track: {(InstrumentNames) track.CombinedPresetNum}" :
+                    $"Instrument Track {(InstrumentNames) (int) track.Program}), Bank {track.Bank}";
+        }
     }
 
     public Song Song { get; } = new Song();
@@ -27,12 +34,13 @@ public class MidiConverter2
         Song.ReplaceTempoMap(tempoMap);
         var eventsByChannel = from timedObj in file.GetTimedEventsAndNotes()
                               let channel = timedObj is Note note ? note.Channel :
-                                                timedObj is TimedEvent te && te.Event is ChannelEvent ce ?
-                                                    ce.Channel : (FBN?) null
+                                  timedObj is TimedEvent te && te.Event is ChannelEvent ce ?
+                                      ce.Channel : (FBN?) null
                               where channel != null
                               // ReSharper disable once PossibleInvalidOperationException
                               group timedObj by channel.Value;
-        foreach (var channel in eventsByChannel) ProcessChannel(channel);
+        foreach (var channel in eventsByChannel)
+            ProcessChannel(channel);
     }
 
     //todo, maybe: possible corner case note on only. But then, its an invalid midi file, so, yeaaah.
@@ -48,16 +56,17 @@ public class MidiConverter2
                 if (!_tracks.TryGetValue(preset.CombinedPresetNum, out var track))
                 {
                     _tracks[preset.CombinedPresetNum] = track = new MidiInstTrack(
-                                                            preset.Bank,
-                                                            preset.Program,
-                                                            preset.IsDrumTrack);
+                        preset.Bank,
+                        preset.Program,
+                        preset.IsDrumTrack);
                 }
                 track.Add(note.Time,               new NoteOnEvent(note.NoteNumber, note.Velocity));
                 track.Add(note.Time + note.Length, new NoteOffEvent(note.NoteNumber, note.OffVelocity));
                 continue;
             }
             var convertedObj = ConvertEvent(((TimedEvent) timedObject).Event);
-            if (convertedObj == null) continue;
+            if (convertedObj == null)
+                continue;
             switch (convertedObj)
             {
             case IPresetChange presetChange:
@@ -73,36 +82,28 @@ public class MidiConverter2
         {
             track.AddRange(_stateChanges);
             track.Clean();
-            track.Name = track.IsDrumTrack ? //
-                             $"Drum Track: Prog {track.Program}" :
-                             $"Instrument Track [{channel.Key}] Bank {track.Bank} Prog {track.Program} ";
             Song.Tracks.Add(track);
         }
     }
 
     private static object ConvertEvent(MidiEvent channelEvent)
     {
-        if (!(channelEvent is ChannelEvent)) return null;
+        if (!(channelEvent is ChannelEvent))
+            return null;
         switch (channelEvent)
         {
-        case Melanchall.DryWetMidi.Smf.NoteEvent _: return null; //ignore!!
-        case ProgramChangeEvent pce:
-            return new ProgramChangeMidiEvent(pce.ProgramNumber);
-        case Melanchall.DryWetMidi.Smf.PitchBendEvent pbe:
-            return new PitchBendEvent(pbe.PitchValue);
+        case Melanchall.DryWetMidi.Smf.NoteEvent _:        return null; //ignore!!
+        case ProgramChangeEvent pce:                       return new ProgramChangeMidiEvent(pce.ProgramNumber);
+        case Melanchall.DryWetMidi.Smf.PitchBendEvent pbe: return new PitchBendEvent(pbe.PitchValue);
         case ControlChangeEvent cce:
         {
             var controlEnum = (ControlNumbers) (byte) cce.ControlNumber;
             switch (controlEnum)
             {
-            case ControlNumbers.BankSelect:
-                return new BankMsbSelectEvent(cce.ControlValue);
-            case ControlNumbers.BankSelectLsb:
-                return new BankLsbSelectEvent(cce.ControlValue);
-            case ControlNumbers.Volume:
-                return new VolumeChangeEvent(cce.ControlValue);
-            case ControlNumbers.Expression:
-                return new ExpressionChangeEvent(cce.ControlValue);
+            case ControlNumbers.BankSelect:    return new BankMsbSelectEvent(cce.ControlValue);
+            case ControlNumbers.BankSelectLsb: return new BankLsbSelectEvent(cce.ControlValue);
+            case ControlNumbers.Volume:        return new VolumeChangeEvent(cce.ControlValue);
+            case ControlNumbers.Expression:    return new ExpressionChangeEvent(cce.ControlValue);
             case ControlNumbers.Balance:
             case ControlNumbers.Pan:
             default:
