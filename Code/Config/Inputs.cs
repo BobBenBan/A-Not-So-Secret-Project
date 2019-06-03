@@ -1,3 +1,5 @@
+using MusicMachine.Util;
+
 namespace MusicMachine.Config
 {
 public static class Inputs

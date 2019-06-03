@@ -1,6 +1,7 @@
 using Godot;
+using MusicMachine.Util;
 
-namespace MusicMachine.Scenes
+namespace MusicMachine.Scenes.Objects
 {
 public class WorldObject : RigidBody
 {

@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
-using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Scenes;
+using Godot.Collections;
+using MusicMachine.Game;
 using MusicMachine.ThirdParty.Midi;
+using MusicMachine.Tracks;
+using MusicMachine.Util;
 
 namespace MusicMachine.Music
 {
 //this is more of a tester.
-public class SongPlayer : Node
+public partial class SortofVirtualSynth : Node
 {
-    private readonly PlayingState[] _playingState;
-    private readonly Song _song;
-    private readonly SongStepper _stepper = new SongStepper();
+    private readonly PlayingState[] _playingStates;
     private Bank _bank;
     private AdsrPlayer[] _players;
     private bool _ready;
@@ -22,29 +21,32 @@ public class SongPlayer : Node
     [Export] public int MaxPolyphony = 128;
     [Export] public AudioStreamPlayer.MixTargetEnum MixTarget = AudioStreamPlayer.MixTargetEnum.Stereo;
     [Export] public string SoundFontFile = "";
+    [Export] public Array<int> UsedPresetNumbers = new Array<int>();
     [Export] public float VolumeDb = -10;
 
-    public SongPlayer(Song song)
+    public SortofVirtualSynth(int numChannels = 24)
     {
-        _song            =  song;
-        _stepper.OnEvent += OnEvent;
-        _playingState    =  new PlayingState[_song.Tracks.Count];
-        for (var i = 0; i < _playingState.Length; i++)
-            _playingState[i] = new PlayingState();
+        _playingStates = new PlayingState[numChannels];
+        for (var i = 0; i < _playingStates.Length; i++)
+            _playingStates[i] = new PlayingState();
     }
 
     public bool Playing { get; private set; }
 
-    public IReadOnlyList<PlayingState> PlayingState => _playingState;
-
-    public event Action OnStop = delegate { };
+    public IReadOnlyList<PlayingState> PlayingStates => _playingStates;
 
     public override void _Ready()
     {
         SetProcess(false);
         CreatePlayers();
         PrepareBank();
-        _ready = true;
+        Loops.AudioProcess += DoProcess;
+        _ready             =  true;
+    }
+
+    public override void _ExitTree()
+    {
+        Loops.AudioProcess -= DoProcess;
     }
 
     private void CreatePlayers()
@@ -64,36 +66,9 @@ public class SongPlayer : Node
     {
         if (_bank != null)
             return;
-        _bank = new Bank(SoundFontFile, _song.Tracks.Select(track => track.CombinedPresetNum).ToGdArray());
-    }
-
-    public void Play<TTImeSpan>(TTImeSpan atTime)
-        where TTImeSpan : ITimeSpan
-    {
-        Play(TimeConverter.ConvertFrom(atTime, _song.TempoMap));
-    }
-
-    public void Play(long startMidiTicks = 0)
-    {
-        if (!_ready)
-            throw new InvalidOperationException();
-        Stop();
-        Playing = true;
-        _stepper.BeginPlay(_song, startMidiTicks);
-        AlternateProcess.Loop += DoProcess;
-//        SetProcess(true);
-    }
-
-    public void Stop()
-    {
-        if (!Playing)
-            return;
-        Playing = false;
-        _stepper.Clear();
-        StopAllNotes();
-        OnStop.Invoke();
-        AlternateProcess.Loop -= DoProcess;
-//        SetProcess(false);
+        if (SoundFontFile != null)
+            _bank = new Bank(SoundFontFile, UsedPresetNumbers);
+        else GD.PushWarning("No soundfont supplied!");
     }
 
     public override void _Process(float delta)
@@ -107,26 +82,28 @@ public class SongPlayer : Node
             return;
         if (!Playing)
             return;
-        foreach (var channel in _playingState)
+        foreach (var channel in _playingStates)
             channel.ClearNotPlaying();
-        if (!_stepper.StepTicks(ticks))
-            Stop();
         foreach (var player in _players)
             player.DoProcess(ticks);
     }
 
     public void StopAllNotes()
     {
+        foreach (var playingState in _playingStates)
+            playingState.StopAllNotes();
         foreach (var player in _players)
             player.Stop();
-        foreach (var channel in _playingState)
-            channel.NotesOn.Clear();
     }
 
-    private void OnEvent(int index, long time, IInstTrackEvent @event)
+    public void Reset()
     {
-        var state = _playingState[index];
-        var track = _song.Tracks[index];
+        foreach (var state in _playingStates) state.Reset();
+    }
+
+    private void OnEvent(int channelNum, InstrumentEvent @event)
+    {
+        var channel = _playingStates[channelNum];
 //        if (index >= 4)
 //            Console.WriteLine("{0}: {1}", track, @event);
 //        Console.WriteLine($"Event: {@event}");
@@ -136,45 +113,45 @@ public class SongPlayer : Node
         {
             var keyNum = noteOnEvent.NoteNumber;
             //update??
-            var preset     = _bank.GetPreset(track.Program, track.Bank);
+            var preset     = _bank.GetPreset(channel.Program, channel.Bank);
             var instrument = preset[keyNum];
             if (instrument == null)
                 return;
-            if (state.NotesOn.TryGetValue(keyNum, out var stopPlayer))
+            if (channel.NotesOn.TryGetValue(keyNum, out var stopPlayer))
                 stopPlayer.StartRelease();
             var player = GetIdlePlayer();
             if (player == null)
                 return;
             player.Velocity = noteOnEvent.Velocity;
-            player.UpdateChannelVolume(AmpDb, VolumeDb, state);
-            player.PitchBend = state.PitchBend;
+            player.UpdateChannelVolume(AmpDb, VolumeDb, channel);
+            player.PitchBend = channel.PitchBend;
             player.SetInstrument(instrument);
             player.Play();
 //            if (!track.IsDrumTrack)
-            state.NotesOn[keyNum] = player;
+            channel.NotesOn[keyNum] = player;
             break;
         }
         case NoteOffEvent noteOffEvent:
         {
             var keyNum = noteOffEvent.NoteNumber;
-            if (!track.IsDrumTrack && state.NotesOn.TryGetAndRemove(keyNum, out var player))
+            if (!channel.IsDrumTrack && channel.NotesOn.TryGetAndRemove(keyNum, out var player))
                 player?.StartRelease();
             break;
         }
-        case VolumeChangeEvent volumeChangeEvent:
-            state.State.Volume = volumeChangeEvent.Volume;
-            state.UpdateVolume(AmpDb, VolumeDb);
+        case VolumeEventEvent volumeChangeEvent:
+            channel.State.Volume = volumeChangeEvent.Volume;
+            channel.UpdateVolume(AmpDb, VolumeDb);
             break;
-        case ExpressionChangeEvent expressionChangeEvent:
+        case ExpressionEventEvent expressionChangeEvent:
         {
-            state.State.Expression = expressionChangeEvent.Expression;
-            state.UpdateVolume(AmpDb, VolumeDb);
+            channel.State.Expression = expressionChangeEvent.Expression;
+            channel.UpdateVolume(AmpDb, VolumeDb);
             break;
         }
         case PitchBendEvent pitchBendEvent:
         {
-            state.State.PitchBend = pitchBendEvent.PitchValue;
-            state.UpdatePitchBend();
+            channel.State.PitchBend = pitchBendEvent.PitchValue;
+            channel.UpdatePitchBend();
             break;
         }
         default:

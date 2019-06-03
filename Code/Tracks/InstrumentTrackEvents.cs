@@ -1,14 +1,23 @@
-namespace MusicMachine.Music
+using MusicMachine.Music;
+using MusicMachine.Util;
+
+namespace MusicMachine.Tracks
 {
-public interface IInstTrackEvent //marker interface.
+public abstract class InstrumentEvent : BaseEvent
 {
+    internal InstrumentEvent()
+    {
+    }
 }
 
-public interface IInstStateEvent : IInstTrackEvent
+public abstract class InstrumentStateEvent : InstrumentEvent
 {
+    internal InstrumentStateEvent()
+    {
+    }
 }
 
-public abstract class NoteEvent : IInstTrackEvent
+public abstract class NoteEvent : InstrumentEvent
 {
     public SBN NoteNumber;
     public SBN Velocity;
@@ -23,9 +32,7 @@ public abstract class NoteEvent : IInstTrackEvent
         Velocity   = velocity;
     }
 
-    protected bool Equals(NoteEvent other) =>
-        NoteNumber.Equals(other.NoteNumber)
-     && Velocity.Equals(other.Velocity);
+    protected bool Equals(NoteEvent other) => NoteNumber.Equals(other.NoteNumber) && Velocity.Equals(other.Velocity);
 
     public override bool Equals(object obj)
     {
@@ -84,7 +91,7 @@ public class NoteOffEvent : NoteEvent
     public override string ToString() => $"Note Off (Num: {NoteNumber}, Vel: {Velocity})";
 }
 
-public sealed class PitchBendEvent : IInstStateEvent
+public sealed class PitchBendEvent : InstrumentStateEvent
 {
     public FTBN PitchValue;
 
@@ -104,9 +111,9 @@ public sealed class PitchBendEvent : IInstStateEvent
 
     public override string ToString() => $"Pitch Bend ({PitchValue})";
 
-    public void ApplyToState(ref InstrumentTrackState instrumentTrackState)
+    public void ApplyToState(ref MidiState midiState)
     {
-        instrumentTrackState.PitchBend = PitchValue;
+        midiState.PitchBend = PitchValue;
     }
 }
 
@@ -122,13 +129,13 @@ public sealed class PitchBendEvent : IInstStateEvent
 //    public override string ToString() => $"Program Change ({Program})";
 //}
 
-public abstract class ControlEvent : IInstStateEvent
+public abstract class ControlEvent : InstrumentStateEvent
 {
     public abstract SBN ControlNumber { get; }
 
     public abstract SBN? ControlNumberLsb { get; }
 
-    public abstract void ApplyToState(ref InstrumentTrackState instrumentTrackState);
+    public abstract void ApplyToState(ref MidiState midiState);
 }
 
 //public class BankSelectEvent : TwoParamControlEvent
@@ -149,9 +156,9 @@ public abstract class ControlEvent : IInstStateEvent
 //    public override string ToString() => $"Bank Select ({Bank})";
 //}
 
-public sealed class VolumeChangeEvent : ControlEvent
+public sealed class VolumeEventEvent : ControlEvent
 {
-    public VolumeChangeEvent(SBN volume)
+    public VolumeEventEvent(SBN volume)
     {
         Volume = volume;
     }
@@ -162,24 +169,24 @@ public sealed class VolumeChangeEvent : ControlEvent
 
     public override SBN? ControlNumberLsb { get; } = null;
 
-    private bool Equals(VolumeChangeEvent other) => Volume.Equals(other.Volume);
+    private bool Equals(VolumeEventEvent other) => Volume.Equals(other.Volume);
 
     public override bool Equals(object obj) =>
-        ReferenceEquals(this, obj) || obj is VolumeChangeEvent other && Equals(other);
+        ReferenceEquals(this, obj) || obj is VolumeEventEvent other && Equals(other);
 
     public override int GetHashCode() => Volume.GetHashCode();
 
-    public override void ApplyToState(ref InstrumentTrackState instrumentTrackState)
+    public override void ApplyToState(ref MidiState midiState)
     {
-        instrumentTrackState.Volume = Volume;
+        midiState.Volume = Volume;
     }
 
     public override string ToString() => $"Volume Change ({Volume})";
 }
 
-public sealed class ExpressionChangeEvent : ControlEvent
+public sealed class ExpressionEventEvent : ControlEvent
 {
-    public ExpressionChangeEvent(SBN expression)
+    public ExpressionEventEvent(SBN expression)
     {
         Expression = expression;
     }
@@ -190,16 +197,16 @@ public sealed class ExpressionChangeEvent : ControlEvent
 
     public override SBN? ControlNumberLsb { get; } = null;
 
-    private bool Equals(ExpressionChangeEvent other) => Expression.Equals(other.Expression);
+    private bool Equals(ExpressionEventEvent other) => Expression.Equals(other.Expression);
 
     public override bool Equals(object obj) =>
-        ReferenceEquals(this, obj) || obj is ExpressionChangeEvent other && Equals(other);
+        ReferenceEquals(this, obj) || obj is ExpressionEventEvent other && Equals(other);
 
     public override int GetHashCode() => Expression.GetHashCode();
 
-    public override void ApplyToState(ref InstrumentTrackState instrumentTrackState)
+    public override void ApplyToState(ref MidiState midiState)
     {
-        instrumentTrackState.Expression = Expression;
+        midiState.Expression = Expression;
     }
 
     public override string ToString() => $"Expression Change ({Expression})";

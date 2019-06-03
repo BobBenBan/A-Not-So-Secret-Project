@@ -10,6 +10,7 @@
 *.tscn text eol=LF
 *.import text eol=LF
 *.godot text eol=LF
+*.tres text eol=LF
 *.md text
 *.py text
 *.sh text

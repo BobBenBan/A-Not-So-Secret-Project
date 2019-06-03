@@ -57,21 +57,32 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+      <Compile Include="Code\Game\ProcessMode.cs" />
+      <Compile Include="Code\Music\MidiState.cs" />
+      <Compile Include="Code\Music\SortofVirtualSynth.cs" />
+      <Compile Include="Code\Music\Synth.PlayingState.cs" />
+      <Compile Include="Code\Tracks\BaseEvent.cs" />
+      <Compile Include="Code\Tracks\InstrumentTrack.cs" />
+      <Compile Include="Code\Tracks\InstrumentTrack.Cleaner.cs">
+          <DependentUpon>InstrumentTrack.cs</DependentUpon>
+      </Compile>
+      <Compile Include="Code\Tracks\InstrumentTrackEvents.cs">
+          <DependentUpon>InstrumentTrack.cs</DependentUpon>
+      </Compile>
+      <Compile Include="Code\Tracks\MidiConstants.cs">
+          <DependentUpon>MidiConverter.cs</DependentUpon>
+      </Compile>
+      <Compile Include="Code\Tracks\MidiConverter.cs" />
+      <Compile Include="Code\Tracks\Program.cs" />
+      <Compile Include="Code\Tracks\Program.Player.cs">
+          <DependentUpon>Program.cs</DependentUpon>
+      </Compile>
+      <Compile Include="Code\Tracks\Track.cs" />
     <Compile Include="Code\Config\Inputs.cs" />
     <Compile Include="Code\Config\Loading.cs" />
     <Compile Include="Code\Delegates.cs" />
-    <Compile Include="Code\Music\MidiConstants.cs" />
-    <Compile Include="Code\Music\MidiInstTrack.cs" />
-    <Compile Include="Code\Music\InstrumentTrackEvents.cs" />
-    <Compile Include="Code\Music\InstrumentTrackState.cs" />
-    <Compile Include="Code\Music\MidiConverter.cs" />
-    <Compile Include="Code\Music\PlayingState.cs" />
-    <Compile Include="Code\Music\Song.cs" />
-    <Compile Include="Code\Music\SongPlayer.cs" />
-    <Compile Include="Code\Music\SongStepper.cs" />
-    <Compile Include="Code\Music\Track.cs" />
-    <Compile Include="Code\Scenes\AlternateProcess.cs" />
-    <Compile Include="Code\Scenes\Global.cs" />
+      <Compile Include="Code\Game\Loops.cs" />
+      <Compile Include="Code\ShouldNotHappenException.cs" />
     <Compile Include="Code\Test\PseudoScratch.cs" />
     <Compile Include="Code\Test\TestException.cs" />
     <Compile Include="Code\Test\TrackTest.cs" />
@@ -79,9 +90,7 @@
     <Compile Include="Code\ThirdParty\Midi\ADSRPlayer.cs" />
     <Compile Include="Code\ThirdParty\Midi\Bank.cs" />
     <Compile Include="Code\Util\DoubleTapDetector.cs" />
-    <Compile Include="Code\Util\EmptyArray.cs" />
     <Compile Include="Code\Util\Extentions.cs" />
-    <Compile Include="Code\Util\FlatteningMultipleIterator.cs" />
     <Compile Include="Code\Util\InputAction.cs" />
     <Compile Include="Code\Util\Mathm.cs" />
     <Compile Include="Code\Util\Numbers.cs" />
@@ -90,10 +99,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\Global\Caches.cs" />
     <Compile Include="Scenes\Global\GlobalNode.cs" />
+      <Compile Include="Scenes\Objects\LightBoard\Bulb.cs" />
+      <Compile Include="Scenes\Objects\LightBoard\LightBoard.cs" />
     <Compile Include="Scenes\Objects\Pointer.cs" />
     <Compile Include="Scenes\Objects\WorldObject.cs" />
     <Compile Include="Scenes\Player\Player.cs" />
-    <Compile Include="Test\AnimationTest.cs" />
     <Compile Include="Test\PlayerDisplayer.cs" />
     <Compile Include="Test\TestOnly.cs" />
     <Compile Include="Test\TestScene.cs" />

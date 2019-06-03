@@ -1,5 +1,6 @@
 using Godot;
 using MusicMachine.Config;
+using MusicMachine.Util;
 
 namespace MusicMachine.Scenes
 {

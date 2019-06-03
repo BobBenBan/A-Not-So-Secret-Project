@@ -1,6 +1,7 @@
 using System;
 using Godot;
 using Godot.Collections;
+using MusicMachine.Util;
 
 namespace MusicMachine.Scenes
 {
@@ -38,8 +39,7 @@ public class Caches : Node
 
     public static Shape GetOrCreateShape(Mesh mesh, bool isTrimesh)
     {
-        var shapeCache =
-            isTrimesh ? Instance._trimeshShapeCache : Instance._convexShapeCaches;
+        var shapeCache = isTrimesh ? Instance._trimeshShapeCache : Instance._convexShapeCaches;
         if (!shapeCache.TryGetValue(mesh, out var o))
             o = shapeCache[mesh] = mesh.CreateShape(isTrimesh);
         return o;

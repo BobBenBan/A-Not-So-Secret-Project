@@ -1,51 +1,30 @@
 using System;
 using System.Collections.Generic;
+using MusicMachine.Util;
 
-namespace MusicMachine.Music
+namespace MusicMachine.Tracks
 {
-/// <summary>
-///     A label for a track that stores its time in units of MidiTicks.
-/// </summary>
-public class MidiInstTrack : Track<IInstTrackEvent>
-{
-    private readonly FTBN _bank;
-    public readonly bool IsDrumTrack;
-    public readonly SBN Program;
-
-    public MidiInstTrack(FTBN bank, SBN program, bool isDrumTrack = false)
-    {
-        _bank       = bank;
-        Program     = program;
-        IsDrumTrack = isDrumTrack;
-    }
-
-    public FTBN Bank => IsDrumTrack ? (FTBN) MidiConstants.DrumBank : _bank;
-
-    public int CombinedPresetNum => (Bank << 7) | Program;
-}
-
-/// <summary>
-///     Just putting the instrument track pruning in another place.
-/// </summary>
-public static class InstrumentTrackCleaner
+public partial class InstrumentTrack
 {
     /// <summary>
-    ///     Removes redundant events from this track.
+    ///     Removes redundant events from this track (events that have no effect on output).
+    ///     This includes identical change events and events played during silence.
+    ///     Only do this when you're sure you don't want to preserve changes.
     /// </summary>
-    /// <param name="midiInstTrack"></param>
-    public static void Clean(this MidiInstTrack midiInstTrack)
+    public void Clean()
     {
-//        if (Program == 56)
+        //just putting the giant aaaah in a separate place.
+        //        if (Program == 56)
 //        {
 //            Debugger.Break();
 //        }
         var  notesOn    = new bool[128];
         byte numNotesOn = 0;
         var  pastEvents = new Dictionary<Type, EffectiveEventPair>();
-        var  toRemove   = new List<KeyValuePair<long, IInstTrackEvent>>();
-        foreach (var curEventPair in midiInstTrack.EventPairs)
+        var  toRemove   = new List<Pair<long, InstrumentEvent>>();
+        foreach (var curEventPair in EventPairs)
         {
-            var @event = curEventPair.Value;
+            var @event = curEventPair.Second;
             switch (@event)
             {
             case NoteOnEvent noteOn:
@@ -71,11 +50,11 @@ public static class InstrumentTrackCleaner
                 }
                 break;
             }
-            case IInstStateEvent _:
+            case InstrumentStateEvent _:
                 var type = @event.GetType();
                 if (pastEvents.TryGetValue(type, out var past))
                 {
-                    if (@event.Equals(past.EventPair.Value))
+                    if (@event.Equals(past.EventPair.Second))
                     {
                         toRemove.Add(curEventPair); //current identical, redundant.
                         break;                      // and don't update past.
@@ -92,19 +71,19 @@ public static class InstrumentTrackCleaner
             foreach (var past in pastEvents.Values)
             {
                 var pair = past.EventPair;
-                if (!(pair.Value is NoteOffEvent))
+                if (!(pair.Second is NoteOffEvent))
                     toRemove.Add(pair);
             }
         }
-        foreach (var eventPair in toRemove) midiInstTrack.Remove(eventPair);
+        foreach (var eventPair in toRemove) Remove(eventPair);
     }
 
     private class EffectiveEventPair
     {
-        public readonly KeyValuePair<long, IInstTrackEvent> EventPair;
+        public readonly Pair<long, InstrumentEvent> EventPair;
         public bool WasEffective;
 
-        public EffectiveEventPair(KeyValuePair<long, IInstTrackEvent> eventPair, bool wasEffective)
+        public EffectiveEventPair(Pair<long, InstrumentEvent> eventPair, bool wasEffective)
         {
             EventPair    = eventPair;
             WasEffective = wasEffective;

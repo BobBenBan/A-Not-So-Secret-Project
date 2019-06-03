@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using Godot;
 using MusicMachine.Music;
+using MusicMachine.Scenes.Objects;
+using MusicMachine.Tracks;
+using MusicMachine.Util;
 
 namespace MusicMachine.Test
 {
@@ -10,31 +13,30 @@ public class PlayerDisplayer : Spatial
     private readonly bool[] _cacheArr = new bool[128];
     private readonly Color[] _colors;
     private readonly Spatial _displayPoint;
-    private readonly SongPlayer _player;
     private readonly Pointer[][] _pointers;
     private readonly Queue<Pointer> _queuedPointers = new Queue<Pointer>();
+    private readonly SortofVirtualSynth _sortofVirtualSynth;
 
     private PlayerDisplayer()
     {
         //donut use
     }
 
-    public PlayerDisplayer(Spatial displayPoint, Song song, string soundFontFile)
+    public PlayerDisplayer(Spatial displayPoint, Program program, string soundFontFile)
     {
         _displayPoint = displayPoint;
-        _colors       = new Color[song.Tracks.Count];
+        _colors       = new Color[program.InstrumentTracks.Count];
         _colors.FillWith(
             () => Color.FromHsv(
                 (float) GD.Randf(),
                 (float) (0.8 + GD.Randf() * 0.6),
                 (float) (0.4 + GD.Randf() * 0.6),
                 0.5f));
-        _pointers = new Pointer[song.Tracks.Count][];
+        _pointers = new Pointer[program.InstrumentTracks.Count][];
         for (var index = 0; index < _pointers.Length; index++)
             _pointers[index] = new Pointer[128];
-        _player        =  new SongPlayer(song) {SoundFontFile = soundFontFile};
-        _player.OnStop += delegate { CallDeferred(nameof(Stop)); };
-        AddChild(_player);
+        _sortofVirtualSynth = new SortofVirtualSynth(program) {SoundFontFile = soundFontFile};
+        AddChild(_sortofVirtualSynth);
     }
 
     public override void _Ready()
@@ -45,7 +47,7 @@ public class PlayerDisplayer : Spatial
     public void Play(long startMidiTicks = 0)
     {
         Stop();
-        _player.Play(startMidiTicks);
+        _sortofVirtualSynth.Play(startMidiTicks);
         SetProcess(true);
     }
 
@@ -58,7 +60,7 @@ public class PlayerDisplayer : Spatial
                 spatial.QueueFree();
             }
         _queuedPointers.Clear();
-        _player.Stop();
+        _sortofVirtualSynth.Stop();
         foreach (var spatials in _pointers)
             spatials.Fill(null);
     }
@@ -66,10 +68,10 @@ public class PlayerDisplayer : Spatial
     public override void _Process(float _)
     {
         var channelHasPt = _cacheArr;
-        for (var iIndex = 0; iIndex < _player.PlayingState.Count; iIndex++)
+        for (var iIndex = 0; iIndex < SortofVirtualSynth.PlayingState.Count; iIndex++)
         {
             channelHasPt.Fill(false);
-            var notesOn = _player.PlayingState[iIndex].NotesOn;
+            var notesOn = SortofVirtualSynth.PlayingState[iIndex].NotesOn;
             foreach (var playerPair in notesOn)
             {
                 var pointer = _pointers[iIndex][playerPair.Key];
@@ -80,7 +82,7 @@ public class PlayerDisplayer : Spatial
                 pointer.SetTranslation(
                     _displayPoint.Translation
                   + Vector3.Forward * iIndex / 1.1f
-                  + Vector3.Right * (playerPair.Key + playerPair.Value.PitchBend * Song.MaxSemitonesPitchBend) / 10);
+                  + Vector3.Right * (playerPair.Key + playerPair.Value.PitchBend * Program.MaxSemitonesPitchBend) / 10);
                 pointer.SetScale(new Vector3(1, 1, 1) * Mathf.Pow(2, playerPair.Value.VolumeDb / 10 + 2));
                 channelHasPt[playerPair.Key] = true;
             }

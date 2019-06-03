@@ -1,5 +1,7 @@
 using Godot;
 
+namespace MusicMachine.Scenes.Objects
+{
 public class Pointer : Spatial
 {
     private static readonly SpatialMaterial _material = GD.Load<SpatialMaterial>("res://Scenes/Objects/Material.tres");
@@ -13,4 +15,5 @@ public class Pointer : Spatial
         SpatialMaterial = (SpatialMaterial) _material.Duplicate();
         _meshInstance.SetSurfaceMaterial(0, SpatialMaterial);
     }
+}
 }

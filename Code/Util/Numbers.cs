@@ -2,7 +2,7 @@ using System;
 using Melanchall.DryWetMidi.Common;
 
 // ReSharper disable InconsistentNaming
-namespace MusicMachine
+namespace MusicMachine.Util
 {
 public struct FBN : IFormattable, IComparable<FBN>, IEquatable<FBN>
 {
@@ -78,10 +78,7 @@ public struct SBN : IFormattable, IComparable<SBN>, IEquatable<SBN>
 
     public int CompareTo(SBN other) => Value.CompareTo(other.Value);
 
-    public bool Equals(SBN other)
-    {
-        return _value == other._value;
-    }
+    public bool Equals(SBN other) => _value == other._value;
 
     public static implicit operator SBN(byte value) => new SBN(value);
 
@@ -139,10 +136,6 @@ public struct FTBN : IFormattable, IComparable<FTBN>, IEquatable<FTBN>
 
     public int CompareTo(FTBN other) => Value.CompareTo(other.Value);
 
-    public bool Equals(FTBN other)
-    {
-        return Head.Equals(other.Head)
-            && Tail.Equals(other.Tail);
-    }
+    public bool Equals(FTBN other) => Head.Equals(other.Head) && Tail.Equals(other.Tail);
 }
 }

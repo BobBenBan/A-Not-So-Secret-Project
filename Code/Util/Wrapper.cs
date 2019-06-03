@@ -1,16 +1,16 @@
 using System;
 
-namespace MusicMachine
+namespace MusicMachine.Util
 {
 public class Wrapper<T>
     where T : class
 {
-    private T _obj;
+    private T _self;
 
     protected T Self
     {
-        get => _obj ?? throw new InvalidOperationException("obj is null");
-        set => _obj = value ?? throw new NullReferenceException();
+        get => _self ?? throw new InvalidOperationException("obj is null");
+        set => _self = value ?? throw new NullReferenceException();
     }
 }
 }

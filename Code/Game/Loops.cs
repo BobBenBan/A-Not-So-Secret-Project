@@ -2,23 +2,22 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using Godot;
-using Object = Godot.Object;
 using Thread = System.Threading.Thread;
 
-namespace MusicMachine.Scenes
+namespace MusicMachine.Game
 {
-public class AlternateProcess : Object
+public class Loops
 {
     private const long MinTicks = 5 * 1000 * 10; //5 milliseconds, or 200 times a second.
-    private static readonly AlternateProcess Instance = new AlternateProcess();
+    private static readonly Loops Instance = new Loops();
     private readonly Thread _thread;
 
-    private AlternateProcess()
+    private Loops()
     {
         _thread = new Thread(ThreadStart);
     }
 
-    public static event Action<long> Loop = delegate { };
+    public static event Action<long> AudioProcess = delegate { };
 
     internal static void Start()
     {
@@ -42,25 +41,21 @@ public class AlternateProcess : Object
                 Thread.Sleep(new TimeSpan(Math.Max(0, MinTicks - elapsedTicks)));
                 elapsedTicks = stopwatch.ElapsedTicks;
                 stopwatch.Restart();
-                var theProcesses = Loop;
+                var theProcesses = AudioProcess;
                 try
                 {
                     theProcesses?.Invoke(elapsedTicks);
-                }
-                catch (ThreadInterruptedException)
+                } catch (ThreadInterruptedException)
                 {
-                }
-                catch (ThreadAbortException)
+                } catch (ThreadAbortException)
                 {
                     break;
-                }
-                catch (Exception e)
+                } catch (Exception e)
                 {
                     GD.PrintErr(e);
                 }
             }
-        }
-        catch (ThreadInterruptedException)
+        } catch (ThreadInterruptedException)
         {
         }
     }

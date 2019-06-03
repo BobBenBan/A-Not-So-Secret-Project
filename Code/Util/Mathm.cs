@@ -1,6 +1,6 @@
 using System;
 
-namespace MusicMachine
+namespace MusicMachine.Util
 {
 public static class Mathm
 {
@@ -32,6 +32,14 @@ public static class Mathm
             value = max;
     }
 
+    public static void Constrain(this ref float value, float min, float max)
+    {
+        if (value < min)
+            value = min;
+        else if (value > max)
+            value = max;
+    }
+
     public static void MinWith(this ref long value, long min)
     {
         value = Math.Min(value, min);
@@ -51,5 +59,7 @@ public static class Mathm
     {
         value = Math.Max(value, max);
     }
+
+    public static bool InRange(this int value, int min, int maxExclusive) => value >= min && value < maxExclusive;
 }
 }

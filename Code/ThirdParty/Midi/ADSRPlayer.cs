@@ -2,6 +2,8 @@ using Godot;
 using Godot.Collections;
 using Melanchall.DryWetMidi.Common;
 using MusicMachine.Music;
+using MusicMachine.Tracks;
+using MusicMachine.Util;
 using GDObject = Godot.Object;
 
 namespace MusicMachine.ThirdParty.Midi
@@ -32,7 +34,7 @@ public class AdsrPlayer : AudioStreamPlayer
         get => _pitchBend;
         set
         {
-            PitchScale = Mathf.Pow(2, value * Song.MaxSemitonesPitchBend / 12);
+            PitchScale = Mathf.Pow(2, value * Program.MaxSemitonesPitchBend / 12); //todo: fix
             _pitchBend = value;
         }
     }
@@ -128,7 +130,7 @@ public class AdsrPlayer : AudioStreamPlayer
         VolumeDb = Mathf.Lerp(MinimumVolumeDb, MaximumVolumeDb, CurrentVolume);
     }
 
-    public void UpdateChannelVolume(float ampDb, float baseVolumeDb, PlayingState state)
+    public void UpdateChannelVolume(float ampDb, float baseVolumeDb, SortofVirtualSynth.PlayingState state)
     {
         var noteVol = state.Volume * state.Expression * Velocity / 127f;
         MaximumVolumeDb = noteVol * ampDb - ampDb + baseVolumeDb;

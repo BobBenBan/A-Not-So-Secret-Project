@@ -1,12 +1,20 @@
 using System;
 using System.Collections.Generic;
 
-namespace MusicMachine
+namespace MusicMachine.Util
 {
-public struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>
+public interface IPair<out T1, out T2>
 {
-    public T1 First;
-    public T2 Second;
+    T1 First { get; }
+
+    T2 Second { get; }
+}
+
+public struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>, IPair<T1, T2>
+{
+    public T1 First { get; set; }
+
+    public T2 Second { get; set; }
 
     public Pair(T1 first, T2 second)
     {

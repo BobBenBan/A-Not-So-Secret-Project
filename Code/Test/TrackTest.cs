@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using MusicMachine.Music;
+using MusicMachine.Tracks;
+using MusicMachine.Util;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
@@ -43,7 +44,7 @@ public class TrackTest
     {
         known = new Dictionary<long, List<string>>(known);
         var random  = new Randomizer(234);
-        var curList = new List<KeyValuePair<long, IReadOnlyList<string>>>();
+        var curList = new List<Pair<long, IReadOnlyList<string>>>();
         for (var j = 0; j < 200; j++)
         {
             var start = -100 + random.NextShort(400);
@@ -63,11 +64,11 @@ public class TrackTest
                 for (var i = cur; i <= next; i++)
                 {
                     var knownHasKey = known.ContainsKey(i);
-                    var trackIndex  = curList.FindIndex(x => x.Key == i);
+                    var trackIndex  = curList.FindIndex(x => x.First == i);
                     Assert.AreEqual(knownHasKey, trackIndex >= 0);
                     if (!knownHasKey)
                         continue;
-                    Assert.AreEqual(known[i], curList[trackIndex].Value);
+                    Assert.AreEqual(known[i], curList[trackIndex].Second);
                     curList.RemoveAt(trackIndex);
                 }
                 Assert.IsEmpty(curList);

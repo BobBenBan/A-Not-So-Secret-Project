@@ -1,6 +1,6 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable InconsistentNaming
-namespace MusicMachine.Music
+namespace MusicMachine.Tracks
 {
 public static class MidiConstants
 {
@@ -78,7 +78,7 @@ public enum ControlNumbers : byte
     PolyMode = 127
 }
 
-public enum InstrumentNames : int
+public enum InstrumentNames
 {
     AcousticGrandPiano = 0,
     BrightAcousticPiano = 1,
