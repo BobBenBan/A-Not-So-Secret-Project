@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Godot.Collections;
 using Object = Godot.Object;
@@ -112,20 +111,6 @@ public static class StructEx
         if (supplier == null) throw new ArgumentNullException(nameof(supplier));
         for (var index = 0; index < arr.Length; index++)
             arr[index] = supplier();
-    }
-
-    public static IEnumerable<T> NotNull<T>(this IEnumerable<T> enumerable)
-        where T : class
-    {
-        if (enumerable == null) throw new ArgumentNullException(nameof(enumerable));
-        return enumerable.Where(o => o != null);
-    }
-
-    public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> enumerable)
-        where T : struct
-    {
-        if (enumerable == null) throw new ArgumentNullException(nameof(enumerable));
-        return enumerable.Where(o => o != null).Select(o => o.Value);
     }
 }
 

@@ -16,12 +16,12 @@ public partial class SortofVirtualSynth : Node
     private Bank _bank;
     private AdsrPlayer[] _players;
     private bool _ready;
+    private Array<int> _usedPresetNumbers = new Array<int>();
     [Export] public float AmpDb = 20;
     [Export] public string Bus = "master";
-    [Export] public int MaxPolyphony = 128;
+    [Export] public int MaxPolyphony = 150;
     [Export] public AudioStreamPlayer.MixTargetEnum MixTarget = AudioStreamPlayer.MixTargetEnum.Stereo;
     [Export] public string SoundFontFile = "";
-    [Export] public Array<int> UsedPresetNumbers = new Array<int>();
     [Export] public float VolumeDb = -10;
 
     public SortofVirtualSynth(int numChannels = 24)
@@ -31,8 +31,22 @@ public partial class SortofVirtualSynth : Node
             _playingStates[i] = new PlayingState();
     }
 
-    public bool Playing { get; private set; }
-
+    [Export]
+    public Array<int> UsedPresetNumbers
+    {
+        get => _usedPresetNumbers;
+        set
+        {
+            var diff = value != _usedPresetNumbers;
+            _usedPresetNumbers = value;
+            if (diff && _ready)
+            {
+                StopAllNotes();
+                PrepareBank();
+                _bank.UpdateUsedProgNums(value);
+            }
+        }
+    }
     public IReadOnlyList<PlayingState> PlayingStates => _playingStates;
 
     public override void _Ready()
@@ -68,7 +82,8 @@ public partial class SortofVirtualSynth : Node
             return;
         if (SoundFontFile != null)
             _bank = new Bank(SoundFontFile, UsedPresetNumbers);
-        else GD.PushWarning("No soundfont supplied!");
+        else
+            GD.PushWarning("No soundfont supplied!");
     }
 
     public override void _Process(float delta)
@@ -79,8 +94,6 @@ public partial class SortofVirtualSynth : Node
     private void DoProcess(long ticks)
     {
         if (_bank == null)
-            return;
-        if (!Playing)
             return;
         foreach (var channel in _playingStates)
             channel.ClearNotPlaying();
@@ -98,11 +111,15 @@ public partial class SortofVirtualSynth : Node
 
     public void Reset()
     {
-        foreach (var state in _playingStates) state.Reset();
+        foreach (var state in _playingStates)
+            state.Reset();
     }
 
-    private void OnEvent(int channelNum, InstrumentEvent @event)
+    public void SendEvent(int channelNum, MusicEvent @event)
     {
+        if (_bank == null)
+            return;
+        Console.WriteLine("Recieved event" + @event);
         var channel = _playingStates[channelNum];
 //        if (index >= 4)
 //            Console.WriteLine("{0}: {1}", track, @event);

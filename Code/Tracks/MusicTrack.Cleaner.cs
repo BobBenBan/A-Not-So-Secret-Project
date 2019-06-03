@@ -4,7 +4,7 @@ using MusicMachine.Util;
 
 namespace MusicMachine.Tracks
 {
-public partial class InstrumentTrack
+public partial class MusicTrack
 {
     /// <summary>
     ///     Removes redundant events from this track (events that have no effect on output).
@@ -21,7 +21,7 @@ public partial class InstrumentTrack
         var  notesOn    = new bool[128];
         byte numNotesOn = 0;
         var  pastEvents = new Dictionary<Type, EffectiveEventPair>();
-        var  toRemove   = new List<Pair<long, InstrumentEvent>>();
+        var  toRemove   = new List<Pair<long, MusicEvent>>();
         foreach (var curEventPair in EventPairs)
         {
             var @event = curEventPair.Second;
@@ -50,7 +50,7 @@ public partial class InstrumentTrack
                 }
                 break;
             }
-            case InstrumentStateEvent _:
+            case MusicStateEvent _:
                 var type = @event.GetType();
                 if (pastEvents.TryGetValue(type, out var past))
                 {
@@ -80,10 +80,10 @@ public partial class InstrumentTrack
 
     private class EffectiveEventPair
     {
-        public readonly Pair<long, InstrumentEvent> EventPair;
+        public readonly Pair<long, MusicEvent> EventPair;
         public bool WasEffective;
 
-        public EffectiveEventPair(Pair<long, InstrumentEvent> eventPair, bool wasEffective)
+        public EffectiveEventPair(Pair<long, MusicEvent> eventPair, bool wasEffective)
         {
             EventPair    = eventPair;
             WasEffective = wasEffective;

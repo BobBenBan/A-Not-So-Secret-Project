@@ -20,8 +20,8 @@ public class GlobalNode : Node
 
     public override void _Ready()
     {
-        if (Instance != null) throw new InvalidOperationException("Two singletons created. Thats a no-no.");
-        Instance = this;
+        if (_instance != null) throw new InvalidOperationException("Two singletons created. Thats a no-no.");
+        _instance = this;
 
         void CenterScreen()
         {

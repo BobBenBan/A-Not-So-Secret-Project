@@ -10,13 +10,13 @@ namespace MusicMachine.Tracks
 {
 public class MidiConverter
 {
-    private readonly Track<InstrumentStateEvent> _stateChanges = new Track<InstrumentStateEvent>();
-    private readonly Dictionary<int, InstrumentTrack> _tracks = new Dictionary<int, InstrumentTrack>();
+    private readonly Track<MusicStateEvent> _stateChanges = new Track<MusicStateEvent>();
+    private readonly Dictionary<int, MusicTrack> _tracks = new Dictionary<int, MusicTrack>();
 
     public MidiConverter(MidiFile file)
     {
         ReadMidiFile(file);
-        foreach (var track in Program.InstrumentTracks)
+        foreach (var track in Program.MusicTracks)
             track.Name = track.IsDrumTrack ? $"Drum Track: Prog {track.Program}" :
                              typeof(InstrumentNames).IsEnumDefined(track.CombinedPresetNum) ?
                                  $"Instrument Track: {(InstrumentNames) track.CombinedPresetNum}" :
@@ -54,7 +54,7 @@ public class MidiConverter
             {
                 if (!_tracks.TryGetValue(preset.CombinedPresetNum, out var track))
                 {
-                    _tracks[preset.CombinedPresetNum] = track = new InstrumentTrack(
+                    _tracks[preset.CombinedPresetNum] = track = new MusicTrack(
                                                             preset.Bank,
                                                             preset.Program,
                                                             preset.IsDrumTrack);
@@ -71,7 +71,7 @@ public class MidiConverter
             case IPresetChange presetChange:
                 presetChange.ApplyTo(ref preset);
                 break;
-            case InstrumentStateEvent stateEvent:
+            case MusicStateEvent stateEvent:
                 _stateChanges.Add(timedObject.Time, stateEvent);
                 break;
             default: throw new ShouldNotHappenException();
@@ -81,7 +81,7 @@ public class MidiConverter
         {
             track.AddRange(_stateChanges);
             track.Clean();
-            Program.InstrumentTracks.Add(track);
+            Program.MusicTracks.Add(track);
         }
     }
 
@@ -229,6 +229,6 @@ public class MidiConverter
 
 public static class MidiConverterEx
 {
-    public static Program ToSong(this MidiFile midiFile) => new MidiConverter(midiFile).Program;
+    public static Program ToProgram(this MidiFile midiFile) => new MidiConverter(midiFile).Program;
 }
 }

@@ -28,6 +28,7 @@ _global_script_class_icons={
 
 config/name="MusicMachine"
 run/main_scene="res://Test/TestScene.tscn"
+boot_splash/image="res://Resources/Images/Loady.gif"
 config/icon="res://Resources/Images/icon.png"
 
 [autoload]
@@ -106,6 +107,7 @@ action_secondary={
 [mono]
 
 debugger_agent/wait_timeout=15000
+export/include_scripts_content=true
 
 [physics]
 

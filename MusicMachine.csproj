@@ -62,21 +62,20 @@
       <Compile Include="Code\Music\SortofVirtualSynth.cs" />
       <Compile Include="Code\Music\Synth.PlayingState.cs" />
       <Compile Include="Code\Tracks\BaseEvent.cs" />
-      <Compile Include="Code\Tracks\InstrumentTrack.cs" />
-      <Compile Include="Code\Tracks\InstrumentTrack.Cleaner.cs">
-          <DependentUpon>InstrumentTrack.cs</DependentUpon>
+      <Compile Include="Code\Tracks\Mapper.cs" />
+      <Compile Include="Code\Tracks\MusicTrack.cs" />
+      <Compile Include="Code\Tracks\MusicTrack.Cleaner.cs">
+          <DependentUpon>MusicTrack.cs</DependentUpon>
       </Compile>
-      <Compile Include="Code\Tracks\InstrumentTrackEvents.cs">
-          <DependentUpon>InstrumentTrack.cs</DependentUpon>
+      <Compile Include="Code\Tracks\MusicTrackEvents.cs">
+          <DependentUpon>MusicTrack.cs</DependentUpon>
       </Compile>
       <Compile Include="Code\Tracks\MidiConstants.cs">
           <DependentUpon>MidiConverter.cs</DependentUpon>
       </Compile>
       <Compile Include="Code\Tracks\MidiConverter.cs" />
       <Compile Include="Code\Tracks\Program.cs" />
-      <Compile Include="Code\Tracks\Program.Player.cs">
-          <DependentUpon>Program.cs</DependentUpon>
-      </Compile>
+      <Compile Include="Code\Tracks\ProgramPlayer.cs" />
       <Compile Include="Code\Tracks\Track.cs" />
     <Compile Include="Code\Config\Inputs.cs" />
     <Compile Include="Code\Config\Loading.cs" />
@@ -105,7 +104,6 @@
     <Compile Include="Scenes\Objects\WorldObject.cs" />
     <Compile Include="Scenes\Player\Player.cs" />
     <Compile Include="Test\PlayerDisplayer.cs" />
-    <Compile Include="Test\TestOnly.cs" />
     <Compile Include="Test\TestScene.cs" />
   </ItemGroup>
   <ItemGroup>

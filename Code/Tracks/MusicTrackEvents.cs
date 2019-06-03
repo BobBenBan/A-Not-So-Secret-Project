@@ -3,21 +3,21 @@ using MusicMachine.Util;
 
 namespace MusicMachine.Tracks
 {
-public abstract class InstrumentEvent : BaseEvent
+public abstract class MusicEvent : BaseEvent
 {
-    internal InstrumentEvent()
+    internal MusicEvent()
     {
     }
 }
 
-public abstract class InstrumentStateEvent : InstrumentEvent
+public abstract class MusicStateEvent : MusicEvent
 {
-    internal InstrumentStateEvent()
+    internal MusicStateEvent()
     {
     }
 }
 
-public abstract class NoteEvent : InstrumentEvent
+public abstract class NoteEvent : MusicEvent
 {
     public SBN NoteNumber;
     public SBN Velocity;
@@ -91,7 +91,7 @@ public class NoteOffEvent : NoteEvent
     public override string ToString() => $"Note Off (Num: {NoteNumber}, Vel: {Velocity})";
 }
 
-public sealed class PitchBendEvent : InstrumentStateEvent
+public sealed class PitchBendEvent : MusicStateEvent
 {
     public FTBN PitchValue;
 
@@ -129,7 +129,7 @@ public sealed class PitchBendEvent : InstrumentStateEvent
 //    public override string ToString() => $"Program Change ({Program})";
 //}
 
-public abstract class ControlEvent : InstrumentStateEvent
+public abstract class ControlEvent : MusicStateEvent
 {
     public abstract SBN ControlNumber { get; }
 

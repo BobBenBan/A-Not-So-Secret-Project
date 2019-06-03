@@ -16,6 +16,8 @@ public class Bank : Wrapper<GDObject>
     private readonly System.Collections.Generic.Dictionary<int, Preset> _presetCache =
         new System.Collections.Generic.Dictionary<int, Preset>();
 
+    private readonly object _sf;
+
     public Bank(string soundFontFile, Array<int> usedProgramNumbers)
     {
         if (soundFontFile == null)
@@ -23,11 +25,18 @@ public class Bank : Wrapper<GDObject>
         if (usedProgramNumbers == null)
             throw new ArgumentNullException(nameof(usedProgramNumbers));
 
+        var soundFontReader = SoundFontGd.New();
+        _sf = soundFontReader.Call("read_file", soundFontFile);
+        UpdateUsedProgNums(usedProgramNumbers);
+    }
+
+    public void UpdateUsedProgNums(Array<int> usedProgramNumbers)
+    {
+        if (usedProgramNumbers == null)
+            throw new ArgumentNullException(nameof(usedProgramNumbers));
         var bank = BankGd.New();
         bank.Call("init");
-        var soundFontReader = SoundFontGd.New();
-        var sf              = soundFontReader.Call("read_file", soundFontFile);
-        bank.Call("read_soundfont", sf, usedProgramNumbers);
+        bank.Call("read_soundfont", _sf, usedProgramNumbers);
         Self = bank;
     }
 
@@ -36,7 +45,6 @@ public class Bank : Wrapper<GDObject>
         var val = (bank << 7) | program;
         if (!_presetCache.TryGetValue(val, out var preset))
             _presetCache[val] = preset = new Preset((Dictionary) Self.Call("get_preset", program, bank));
-        Self.Call("get_preset", program, bank);
         return preset;
     }
 }

@@ -8,9 +8,6 @@ using MusicMachine.Util;
 
 namespace MusicMachine.Tracks
 {
-public partial class Program
-{
-}
 
 /// <summary>
 ///     Unlike a <i>steppers</i> this one is delegate based, since we would be using this to PLAY, rather
@@ -18,30 +15,31 @@ public partial class Program
 /// </summary>
 public class ProgramPlayer : Node, IProcessable
 {
-    private readonly List<Pair<long, object>> _cachedList = new List<Pair<long, object>>();
-    private readonly Program _program;
+    private readonly List<Action> _cachedList = new List<Action>();
+    private Program _program;
 
-    private readonly List<Pair<int, Track<object>.Stepper>> _steppers =
-        new List<Pair<int, Track<object>.Stepper>>(); //colors!!!
+    private readonly List<Track<Action>.Stepper> _steppers =
+        new List<Track<Action>.Stepper>();
 
     private long _curTimeTicks;
     private bool _playing;
     private ProcessMode _processMode;
     private bool _started;
 
-    /// <summary>
-    ///     Will trigger on event steps.
-    ///     Arguments are:
-    ///     track index, Time, Event.
-    /// </summary>
-    public Action<int, long, object> OnEvent;
-
-    internal ProgramPlayer(Program program, ProcessMode processMode = ProcessMode.Physics)
+    public ProgramPlayer(Program program = null, ProcessMode processMode = ProcessMode.Audio)
     {
         _program = program;
-        program.LoadMappedTracks();
-
         ProcessMode = processMode;
+    }
+
+    public override void _PhysicsProcess(float delta)
+    {
+        Step(delta);
+    }
+
+    public override void _Process(float delta)
+    {
+        Step(delta);
     }
 
     public ProcessMode ProcessMode
@@ -58,6 +56,12 @@ public class ProgramPlayer : Node, IProcessable
         }
     }
 
+    public override void _Ready()
+    {
+        SetPhysicsProcess(false);
+        SetProcess(false);
+    }
+
     private TempoMap TempoMap => _program.TempoMap;
 
     private long CurMicros => (_curTimeTicks + 5) / 10;
@@ -67,7 +71,7 @@ public class ProgramPlayer : Node, IProcessable
         get => _playing;
         private set
         {
-            if (Playing) this.AddProcess(ProcessMode);
+            if (value) this.AddProcess(ProcessMode);
             else this.RemoveProcess(ProcessMode);
             _playing = value;
         }
@@ -87,30 +91,35 @@ public class ProgramPlayer : Node, IProcessable
             _started = true;
         else
             _curTimeTicks += ticks;
-        foreach (var stepperPair in _steppers)
+        foreach (var stepper in _steppers)
         {
-            var stepper = stepperPair.Second;
             if (!stepper.StepToInclusive((_curTimeTicks + 5) / 10))
                 continue;
-            var theEvent = OnEvent;
-            if (theEvent == null)
-                continue;
             stepper.CopyCurrentTo(_cachedList);
-            foreach (var eventPair in _cachedList)
-                theEvent(stepperPair.First, eventPair.First, eventPair.Second);
+            foreach (var action in _cachedList)
+            {
+                if(action!=null)
+                    Console.WriteLine($"invoking action... {action}");
+                action?.Invoke();
+            }
         }
-        _steppers.RemoveAll(x => x.Second.IsCurrentlyDone);
+        _steppers.RemoveAll(x => x.IsCurrentlyDone);
     }
 
-    public void Play(long at = 0)
+    public void Play(long atMicros = 0)
     {
-        _curTimeTicks = at * 10;
-        _started      = false;
-        for (var index = 0; index < _program._mappedTracks.Count; index++)
+        if (_program == null)
         {
-            var track   = _program._mappedTracks[index];
+            GD.PushWarning("No program to play!");
+            return;
+        }
+        _curTimeTicks = atMicros * 10;
+        _started      = false;
+        _program.LoadMappedTracks();
+        foreach (var track in _program.MappedTracks)
+        {
             var stepper = track.GetStepper(Math.Min(_curTimeTicks, track.Times.First()));
-            _steppers.Add(new Pair<int, Track<object>.Stepper>(index, stepper));
+            _steppers.Add(stepper);
         }
         Playing = true;
     }
@@ -121,6 +130,6 @@ public class ProgramPlayer : Node, IProcessable
         _steppers.Clear();
     }
 
-    public void Step(float seconds) => StepTicks((seconds * 10e6).RoundToLong());
+    private void Step(float seconds) => StepTicks((seconds * 10e6).RoundToLong());
 }
 }

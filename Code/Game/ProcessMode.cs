@@ -65,7 +65,7 @@ public static class ProcessModeEx
             node.SetPhysicsProcess(true);
             break;
         case ProcessMode.Audio:
-            Loops.AudioProcess -= node.StepTicks;
+            Loops.AudioProcess += node.StepTicks;
             break;
         case ProcessMode.Manual: break;
         default:                 throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
