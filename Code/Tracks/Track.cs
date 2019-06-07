@@ -10,8 +10,8 @@ namespace MusicMachine.Tracks
 ///     Represents events on a track in time.
 ///     This can indexed with track time, and will return a LIST of events at that track time.
 ///     Track time can be any number (negative or positive).
-///     Please be nice and don't try to cast the IReadOnlyLists into Lists then modify them.
-///     I could do a thing with a delegate but I don't wanna
+///
+///     Please be nice and don't try to cast the IReadOnlyLists into Lists to modify them, it will break things
 /// </summary>
 public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
 {
@@ -40,7 +40,7 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
     ///     May become invalidated later if elements at this time reach 0 at any point.
     /// </summary>
     /// <param name="time"></param>
-    public IEnumerable<TEvent> this[long time] => _track[time];
+    public IReadOnlyList<TEvent> this[long time] => _track[time];
 
     /// <summary>
     ///     The number of separate times that have events.
@@ -244,7 +244,7 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
 
         internal Stepper(Track<TEvent> owner, long startTimeInclusive)
         {
-            _owner            = owner;
+            _owner = owner;
             _curTimeInclusive = startTimeInclusive;
         }
 
@@ -255,7 +255,7 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
             get => _curTimeInclusive;
             set
             {
-                _idx              = -1;
+                _idx = -1;
                 _curTimeInclusive = value;
             }
         }
@@ -265,7 +265,7 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
             get => _curTimeInclusive - 1;
             set
             {
-                _idx              = -1;
+                _idx = -1;
                 _curTimeInclusive = value + 1;
             }
         }
@@ -281,8 +281,7 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
                 _idx = Track.Keys.BinarySearchIndexOf(_curTimeInclusive);
                 if (_idx < 0)
                     _idx = ~_idx;
-            }
-            else
+            } else
             {
                 _idx.Constrain(0, Track.Count - 1);
                 //linear search
@@ -292,8 +291,7 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
                     {
                         _idx++;
                     } while (_idx < Track.Count && Track.Keys[_idx] < _curTimeInclusive);
-                }
-                else
+                } else
                 {
                     while (_idx > 0 && Track.Keys[_idx - 1] > _curTimeInclusive)
                         _idx--;

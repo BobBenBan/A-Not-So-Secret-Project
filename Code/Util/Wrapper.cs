@@ -9,8 +9,8 @@ public class Wrapper<T>
 
     protected T Self
     {
-        get => _self ?? throw new InvalidOperationException("obj is null");
-        set => _self = value ?? throw new NullReferenceException();
+        get => _self ?? throw new NullReferenceException("No self is set.");
+        set => _self = value ?? throw new ArgumentNullException(nameof(Self));
     }
 }
 }

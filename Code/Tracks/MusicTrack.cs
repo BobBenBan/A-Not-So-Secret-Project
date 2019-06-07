@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Melanchall.DryWetMidi.Smf.Interaction;
+using MusicMachine.Tracks.Mappers;
 using MusicMachine.Util;
 
 namespace MusicMachine.Tracks
@@ -9,18 +9,19 @@ namespace MusicMachine.Tracks
 ///     A label for a track that stores its time in units of MidiTicks.
 ///     This is also the class that
 /// </summary>
-public partial class MusicTrack : Track<MusicEvent>
+public partial class MusicTrack
 {
     private readonly FTBN _bank;
     public readonly bool IsDrumTrack;
-    public readonly List<Mapper> Mappers = new List<Mapper>();
+    public readonly List<IMapper> Mappers = new List<IMapper>();
     public readonly SBN Program;
+    public readonly Track<MusicEvent> Track = new Track<MusicEvent>();
     public string Name;
 
     public MusicTrack(FTBN bank, SBN program, bool isDrumTrack = false)
     {
-        _bank       = bank;
-        Program     = program;
+        _bank = bank;
+        Program = program;
         IsDrumTrack = isDrumTrack;
     }
 
@@ -30,21 +31,13 @@ public partial class MusicTrack : Track<MusicEvent>
 
     public override string ToString() => Name;
 
-    public IEnumerable<Track<Action>> GetMappedTracks(TempoMap tempoMap)
+    public IEnumerable<Pair<long, Action>> GetMappedEvents(MappingInfo mappingInfo)
     {
-        var o = new List<Track<Action>>(Mappers.Count);
-        foreach (var mapping in Mappers)
-        {
-            var track = new Track<Action>();
-            foreach (var pair in EventPairs)
-            {
-                var eventPair = mapping(pair.First, pair.Second, tempoMap);
-                if (eventPair != null)
-                    track.Add(eventPair.Value);
-            }
-            o.Add(track);
-        }
-        return o;
+        if (!mappingInfo.IsValid)
+            throw new ArgumentException(nameof(mappingInfo));
+        foreach (var mapper in Mappers)
+        foreach (var pair in mapper.MapTrack(Track.EventPairs, mappingInfo))
+            yield return pair;
     }
 }
 }

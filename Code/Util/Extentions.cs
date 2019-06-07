@@ -77,6 +77,22 @@ public static class StructEx
 
     public static T ListLast<T>(this IList<T> list) => list[list.Count - 1];
 
+    public static int IndexMatch<T>(this IList<T> list, Predicate<T> match)
+    {
+        for (var index = 0; index < list.Count; index++)
+            if (match(list[index]))
+                return index;
+        return -1;
+    }
+
+    public static int IndexMatch<T>(this IReadOnlyList<T> list, Predicate<T> match)
+    {
+        for (var index = 0; index < list.Count; index++)
+            if (match(list[index]))
+                return index;
+        return -1;
+    }
+
     public static void ForEach<T>(this IEnumerable<T> enumeration, Action<T> action)
     {
         foreach (var item in enumeration)
@@ -88,7 +104,7 @@ public static class StructEx
     {
         if (dictionary.TryGetValue(key, out var value))
             return value;
-        value           = new TValue();
+        value = new TValue();
         dictionary[key] = value;
         return value;
     }

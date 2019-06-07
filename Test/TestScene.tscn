@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://Test/TestScene.cs" type="Script" id=1]
-[ext_resource path="res://Test/DefaultEnv.tres" type="Environment" id=2]
+[ext_resource path="res://Test/Night.tres" type="Environment" id=2]
 [ext_resource path="res://Scenes/Player/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Objects/WorldObject.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Test/FloorMaterial.tres" type="Material" id=5]
@@ -9,7 +9,7 @@
 [sub_resource type="PhysicsMaterial" id=1]
 friction = 0.4
 rough = true
-bounce = 2.0
+bounce = 0.8
 
 [sub_resource type="PlaneMesh" id=2]
 
@@ -47,10 +47,11 @@ __meta__ = {
 environment = ExtResource( 2 )
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
-transform = Transform( -0.972964, 0, 0.230955, 0, 1, 0, -0.230955, 0, -0.972964, 0, 1.94089, 0 )
+transform = Transform( -1, 0, -8.74227e-008, 0, 1, 0, 8.74227e-008, 0, -1, 0, 1.94089, 0 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 0.760563, -0.649258, -0.00294041, -0.547262, -0.643505, 0.535169, -0.349355, -0.405421, -0.84474, 5.75243, 17.8084, -51.4644 )
+visible = false
 light_energy = 0.42
 light_bake_mode = 2
 shadow_enabled = true
@@ -65,9 +66,9 @@ collision_layer = 1
 mode = 1
 physics_material_override = SubResource( 1 )
 IsTrimesh = true
+AutoShapeMesh = NodePath("MeshInstance")
 
-[node name="MeshInstance" parent="Floor" index="0"]
-use_in_baked_light = true
+[node name="MeshInstance" type="MeshInstance" parent="Floor"]
 mesh = SubResource( 2 )
 material/0 = ExtResource( 5 )
 

@@ -18,9 +18,9 @@ public class MidiConverter
         ReadMidiFile(file);
         foreach (var track in Program.MusicTracks)
             track.Name = track.IsDrumTrack ? $"Drum Track: Prog {track.Program}" :
-                             typeof(InstrumentNames).IsEnumDefined(track.CombinedPresetNum) ?
-                                 $"Instrument Track: {(InstrumentNames) track.CombinedPresetNum}" :
-                                 $"Instrument Track {(InstrumentNames) (int) track.Program}), Bank {track.Bank}";
+                typeof(InstrumentNames).IsEnumDefined(track.CombinedPresetNum) ?
+                    $"Instrument Track: {(InstrumentNames) track.CombinedPresetNum}" :
+                    $"Instrument Track {(InstrumentNames) (int) track.Program}), Bank {track.Bank}";
     }
 
     public Program Program { get; } = new Program();
@@ -33,8 +33,8 @@ public class MidiConverter
         Program.ReplaceTempoMap(tempoMap);
         var eventsByChannel = from timedObj in file.GetTimedEventsAndNotes()
                               let channel = timedObj is Note note ? note.Channel :
-                                                timedObj is TimedEvent te && te.Event is ChannelEvent ce ?
-                                                    ce.Channel : (FBN?) null
+                                  timedObj is TimedEvent te && te.Event is ChannelEvent ce ?
+                                      ce.Channel : (FBN?) null
                               where channel != null
                               // ReSharper disable once PossibleInvalidOperationException
                               group timedObj by channel.Value;
@@ -55,12 +55,12 @@ public class MidiConverter
                 if (!_tracks.TryGetValue(preset.CombinedPresetNum, out var track))
                 {
                     _tracks[preset.CombinedPresetNum] = track = new MusicTrack(
-                                                            preset.Bank,
-                                                            preset.Program,
-                                                            preset.IsDrumTrack);
+                        preset.Bank,
+                        preset.Program,
+                        preset.IsDrumTrack);
                 }
-                track.Add(note.Time,               new NoteOnEvent(note.NoteNumber, note.Velocity));
-                track.Add(note.Time + note.Length, new NoteOffEvent(note.NoteNumber, note.OffVelocity));
+                track.Track.Add(note.Time,               new NoteOnEvent(note.NoteNumber, note.Velocity));
+                track.Track.Add(note.Time + note.Length, new NoteOffEvent(note.NoteNumber, note.OffVelocity));
                 continue;
             }
             var convertedObj = ConvertEvent(((TimedEvent) timedObject).Event);
@@ -74,12 +74,12 @@ public class MidiConverter
             case MusicStateEvent stateEvent:
                 _stateChanges.Add(timedObject.Time, stateEvent);
                 break;
-            default: throw new ShouldNotHappenException();
+            default: throw new Exception("Shouldn't happen");
             }
         }
         foreach (var track in _tracks.Values)
         {
-            track.AddRange(_stateChanges);
+            track.Track.AddRange(_stateChanges);
             track.Clean();
             Program.MusicTracks.Add(track);
         }

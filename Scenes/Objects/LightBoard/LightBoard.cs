@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Godot;
@@ -6,14 +5,14 @@ using MusicMachine.Util;
 
 namespace MusicMachine.Scenes.Objects.LightBoard
 {
-[Tool]
-public class LightBoard : Spatial
+public class LightBoard : WorldObject
 {
+    public readonly IReadOnlyList<Bulb> Bulbs;
     private Spatial _bulbs;
     private PackedScene _bulbScene;
+    private int[] _onCount;
     private Transform _transform1;
     private Transform _transform2;
-    public BulbList Bulbs;
 
     public LightBoard()
     {
@@ -22,13 +21,24 @@ public class LightBoard : Spatial
 
     [Export(PropertyHint.Dir)] public string BulbScene { get; private set; } = Bulb.Dir;
 
-    [Export(PropertyHint.Range, "0,200")] public int NumBulbs { get; private set; } = 128;
+    [Export(PropertyHint.Range, "0,127")] public byte StartNum { get; private set; } = 20;
+
+    [Export(PropertyHint.Range, "0,127")] public byte EndNum { get; private set; } = 99;
+
+    public byte NumBulbs => (byte) (EndNum - StartNum + 1);
 
     public override void _Ready()
     {
+        base._Ready();
+        if (EndNum < StartNum)
+        {
+            var t = EndNum;
+            EndNum = StartNum;
+            StartNum = t;
+        }
         _transform1 = GetNode<Spatial>("FirstBulb").Transform;
         _transform2 = GetNode<Spatial>("NextBulb").Transform;
-        _bulbs      = new Spatial {Name = "Bulbs"};
+        _bulbs = new Spatial {Name = "Bulbs"};
         AddChild(_bulbs);
 
         _bulbScene = GD.Load(Bulb.Dir) as PackedScene;
@@ -47,16 +57,45 @@ public class LightBoard : Spatial
             bulb.Transform = _transform1.InterpolateWith(_transform2, i);
             _bulbs.AddChild(bulb);
         }
+        _onCount = new int[NumBulbs];
     }
 
-    public struct BulbList : IReadOnlyList<Bulb>
+    public bool AddOnCount(int index)
+    {
+        index -= StartNum;
+        if (!index.InRange(0, NumBulbs))
+            return false;
+        if (_onCount[index]++ == 0)
+            _bulbs.GetChild<Bulb>(index).LightOn = true;
+        return true;
+    }
+
+    public bool RemoveOnCount(int index)
+    {
+        index -= StartNum;
+        if (!index.InRange(0, NumBulbs))
+            return false;
+        if (_onCount[index] == 0)
+            return false;
+        if (--_onCount[index] == 0)
+            _bulbs.GetChild<Bulb>(index).LightOn = false;
+        return true;
+    }
+
+    private void OnWorldExit()
+    {
+        Translation = new Vector3(0, 10, 0);
+        LinearVelocity = Vector3.Zero;
+        AngularVelocity = Vector3.Zero;
+    }
+
+    private sealed class BulbList : IReadOnlyList<Bulb>
     {
         private readonly LightBoard _board;
 
         internal BulbList(LightBoard board)
         {
             _board = board;
-            Count  = _board.NumBulbs;
         }
 
         public IEnumerator<Bulb> GetEnumerator()
@@ -67,14 +106,16 @@ public class LightBoard : Spatial
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int Count { get; }
+        public int Count => _board.NumBulbs;
 
         public Bulb this[int index]
         {
             get
             {
-                if (!index.InRange(0, Count)) throw new ArgumentOutOfRangeException(nameof(index));
-                return _board._bulbs.GetChild<Bulb>(index);
+                index -= _board.StartNum;
+                return index.InRange(0, Count) ?
+                    _board._bulbs.GetChild<Bulb>(index) :
+                    null;
             }
         }
     }

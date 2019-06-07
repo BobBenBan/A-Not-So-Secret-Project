@@ -97,7 +97,7 @@ func read_file( path:String ):
 
 	if f.open( path, f.READ ) != OK:
 		push_error( "error: cant read file %s" % path )
-		breakpoint
+		return null
 	var stream:StreamPeerBuffer = StreamPeerBuffer.new( )
 	stream.set_data_array( f.get_buffer( f.get_len( ) ) )
 	stream.big_endian = false

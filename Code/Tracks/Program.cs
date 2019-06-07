@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Godot.Collections;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Music;
+using MusicMachine.Tracks.Mappers;
 using MusicMachine.Util;
 
 namespace MusicMachine.Tracks
 {
-public partial class Program
+public class Program
 {
     public const float MaxSemitonesPitchBend = 12;
-    internal readonly List<Track<Action>> MappedTracks = new List<Track<Action>>();
     private readonly TempoMapManager _tempoMapManager = new TempoMapManager();
     public readonly List<MusicTrack> MusicTracks = new List<MusicTrack>();
 
@@ -22,7 +20,7 @@ public partial class Program
         _tempoMapManager.ReplaceTempoMap(tempoMap);
     }
 
-    public MusicTrack GetTrack(FTBN bank, SBN program)
+    public MusicTrack GetTrack(SBN program, FTBN bank)
     {
         foreach (var track in MusicTracks)
             if (track.Program == program && track.Bank == bank)
@@ -30,17 +28,23 @@ public partial class Program
         return null;
     }
 
+    public MusicTrack GetTrack(SBN program) => GetTrack(program, 0);
+
     public void RemoveEmptyTracks()
     {
-        MusicTracks.RemoveAll(track => !track.Events.Any(x => x is NoteOnEvent));
+        MusicTracks.RemoveAll(track => !track.Track.Events.Any(x => x is NoteOnEvent));
         //remove redundant channel events???
     }
 
-    internal void LoadMappedTracks()
+    public Track<Action> GetMappedTrack()
     {
-        MappedTracks.Clear();
+        var actionTrack = new Track<Action>();
         foreach (var track in MusicTracks)
-            MappedTracks.AddRange(track.GetMappedTracks(TempoMap));
+        {
+            var mappingInfo = new MappingInfo(TempoMap, track.Bank, track.Program);
+            actionTrack.AddRange(track.GetMappedEvents(mappingInfo));
+        }
+        return actionTrack;
     }
 }
 }

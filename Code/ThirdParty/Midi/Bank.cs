@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 using MusicMachine.Util;
@@ -26,7 +28,8 @@ public class Bank : Wrapper<GDObject>
             throw new ArgumentNullException(nameof(usedProgramNumbers));
 
         var soundFontReader = SoundFontGd.New();
-        _sf = soundFontReader.Call("read_file", soundFontFile);
+        _sf = soundFontReader.Call("read_file", soundFontFile)
+           ?? throw new FileNotFoundException("Cannot find synth file.");
         UpdateUsedProgNums(usedProgramNumbers);
     }
 
@@ -51,14 +54,24 @@ public class Bank : Wrapper<GDObject>
 
 public class Preset : Wrapper<Dictionary>
 {
-    private readonly List<Instrument> _instruments = new List<Instrument>();
+    private readonly IReadOnlyList<Instrument> _instruments;
 
     internal Preset(Dictionary self)
     {
+        if (self == null)
+        {
+            _instruments = new Instrument[128];
+            return;
+        }
         Self = self;
+        var instruments = new List<Instrument>();
+        _instruments = instruments;
         var gdInstruments = Self["instruments"];
-        foreach (var instrument in (IEnumerable) gdInstruments)
-            _instruments.Add(instrument != null ? new Instrument((Dictionary) instrument) : null);
+        instruments.AddRange(
+            from object instrument in (IEnumerable) gdInstruments
+            select instrument != null ?
+                new Instrument((Dictionary) instrument) :
+                null);
     }
 
     public Instrument this[byte keyNumber] => _instruments[keyNumber];
@@ -68,10 +81,10 @@ public class Instrument : Wrapper<Dictionary>
 {
     internal Instrument(Dictionary self)
     {
-        Self         = self;
-        MixRate      = (float) Self["mix_rate"];
-        Stream       = (AudioStreamSample) Self["stream"];
-        AdsState     = State.Create(Self["ads_state"]);
+        Self = self;
+        MixRate = (float) Self["mix_rate"];
+        Stream = (AudioStreamSample) Self["stream"];
+        AdsState = State.Create(Self["ads_state"]);
         ReleaseState = State.Create(Self["release_state"]);
     }
 

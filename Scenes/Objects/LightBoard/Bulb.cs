@@ -9,6 +9,7 @@ public class Bulb : MeshInstance
     public const string Dir = "res://Scenes/Objects/LightBoard/Bulb.tscn";
     private float _curTime;
     private SpatialMaterial _material;
+    private OmniLight _light;
     [Export(PropertyHint.ExpEasing)] public float Curve = 1f;
     [Export(PropertyHint.Range, "0,100")] public float Energy = 1;
     [Export] public bool LightOn = false;
@@ -18,7 +19,8 @@ public class Bulb : MeshInstance
     public override void _Ready()
     {
         _material = GetMaterialOverride() as SpatialMaterial;
-        _curTime  = LightOn ? 1 : 0;
+        _light = GetNode<OmniLight>("OmniLight");
+        _curTime = LightOn ? 1 : 0;
     }
 
     public override void _Process(float delta)
@@ -29,6 +31,8 @@ public class Bulb : MeshInstance
         var energy = Energy * Mathf.Ease(_curTime, Curve);
 //        GD.Print(energy.ToString());
         _material.EmissionEnergy = energy;
+        _light.LightEnergy = energy;
+        _light.LightIndirectEnergy = energy;
     }
 }
 }

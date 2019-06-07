@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Godot;
+using MusicMachine.Util.Physics;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
 namespace MusicMachine.Test
 {
+[TestFixture]
 public class PseudoScratch
 {
     public static void EnumName()
@@ -12,6 +15,12 @@ public class PseudoScratch
         var random = new Randomizer(123);
         for (var i = 0; i < 20; i++)
             Console.WriteLine(random.NextEnum<E>().ToString());
+    }
+
+    public static void DoesNullableSubtractionWork()
+    {
+        Console.WriteLine(3 - (long?) 4);
+        Console.WriteLine((null - (long?) 4).HasValue);
     }
 
     private static IEnumerable<string> ForeverEnumerator()
@@ -24,26 +33,8 @@ public class PseudoScratch
         finally
         {
             Console.WriteLine("Finally entered");
-            throw new TestException();
+            throw new Exception();
         }
-    }
-
-    [Test]
-    public static void EnumFinallyTest()
-    {
-        Assert.Throws<TestException>(
-            () =>
-            {
-                var enumerator = ForeverEnumerator().GetEnumerator();
-                for (var i = 0; i < 100; i++)
-                {
-                    enumerator.MoveNext();
-                    Console.Write(enumerator.Current);
-                }
-                Console.WriteLine();
-                Console.WriteLine("Disposing...");
-                enumerator.Dispose();
-            });
     }
 
     public static void EnumCast()
@@ -59,6 +50,26 @@ public class PseudoScratch
         Cee = 4,
         Dirt = 5,
         EEt = 6
+    }
+
+
+
+    [Test]
+    public static void EnumFinallyTest()
+    {
+        Assert.Throws<Exception>(
+            () =>
+            {
+                var enumerator = ForeverEnumerator().GetEnumerator();
+                for (var i = 0; i < 100; i++)
+                {
+                    enumerator.MoveNext();
+                    Console.Write(enumerator.Current);
+                }
+                Console.WriteLine();
+                Console.WriteLine("Disposing...");
+                enumerator.Dispose();
+            });
     }
 }
 }

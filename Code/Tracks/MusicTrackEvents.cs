@@ -1,4 +1,3 @@
-using MusicMachine.Music;
 using MusicMachine.Util;
 
 namespace MusicMachine.Tracks
@@ -15,6 +14,8 @@ public abstract class MusicStateEvent : MusicEvent
     internal MusicStateEvent()
     {
     }
+
+    public abstract void ApplyToState(ref PlayingState playingState);
 }
 
 public abstract class NoteEvent : MusicEvent
@@ -29,7 +30,7 @@ public abstract class NoteEvent : MusicEvent
     protected NoteEvent(SBN noteNumber, SBN velocity)
     {
         NoteNumber = noteNumber;
-        Velocity   = velocity;
+        Velocity = velocity;
     }
 
     protected bool Equals(NoteEvent other) => NoteNumber.Equals(other.NoteNumber) && Velocity.Equals(other.Velocity);
@@ -111,9 +112,9 @@ public sealed class PitchBendEvent : MusicStateEvent
 
     public override string ToString() => $"Pitch Bend ({PitchValue})";
 
-    public void ApplyToState(ref MidiState midiState)
+    public override void ApplyToState(ref PlayingState playingState)
     {
-        midiState.PitchBend = PitchValue;
+        playingState.PitchBend = PitchValue;
     }
 }
 
@@ -134,8 +135,6 @@ public abstract class ControlEvent : MusicStateEvent
     public abstract SBN ControlNumber { get; }
 
     public abstract SBN? ControlNumberLsb { get; }
-
-    public abstract void ApplyToState(ref MidiState midiState);
 }
 
 //public class BankSelectEvent : TwoParamControlEvent
@@ -176,9 +175,9 @@ public sealed class VolumeEventEvent : ControlEvent
 
     public override int GetHashCode() => Volume.GetHashCode();
 
-    public override void ApplyToState(ref MidiState midiState)
+    public override void ApplyToState(ref PlayingState playingState)
     {
-        midiState.Volume = Volume;
+        playingState.Volume = Volume;
     }
 
     public override string ToString() => $"Volume Change ({Volume})";
@@ -204,9 +203,9 @@ public sealed class ExpressionEventEvent : ControlEvent
 
     public override int GetHashCode() => Expression.GetHashCode();
 
-    public override void ApplyToState(ref MidiState midiState)
+    public override void ApplyToState(ref PlayingState playingState)
     {
-        midiState.Expression = Expression;
+        playingState.Expression = Expression;
     }
 
     public override string ToString() => $"Expression Change ({Expression})";

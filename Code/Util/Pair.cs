@@ -18,7 +18,7 @@ public struct Pair<T1, T2> : IEquatable<Pair<T1, T2>>, IPair<T1, T2>
 
     public Pair(T1 first, T2 second)
     {
-        First  = first;
+        First = first;
         Second = second;
     }
 

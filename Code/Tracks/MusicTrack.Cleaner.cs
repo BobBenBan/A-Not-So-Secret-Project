@@ -22,7 +22,7 @@ public partial class MusicTrack
         byte numNotesOn = 0;
         var  pastEvents = new Dictionary<Type, EffectiveEventPair>();
         var  toRemove   = new List<Pair<long, MusicEvent>>();
-        foreach (var curEventPair in EventPairs)
+        foreach (var curEventPair in Track.EventPairs)
         {
             var @event = curEventPair.Second;
             switch (@event)
@@ -75,7 +75,7 @@ public partial class MusicTrack
                     toRemove.Add(pair);
             }
         }
-        foreach (var eventPair in toRemove) Remove(eventPair);
+        foreach (var eventPair in toRemove) Track.Remove(eventPair);
     }
 
     private class EffectiveEventPair
@@ -85,7 +85,7 @@ public partial class MusicTrack
 
         public EffectiveEventPair(Pair<long, MusicEvent> eventPair, bool wasEffective)
         {
-            EventPair    = eventPair;
+            EventPair = eventPair;
             WasEffective = wasEffective;
         }
     }

@@ -47,6 +47,9 @@
       <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharpEditor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="GodotSharpEditor, Version=1.0.7055.41580, Culture=neutral, PublicKeyToken=null">
+      <HintPath>.mono\assemblies\GodotSharpEditor.dll</HintPath>
+    </Reference>
     <Reference Include="Melanchall.DryWetMidi, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>packages\Melanchall.DryWetMidi.4.1.0\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
       <Private>True</Private>
@@ -57,53 +60,64 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-      <Compile Include="Code\Game\ProcessMode.cs" />
-      <Compile Include="Code\Music\MidiState.cs" />
-      <Compile Include="Code\Music\SortofVirtualSynth.cs" />
-      <Compile Include="Code\Music\Synth.PlayingState.cs" />
-      <Compile Include="Code\Tracks\BaseEvent.cs" />
-      <Compile Include="Code\Tracks\Mapper.cs" />
-      <Compile Include="Code\Tracks\MusicTrack.cs" />
-      <Compile Include="Code\Tracks\MusicTrack.Cleaner.cs">
-          <DependentUpon>MusicTrack.cs</DependentUpon>
-      </Compile>
-      <Compile Include="Code\Tracks\MusicTrackEvents.cs">
-          <DependentUpon>MusicTrack.cs</DependentUpon>
-      </Compile>
-      <Compile Include="Code\Tracks\MidiConstants.cs">
-          <DependentUpon>MidiConverter.cs</DependentUpon>
-      </Compile>
-      <Compile Include="Code\Tracks\MidiConverter.cs" />
-      <Compile Include="Code\Tracks\Program.cs" />
-      <Compile Include="Code\Tracks\ProgramPlayer.cs" />
-      <Compile Include="Code\Tracks\Track.cs" />
+    <Compile Include="addons\MusicMachine\Plugin.cs" />
+    <Compile Include="Code\Interaction\BaseAwaitable.cs" />
+    <Compile Include="Code\Interaction\BoolAwaitable.cs" />
+    <Compile Include="Code\SignalNames.cs" />
+    <Compile Include="Code\Interaction\CustomConfig.cs" />
+    <Compile Include="Code\Tracks\BaseEvent.cs" />
+    <Compile Include="Code\Tracks\Mappers\IMapper.cs" />
+    <Compile Include="Code\Tracks\Mappers\Mappers.cs" />
+    <Compile Include="Code\Tracks\Mappers\RunningInfo.cs" />
+    <Compile Include="Code\Tracks\MusicTrack.cs" />
+    <Compile Include="Code\Tracks\MusicTrack.Cleaner.cs">
+      <DependentUpon>MusicTrack.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Code\Tracks\MusicTrackEvents.cs">
+      <DependentUpon>MusicTrack.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Code\Tracks\MidiConstants.cs">
+      <DependentUpon>MidiConverter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Code\Tracks\MidiConverter.cs" />
+    <Compile Include="Code\Tracks\PlayingState.cs" />
+    <Compile Include="Code\Tracks\Program.cs" />
+    <Compile Include="Code\Tracks\ProgramPlayer.cs" />
+    <Compile Include="Code\Tracks\Track.cs" />
     <Compile Include="Code\Config\Inputs.cs" />
     <Compile Include="Code\Config\Loading.cs" />
     <Compile Include="Code\Delegates.cs" />
-      <Compile Include="Code\Game\Loops.cs" />
-      <Compile Include="Code\ShouldNotHappenException.cs" />
     <Compile Include="Code\Test\PseudoScratch.cs" />
-    <Compile Include="Code\Test\TestException.cs" />
     <Compile Include="Code\Test\TrackTest.cs" />
     <Compile Include="Code\ThirdParty\GDLocations.cs" />
     <Compile Include="Code\ThirdParty\Midi\ADSRPlayer.cs" />
     <Compile Include="Code\ThirdParty\Midi\Bank.cs" />
     <Compile Include="Code\Util\DoubleTapDetector.cs" />
     <Compile Include="Code\Util\Extentions.cs" />
+    <Compile Include="Code\Util\Holder.cs" />
     <Compile Include="Code\Util\InputAction.cs" />
     <Compile Include="Code\Util\Mathm.cs" />
     <Compile Include="Code\Util\Numbers.cs" />
     <Compile Include="Code\Util\Pair.cs" />
+    <Compile Include="Code\Util\Physics\Projectiles.cs" />
     <Compile Include="Code\Util\Wrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scenes\Functional\ProcessOnlyNode.cs" />
+    <Compile Include="Scenes\Functional\Synth\ChannelState.cs" />
+    <Compile Include="Scenes\Functional\Synth\SortofVirtualSynth.cs" />
+    <Compile Include="Scenes\Functional\Timing\Clock.cs" />
+    <Compile Include="Scenes\Functional\Timing\Timing.cs" />
+    <Compile Include="Scenes\Functional\Timing\TimingRecorder.cs" />
     <Compile Include="Scenes\Global\Caches.cs" />
     <Compile Include="Scenes\Global\GlobalNode.cs" />
-      <Compile Include="Scenes\Objects\LightBoard\Bulb.cs" />
-      <Compile Include="Scenes\Objects\LightBoard\LightBoard.cs" />
-    <Compile Include="Scenes\Objects\Pointer.cs" />
+    <Compile Include="Scenes\Objects\Launchers\CollisionTimingLauncher.cs" />
+    <Compile Include="Scenes\Objects\Launchers\Launcher.cs" />
+    <Compile Include="Scenes\Objects\LightBoard\Bulb.cs" />
+    <Compile Include="Scenes\Objects\LightBoard\LightBoard.cs" />
+    <Compile Include="Scenes\Objects\LightBoard\LightBoardMapper.cs" />
     <Compile Include="Scenes\Objects\WorldObject.cs" />
     <Compile Include="Scenes\Player\Player.cs" />
-    <Compile Include="Test\PlayerDisplayer.cs" />
+    <Compile Include="Test\TestOnly.cs" />
     <Compile Include="Test\TestScene.cs" />
   </ItemGroup>
   <ItemGroup>
