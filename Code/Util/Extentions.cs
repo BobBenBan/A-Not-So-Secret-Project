@@ -227,5 +227,13 @@ public static class GodotEx
         foreach (var element in elements)
             array.Add(element);
     }
+
+    public static Vector3 GetGlobalTranslation(this Spatial spatial) => spatial.GetGlobalTransform().origin;
+
+    public static bool CollidableWith(this PhysicsBody a, PhysicsBody b)
+    {
+        return (a.CollisionMask & b.CollisionLayer) != 0
+            || (a.CollisionLayer & b.CollisionMask) != 0;
+    }
 }
 }

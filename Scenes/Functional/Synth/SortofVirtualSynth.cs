@@ -15,7 +15,7 @@ namespace MusicMachine.Scenes.Functional.Synth
 //this is more of a tester.
 
 //TODO: FIX CONCURRENCY
-public class SortofVirtualSynth : ProcessOnlyNode
+public class SortofVirtualSynth : ProcessNode
 {
     private Bank _bank;
     private ChannelState[] _channelStates;

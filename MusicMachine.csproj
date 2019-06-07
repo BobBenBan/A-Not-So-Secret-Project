@@ -82,6 +82,7 @@
     <Compile Include="Code\Tracks\MidiConverter.cs" />
     <Compile Include="Code\Tracks\PlayingState.cs" />
     <Compile Include="Code\Tracks\Program.cs" />
+    <Compile Include="Code\Tracks\ActionPlayer.cs" />
     <Compile Include="Code\Tracks\ProgramPlayer.cs" />
     <Compile Include="Code\Tracks\Track.cs" />
     <Compile Include="Code\Config\Inputs.cs" />
@@ -96,13 +97,14 @@
     <Compile Include="Code\Util\Extentions.cs" />
     <Compile Include="Code\Util\Holder.cs" />
     <Compile Include="Code\Util\InputAction.cs" />
-    <Compile Include="Code\Util\Mathm.cs" />
-    <Compile Include="Code\Util\Numbers.cs" />
+    <Compile Include="Code\Util\Maths\Mathm.cs" />
+    <Compile Include="Code\Util\Maths\Numbers.cs" />
+    <Compile Include="Code\Util\Maths\Projectiles.cs" />
+    <Compile Include="Code\Util\Maths\Vector2d.cs" />
     <Compile Include="Code\Util\Pair.cs" />
-    <Compile Include="Code\Util\Physics\Projectiles.cs" />
     <Compile Include="Code\Util\Wrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenes\Functional\ProcessOnlyNode.cs" />
+    <Compile Include="Scenes\Functional\ProcessNode.cs" />
     <Compile Include="Scenes\Functional\Synth\ChannelState.cs" />
     <Compile Include="Scenes\Functional\Synth\SortofVirtualSynth.cs" />
     <Compile Include="Scenes\Functional\Timing\Clock.cs" />
@@ -112,6 +114,7 @@
     <Compile Include="Scenes\Global\GlobalNode.cs" />
     <Compile Include="Scenes\Objects\Launchers\CollisionTimingLauncher.cs" />
     <Compile Include="Scenes\Objects\Launchers\Launcher.cs" />
+    <Compile Include="Scenes\Objects\Launchers\LocationVelocityPair.cs" />
     <Compile Include="Scenes\Objects\LightBoard\Bulb.cs" />
     <Compile Include="Scenes\Objects\LightBoard\LightBoard.cs" />
     <Compile Include="Scenes\Objects\LightBoard\LightBoardMapper.cs" />

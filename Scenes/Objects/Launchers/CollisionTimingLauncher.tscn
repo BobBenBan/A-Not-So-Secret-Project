@@ -4,8 +4,10 @@
 [ext_resource path="res://Scenes/Objects/Launchers/CollisionTimingLauncher.cs" type="Script" id=2]
 [ext_resource path="res://Scenes/Functional/Timing/TimingRecorder.cs" type="Script" id=3]
 
-[node name="CollisionTimedLauncher" index="0" instance=ExtResource( 1 )]
+[node name="CollisionTimedLauncher" instance=ExtResource( 1 )]
 script = ExtResource( 2 )
 
 [node name="TimingRecorder" type="Node" parent="." index="1"]
 script = ExtResource( 3 )
+ProcessMode = 1
+Enabled = true

@@ -2,7 +2,7 @@ using Godot;
 using Godot.Collections;
 using Melanchall.DryWetMidi.Common;
 using MusicMachine.Tracks;
-using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 using GDObject = Godot.Object;
 
 namespace MusicMachine.ThirdParty.Midi

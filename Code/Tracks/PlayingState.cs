@@ -1,4 +1,4 @@
-using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Tracks
 {

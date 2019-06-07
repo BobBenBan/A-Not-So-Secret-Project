@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MusicMachine.Scenes.Functional.Timing
 {
@@ -12,35 +13,36 @@ public class TimingRecorder : Clock, IDictionary<object, Timing>
 {
 //    public const string Dir = "res://Scenes/Functional/Timer/" + nameof(TimingRecorder) + ".cs";
     private readonly IDictionary<object, Timing> _timings = new Dictionary<object, Timing>();
-
-    public void StartAll(bool cancel, bool restart)
+    //todo: signal on all done/ record status.
+    public int StartAll(bool cancel, bool restart)
     {
-        foreach (var timing in _timings.Values)
-            timing.Start(cancel, restart);
+        return _timings.Values.Count(timing => timing.StartTiming(cancel, restart));
     }
 
-    public void CancelAll(bool ifDone)
+    public int CancelAll(bool evenIfDone)
     {
-        foreach (var timing in _timings.Values)
-            timing.Cancel(ifDone);
+        return _timings.Values.Count(timing => timing.CancelTiming(evenIfDone));
     }
 
     public void Start(object key, bool cancel, bool restart)
     {
-        if (!_timings.TryGetValue(key, out var timing)) throw new KeyNotFoundException();
-        timing.Start(cancel, restart);
+        if (!_timings.TryGetValue(key, out var timing))
+            throw new KeyNotFoundException($"No timing for key ({key}) ");
+        timing.StartTiming(cancel, restart);
     }
 
     public void Cancel(object key, bool ifDone)
     {
-        if (!_timings.TryGetValue(key, out var timing)) throw new KeyNotFoundException();
-        timing.Cancel(ifDone);
+        if (!_timings.TryGetValue(key, out var timing))
+            throw new KeyNotFoundException($"No timing for key ({key}) ");
+        timing.CancelTiming(ifDone);
     }
 
     public void End(object key)
     {
-        if (!_timings.TryGetValue(key, out var timing)) throw new KeyNotFoundException();
-        timing.End();
+        if (!_timings.TryGetValue(key, out var timing))
+            throw new KeyNotFoundException($"No timing for key ({key}) ");
+        timing.EndTiming();
     }
 
     public IEnumerator<KeyValuePair<object, Timing>> GetEnumerator() => _timings.GetEnumerator();
@@ -104,6 +106,19 @@ public class TimingRecorder : Clock, IDictionary<object, Timing>
             _timings[key] = value;
         }
     }
+//
+//    private class Obj : Object
+//    {
+//        public void OnThing()
+//        {
+//            GD.Print("AAAAh");
+//        }
+//    }
+//    public override void _EnterTree()
+//    {
+//        var obj = new Obj();
+//        this.Connect(SignalNames.NodeReady, obj, nameof(obj.OnThing));
+//    }
 
     public ICollection<object> Keys => _timings.Keys;
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MusicMachine.Tracks.Mappers;
 using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Tracks
 {

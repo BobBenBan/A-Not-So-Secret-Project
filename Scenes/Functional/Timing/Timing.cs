@@ -1,6 +1,6 @@
 namespace MusicMachine.Scenes.Functional.Timing
 {
-public abstract class Timing
+public class Timing : Godot.Object
 //feel free to extend!!!!!!!!!!
 {
     public enum TimingStatus { Unstarted, InProgress, Done }
@@ -18,21 +18,28 @@ public abstract class Timing
     {
         set
         {
-            Cancel(false);
+            CancelTiming(false);
             _timingRecorder = value;
         }
         private get { return _timingRecorder; }
     }
 
-    public long? ElapsedTime => _endTime - _startTime;
+    public long? ElapsedTicks => _endTime - _startTime;
+    public long? ElapsedMicros => (ElapsedTicks + 5) / 10;
 
-    protected abstract void OnStart();
+    protected virtual void OnStart()
+    {
+    }
 
-    protected abstract void OnCancel(bool isDone);
+    protected virtual void OnCancel(bool isDone)
+    {
+    }
 
-    protected abstract void OnEnd();
+    protected virtual void OnEnd()
+    {
+    }
 
-    public bool Start(bool cancel, bool restart)
+    public bool StartTiming(bool cancel, bool restart)
     {
         var status = Status;
         if (TimingRecorder == null
@@ -49,7 +56,7 @@ public abstract class Timing
         return true;
     }
 
-    public bool Cancel(bool ifDone)
+    public bool CancelTiming(bool ifDone)
     {
         var status = Status;
         if (status == TimingStatus.Unstarted || !ifDone && status == TimingStatus.Done) return false;
@@ -59,7 +66,7 @@ public abstract class Timing
         return true;
     }
 
-    public bool End()
+    public bool EndTiming()
     {
         if (Status != TimingStatus.InProgress) return false;
         _endTime = TimingRecorder.CurTicks;

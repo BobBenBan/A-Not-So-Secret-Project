@@ -32,7 +32,7 @@ public class Player : KinematicBody
     [Export] public Vector3 SpawnPoint = Vector3.Inf;
     [Export(PropertyHint.Range, "0,30")] public float WalkSpeed = 6;
 
-    public Transform CameraLocation => _roll.GlobalTransform;
+    public Transform CameraLocation => _camera.GlobalTransform;
 
     [Export]
     public Vector3 Gravity

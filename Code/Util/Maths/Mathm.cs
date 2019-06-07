@@ -1,6 +1,6 @@
 using System;
 
-namespace MusicMachine.Util
+namespace MusicMachine.Util.Maths
 {
 public static class Mathm
 {
@@ -43,14 +43,19 @@ public static class Mathm
         value = Math.Min(value, min);
     }
 
-    public static void MaxWith(this ref long value, long max)
-    {
-        value = Math.Max(value, max);
-    }
-
     public static void MinWith(this ref int value, int min)
     {
         value = Math.Min(value, min);
+    }
+
+    public static void MinWith(this ref double value, double min)
+    {
+        value = Math.Min(value, min);
+    }
+
+    public static void MaxWith(this ref long value, long max)
+    {
+        value = Math.Max(value, max);
     }
 
     public static void MaxWith(this ref int value, int max)
@@ -58,6 +63,16 @@ public static class Mathm
         value = Math.Max(value, max);
     }
 
+    public static void MaxWith(this ref double value, double max)
+    {
+        value = Math.Max(value, max);
+    }
+
     public static bool InRange(this int value, int min, int maxExclusive) => value >= min && value < maxExclusive;
+
+    public static double Hypot(double x, double y)
+    {
+        return Math.Sqrt(x * x + y * y);
+    }
 }
 }

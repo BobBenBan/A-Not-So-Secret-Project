@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Godot;
-using MusicMachine.Util.Physics;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 

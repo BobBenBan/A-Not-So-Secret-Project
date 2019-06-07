@@ -1,10 +1,11 @@
 using System;
 using Godot;
-using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Functional
 {
-public abstract class ProcessOnlyNode : Node
+//TODO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO CONCURRENCY ISSUES!!!!!!!!!!
+public abstract class ProcessNode : Node
 {
     public enum Mode
     {
@@ -36,6 +37,7 @@ public abstract class ProcessOnlyNode : Node
         get => _enabled;
         set
         {
+            if (_enabled == value) return;
             _enabled = value;
             SetProcess(_mode, _enabled);
         }
@@ -68,6 +70,7 @@ public abstract class ProcessOnlyNode : Node
     {
         SetProcess(false);
         SetPhysicsProcess(false);
+        ProcessMode = _mode; //reset;
         Ready();
     }
 

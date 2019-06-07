@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Melanchall.DryWetMidi.Smf;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 // ReSharper disable RedundantCaseLabel
 namespace MusicMachine.Tracks

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Godot;
@@ -28,7 +30,20 @@ public class GlobalNode : Node
         }
     }
 
-    public static event Action<long> AudioProcess = delegate { };
+    private static readonly ConcurrentDictionary<Action<long>, bool> AudioProcesses =
+        new ConcurrentDictionary<Action<long>, bool>();
+
+    public static event Action<long> AudioProcess
+    {
+        add
+        {
+            if (value != null)
+                AudioProcesses.TryAdd(value, true);
+        }
+        remove => AudioProcesses.TryRemove(value, out _);
+    }
+
+    private readonly List<Action<long>> _processesList = new List<Action<long>>();
 
     private void ThreadStart()
     {
@@ -42,23 +57,26 @@ public class GlobalNode : Node
                 Thread.Sleep(new TimeSpan(Math.Max(0, MinTicks - elapsedTicks - BufferTime)));
                 elapsedTicks = stopwatch.ElapsedTicks;
                 stopwatch.Restart();
-                var theProcesses = AudioProcess;
-                try
-                {
-                    theProcesses?.Invoke(elapsedTicks);
-                }
-                catch (ThreadAbortException)
-                {
-                    break;
-                }
-                catch (Exception e)
-                {
-                    GD.PrintErr(e);
-                }
+                _processesList.AddRange(AudioProcesses.Keys);
+                foreach (var action in _processesList)
+                    try
+                    {
+                        action(elapsedTicks);
+                    }
+                    catch (Exception e)
+                    {
+                        GD.PrintErr(e);
+                        throw;
+                    }
+                _processesList.Clear();
             }
         }
         catch (ThreadInterruptedException)
         {
+        }
+        finally
+        {
+            _processesList.Clear();
         }
     }
 

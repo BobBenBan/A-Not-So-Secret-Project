@@ -1,6 +1,6 @@
 namespace MusicMachine.Scenes.Functional.Timing
 {
-public class Clock : ProcessOnlyNode
+public class Clock : ProcessNode
 {
     public long CurTicks { get; private set; }
 

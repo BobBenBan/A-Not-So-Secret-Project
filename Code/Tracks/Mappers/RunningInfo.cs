@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Tracks.Mappers
 {

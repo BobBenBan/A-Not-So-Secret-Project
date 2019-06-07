@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Godot;
-using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Objects.LightBoard
 {

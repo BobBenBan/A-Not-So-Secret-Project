@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using Melanchall.DryWetMidi.Smf.Interaction;
 using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Tracks.Mappers
 {

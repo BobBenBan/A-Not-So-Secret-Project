@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using MusicMachine.ThirdParty.Midi;
 using MusicMachine.Tracks;
-using MusicMachine.Util;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Functional.Synth
 {

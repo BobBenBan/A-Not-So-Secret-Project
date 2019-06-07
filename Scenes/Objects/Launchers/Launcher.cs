@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Objects.Launchers
 {
@@ -25,13 +26,19 @@ public class Launcher : Spatial
         _projectileHolder = GetNode<Spatial>("Projectiles");
     }
 
-    public void LaunchProjectile(Vector3 fromLocation, Vector3 velocity)
-
+    //todo: launchProjectileTarget
+    public void LaunchProjectileTarget(Projectiles.TargetingParams targetingParams)
     {
+        Launch(LocationVelocityPair.Targeting(targetingParams));
+    }
+
+    public void Launch(LocationVelocityPair locationVelocityPair)
+    {
+        var pair = locationVelocityPair;
         _projectileHolder.AddChild(NextToBeLaunched);
-        var toTranslate = fromLocation - NextToBeLaunched.GlobalTransform.origin;
+        var toTranslate = pair.Location - NextToBeLaunched.GlobalTransform.origin;
         NextToBeLaunched.GlobalTranslate(toTranslate);
-        NextToBeLaunched.LinearVelocity = velocity;
+        NextToBeLaunched.LinearVelocity = pair.Velocity;
         NextToBeLaunched = (RigidBody) _projectileScene.Instance();
     }
 }

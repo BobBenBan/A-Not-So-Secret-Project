@@ -2,7 +2,7 @@ using System;
 using Melanchall.DryWetMidi.Common;
 
 // ReSharper disable InconsistentNaming
-namespace MusicMachine.Util
+namespace MusicMachine.Util.Maths
 {
 public struct FBN : IFormattable, IComparable<FBN>, IEquatable<FBN>
 {
