@@ -9,7 +9,7 @@ namespace MusicMachine.Scenes.Objects.Launchers
 {
 public class CollisionTimingLauncher : Launcher
 {
-    public TimingRecorder TimingRecorder { get; private set; }
+    public TimingRecorder TimingRecorder {  get;  set; }
 
     public override void _Ready()
     {
@@ -17,7 +17,7 @@ public class CollisionTimingLauncher : Launcher
         TimingRecorder = GetNode<TimingRecorder>("TimingRecorder");
     }
 
-    public Timing GetProjectileTiming(LocationVelocityPair locationVelocityPair)
+    public Timing GetOrMakeProjectileTiming(LocationVelocityPair locationVelocityPair)
     {
         var key = locationVelocityPair;
         if (TimingRecorder.TryGetValue(key, out var timing))
@@ -79,6 +79,11 @@ public class CollisionTimingLauncher : Launcher
         {
             _projectile?.QueueFree();
         }
+    }
+
+    public void StartAll(bool cancel, bool restart)
+    {
+        TimingRecorder.StartAll(cancel, restart);
     }
 }
 }

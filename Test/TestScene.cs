@@ -12,6 +12,8 @@ using MusicMachine.Scenes.Objects.LightBoard;
 using MusicMachine.Tracks;
 using MusicMachine.Util;
 using MusicMachine.Util.Maths;
+using NoteEvent = MusicMachine.Tracks.NoteEvent;
+using NoteOnEvent = MusicMachine.Tracks.NoteOnEvent;
 
 namespace MusicMachine.Test
 {
@@ -45,8 +47,8 @@ public class TestScene : Area
             var t2 = GetLaunch2(child);
             _launches.Add(t1);
             _launches.Add(t2);
-            _launchTimings.Add(_launcher.GetProjectileTiming(t1));
-            _launchTimings.Add(_launcher.GetProjectileTiming(t2));
+            _launchTimings.Add(_launcher.GetOrMakeProjectileTiming(t1));
+            _launchTimings.Add(_launcher.GetOrMakeProjectileTiming(t2));
         }
     }
 
@@ -83,7 +85,7 @@ public class TestScene : Area
         lightBoardTrack1?.Mappers.Add(lightBoardMapper);
 //        lightBoardTrack2?.Mappers.Add(lightBoardMapper);
 //        lightBoardTrack3?.Mappers.Add(lightBoardMapper);
-
+        var launcherMapper = new CollisionTimingLaunchMapper(_launcher,EventToLaunch);
         var synth = new SortofVirtualSynth
         {
             NumChannels = _program.MusicTracks.Count,
@@ -104,11 +106,22 @@ public class TestScene : Area
             Console.WriteLine(track);
     }
 
+    private static LocationVelocityPair? EventToLaunch(Pair<long, MusicEvent> pair)
+    {
+        if (!(pair.Second is NoteOnEvent note)) return null;
+
+    }
+
     public Vector3 LaunchLoc => _launcher.GetGlobalTranslation();
 
     private void OnAction(float delta)
     {
-        _launcher.TimingRecorder.StartAll(true, true);
+        PrepBallLaunch();
+    }
+
+    private void PrepBallLaunch()
+    {
+        _launcher.StartAll(true, true);
         if (_actionPlayer != null)
         {
             RemoveChild(_actionPlayer);
@@ -119,14 +132,18 @@ public class TestScene : Area
 
     private void OnSecondary(float delta)
     {
+        DoBallLaunch();
+    }
+
+    private void DoBallLaunch()
+    {
         if (_actionPlayer != null)
         {
             _actionPlayer.Play();
             return;
         }
         var recorder = _launcher.TimingRecorder;
-        if (recorder.Values.Any(timing => timing.Status != Timing.TimingStatus.Done)
-        ) return;
+        if (recorder.Values.Any(timing => timing.Status != Timing.TimingStatus.Done)) return;
         var track   = new Track<Action>();
         var maxTime = recorder.Values.Select(x => x.ElapsedMicros.Value).Max();
         foreach (var launch in _launches)
@@ -135,7 +152,6 @@ public class TestScene : Area
                 continue;
             var micros = timing.ElapsedMicros.Value;
             var time   = maxTime - micros;
-            GD.Print($"Setting at time {time} micros.");
             track.Add(
                 time,
                 () => _launcher.Launch(launch));

@@ -59,20 +59,11 @@ public partial class MusicTrack
                         toRemove.Add(curEventPair); //current identical, redundant.
                         break;                      // and don't update past.
                     }
-                    if (!past.WasEffective)
+                    if (numNotesOn != 0 && !past.WasEffective)
                         toRemove.Add(past.EventPair); //past was never effective, and now overriden.
                 }
                 pastEvents[type] = new EffectiveEventPair(curEventPair, numNotesOn != 0);
                 break;
-            }
-        }
-        if (numNotesOn != 0)
-        {
-            foreach (var past in pastEvents.Values)
-            {
-                var pair = past.EventPair;
-                if (!(pair.Second is NoteOffEvent))
-                    toRemove.Add(pair);
             }
         }
         foreach (var eventPair in toRemove) Track.Remove(eventPair);

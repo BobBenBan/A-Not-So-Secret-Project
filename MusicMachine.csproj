@@ -113,6 +113,7 @@
     <Compile Include="Scenes\Global\Caches.cs" />
     <Compile Include="Scenes\Global\GlobalNode.cs" />
     <Compile Include="Scenes\Objects\Launchers\CollisionTimingLauncher.cs" />
+    <Compile Include="Scenes\Objects\Launchers\CollisionTimingLaunchMapper.cs" />
     <Compile Include="Scenes\Objects\Launchers\Launcher.cs" />
     <Compile Include="Scenes\Objects\Launchers\LocationVelocityPair.cs" />
     <Compile Include="Scenes\Objects\LightBoard\Bulb.cs" />

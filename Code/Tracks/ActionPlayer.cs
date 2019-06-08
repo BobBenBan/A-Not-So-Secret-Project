@@ -11,7 +11,7 @@ namespace MusicMachine.Tracks
 ///     Unlike a <i>steppers</i> this one is delegate based, since we would be using this to PLAY, rather
 ///     than gather info.
 /// </summary>
-// TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO CONCURRENCY ISSUES
+// TODO TO DO TO DO TO DO TO DO TO DO TO DO TO DO CONCURRENCY ISSUES
 public class ActionPlayer : ProcessNode
 {
     private readonly List<Action> _cachedList = new List<Action>();
