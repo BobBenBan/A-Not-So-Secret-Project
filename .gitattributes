@@ -23,3 +23,5 @@
 *.jpg binary
 *.sf2 binary
 *.exr binary
+*.mid binary
+*.midi binary

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using Godot;
+using MusicMachine.Scenes.Global;
 using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Functional
@@ -15,8 +17,16 @@ public abstract class ProcessNode : Node
         Manual
     }
 
+    private readonly ConcurrentQueue<Action> _afterDeferredActions = new ConcurrentQueue<Action>();
+    private readonly ConcurrentQueue<Action> _beforeDeferredActions = new ConcurrentQueue<Action>();
+    private readonly Action<long> _doStepTicks;
+    private bool _enabled = true;
     private Mode _mode = Mode.Manual;
-    private bool _enabled;
+
+    public ProcessNode()
+    {
+        _doStepTicks = DoStepTicks;
+    }
 
     [Export(PropertyHint.Enum)]
     public Mode ProcessMode
@@ -56,9 +66,9 @@ public abstract class ProcessNode : Node
         case Mode.Audio:
         {
             if (value)
-                GlobalNode.AudioProcess += StepTicks;
+                AudioProcess.OnProcess += _doStepTicks;
             else
-                GlobalNode.AudioProcess -= StepTicks;
+                AudioProcess.OnProcess -= _doStepTicks;
             break;
         }
         case Mode.Manual: break;
@@ -80,19 +90,36 @@ public abstract class ProcessNode : Node
 
     public sealed override void _Process(float delta)
     {
-        StepTicks((delta * 10_000_000.0).RoundToLong());
+        DoStepTicks((delta * 10_000_000.0).RoundToLong());
     }
 
     public sealed override void _PhysicsProcess(float delta)
     {
-        StepTicks((delta * 10_000_000.0).RoundToLong());
+        DoStepTicks((delta * 10_000_000.0).RoundToLong());
     }
 
     protected abstract void StepTicks(long ticks);
 
+    protected void DoStepTicks(long ticks)
+    {
+        while (_beforeDeferredActions.TryDequeue(out var action)) action();
+        StepTicks(ticks);
+        while (_afterDeferredActions.TryDequeue(out var action)) action();
+    }
+
     public void ManualStepTicks(long ticks)
     {
-        if (_mode == Mode.Manual) StepTicks(ticks);
+        if (_mode == Mode.Manual) DoStepTicks(ticks);
+    }
+
+    public void QueueCallBefore(Action action)
+    {
+        _beforeDeferredActions.Enqueue(action);
+    }
+
+    public void QueueCallAfter(Action action)
+    {
+        _afterDeferredActions.Enqueue(action);
     }
 }
 }

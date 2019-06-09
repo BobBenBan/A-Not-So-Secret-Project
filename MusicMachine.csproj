@@ -61,64 +61,69 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="addons\MusicMachine\Plugin.cs" />
-    <Compile Include="Code\Interaction\BaseAwaitable.cs" />
-    <Compile Include="Code\Interaction\BoolAwaitable.cs" />
-    <Compile Include="Code\SignalNames.cs" />
-    <Compile Include="Code\Interaction\CustomConfig.cs" />
-    <Compile Include="Code\Tracks\BaseEvent.cs" />
-    <Compile Include="Code\Tracks\Mappers\IMapper.cs" />
-    <Compile Include="Code\Tracks\Mappers\Mappers.cs" />
-    <Compile Include="Code\Tracks\Mappers\RunningInfo.cs" />
-    <Compile Include="Code\Tracks\MusicTrack.cs" />
-    <Compile Include="Code\Tracks\MusicTrack.Cleaner.cs">
+      <Compile Include="Code\Interaction\CombinedCompletionAwaiter.cs" />
+      <Compile Include="Code\Mechanisms\Projectiles\CollisionTiming.cs" />
+      <Compile Include="Code\Mechanisms\Projectiles\CollisionTimingMapper.cs" />
+      <Compile Include="Code\Mechanisms\Projectiles\ITrackToLaunchMapper.cs" />
+      <Compile Include="Code\Mechanisms\Projectiles\ILauncher.cs" />
+      <Compile Include="Code\Mechanisms\Projectiles\LaunchInfo.cs" />
+      <Compile Include="Code\Mechanisms\Projectiles\Targeting.cs" />
+      <Compile Include="Code\Mechanisms\Timings\Clock.cs" />
+      <Compile Include="Code\Mechanisms\Timings\Timing.cs" />
+      <Compile Include="Code\Mechanisms\Timings\TimingRecorder.cs" />
+      <Compile Include="Code\Game\Constants\Inputs.cs" />
+      <Compile Include="Code\Game\Constants\SignalNames.cs" />
+      <Compile Include="Code\Game\DoubleTapDetector.cs" />
+      <Compile Include="Code\Game\InputAction.cs" />
+      <Compile Include="Code\Interaction\BaseCompletionAwaiter.cs" />
+      <Compile Include="Code\Interaction\AlreadyDoneCompletionAwaiter.cs" />
+      <Compile Include="Code\Interaction\ICompletionAwaiter.cs" />
+      <Compile Include="Code\Programs\BaseEvent.cs" />
+      <Compile Include="Code\Programs\AnyTrack.cs" />
+      <Compile Include="Code\Programs\Mappers\ITrackMapper.cs" />
+      <Compile Include="Code\Programs\Mappers\RunningInfo.cs" />
+      <Compile Include="Code\Programs\MusicTrack.cs" />
+      <Compile Include="Code\Programs\MusicTrack.Cleaner.cs">
       <DependentUpon>MusicTrack.cs</DependentUpon>
     </Compile>
-    <Compile Include="Code\Tracks\MusicTrackEvents.cs">
+      <Compile Include="Code\Programs\MusicTrackEvents.cs">
       <DependentUpon>MusicTrack.cs</DependentUpon>
     </Compile>
-    <Compile Include="Code\Tracks\MidiConstants.cs">
+      <Compile Include="Code\Programs\MidiConstants.cs">
       <DependentUpon>MidiConverter.cs</DependentUpon>
     </Compile>
-    <Compile Include="Code\Tracks\MidiConverter.cs" />
-    <Compile Include="Code\Tracks\PlayingState.cs" />
-    <Compile Include="Code\Tracks\Program.cs" />
-    <Compile Include="Code\Tracks\ActionPlayer.cs" />
-    <Compile Include="Code\Tracks\ProgramPlayer.cs" />
-    <Compile Include="Code\Tracks\Track.cs" />
-    <Compile Include="Code\Config\Inputs.cs" />
-    <Compile Include="Code\Config\Loading.cs" />
-    <Compile Include="Code\Delegates.cs" />
+      <Compile Include="Code\Programs\MidiConverter.cs" />
+      <Compile Include="Code\Programs\PlayingState.cs" />
+      <Compile Include="Code\Programs\Program.cs" />
+      <Compile Include="Code\Programs\Track.cs" />
     <Compile Include="Code\Test\PseudoScratch.cs" />
     <Compile Include="Code\Test\TrackTest.cs" />
     <Compile Include="Code\ThirdParty\GDLocations.cs" />
     <Compile Include="Code\ThirdParty\Midi\ADSRPlayer.cs" />
     <Compile Include="Code\ThirdParty\Midi\Bank.cs" />
-    <Compile Include="Code\Util\DoubleTapDetector.cs" />
+      <Compile Include="Code\Util\Delegates.cs" />
     <Compile Include="Code\Util\Extentions.cs" />
     <Compile Include="Code\Util\Holder.cs" />
-    <Compile Include="Code\Util\InputAction.cs" />
     <Compile Include="Code\Util\Maths\Mathm.cs" />
     <Compile Include="Code\Util\Maths\Numbers.cs" />
-    <Compile Include="Code\Util\Maths\Projectiles.cs" />
     <Compile Include="Code\Util\Maths\Vector2d.cs" />
     <Compile Include="Code\Util\Pair.cs" />
     <Compile Include="Code\Util\Wrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\Functional\ProcessNode.cs" />
-    <Compile Include="Scenes\Functional\Synth\ChannelState.cs" />
-    <Compile Include="Scenes\Functional\Synth\SortofVirtualSynth.cs" />
-    <Compile Include="Scenes\Functional\Timing\Clock.cs" />
-    <Compile Include="Scenes\Functional\Timing\Timing.cs" />
-    <Compile Include="Scenes\Functional\Timing\TimingRecorder.cs" />
+      <Compile Include="Scenes\Functional\Tracks\ActionPlayer.cs" />
+      <Compile Include="Scenes\Functional\Tracks\ProgramPlayer.cs" />
+      <Compile Include="Scenes\Global\AudioProcess.cs" />
     <Compile Include="Scenes\Global\Caches.cs" />
     <Compile Include="Scenes\Global\GlobalNode.cs" />
-    <Compile Include="Scenes\Objects\Launchers\CollisionTimingLauncher.cs" />
-    <Compile Include="Scenes\Objects\Launchers\CollisionTimingLaunchMapper.cs" />
-    <Compile Include="Scenes\Objects\Launchers\Launcher.cs" />
-    <Compile Include="Scenes\Objects\Launchers\LocationVelocityPair.cs" />
-    <Compile Include="Scenes\Objects\LightBoard\Bulb.cs" />
-    <Compile Include="Scenes\Objects\LightBoard\LightBoard.cs" />
-    <Compile Include="Scenes\Objects\LightBoard\LightBoardMapper.cs" />
+      <Compile Include="Scenes\Mechanisms\LightBoard\Bulb.cs" />
+      <Compile Include="Scenes\Mechanisms\LightBoard\LightBoard.cs" />
+      <Compile Include="Scenes\Mechanisms\LightBoard\LightBoardMapper.cs" />
+      <Compile Include="Scenes\Mechanisms\Synth\ChannelState.cs">
+          <DependentUpon>SortofVirtualSynth.cs</DependentUpon>
+      </Compile>
+      <Compile Include="Scenes\Mechanisms\Synth\SortofVirtualSynth.cs" />
+      <Compile Include="Scenes\Mechanisms\Projectiles\Launcher.cs" />
     <Compile Include="Scenes\Objects\WorldObject.cs" />
     <Compile Include="Scenes\Player\Player.cs" />
     <Compile Include="Test\TestOnly.cs" />
@@ -127,5 +132,8 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Scenes\Mechanisms" />
+    </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

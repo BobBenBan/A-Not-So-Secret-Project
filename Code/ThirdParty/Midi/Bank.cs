@@ -69,9 +69,7 @@ public class Preset : Wrapper<Dictionary>
         var gdInstruments = Self["instruments"];
         instruments.AddRange(
             from object instrument in (IEnumerable) gdInstruments
-            select instrument != null ?
-                new Instrument((Dictionary) instrument) :
-                null);
+            select instrument != null ? new Instrument((Dictionary) instrument) : null);
     }
 
     public Instrument this[byte keyNumber] => _instruments[keyNumber];
@@ -81,10 +79,10 @@ public class Instrument : Wrapper<Dictionary>
 {
     internal Instrument(Dictionary self)
     {
-        Self = self;
-        MixRate = (float) Self["mix_rate"];
-        Stream = (AudioStreamSample) Self["stream"];
-        AdsState = State.Create(Self["ads_state"]);
+        Self         = self;
+        MixRate      = (float) Self["mix_rate"];
+        Stream       = (AudioStreamSample) Self["stream"];
+        AdsState     = State.Create(Self["ads_state"]);
         ReleaseState = State.Create(Self["release_state"]);
     }
 

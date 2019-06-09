@@ -1,5 +1,5 @@
 using Godot;
-using MusicMachine.Config;
+using MusicMachine.Game.Constants;
 using MusicMachine.Util;
 
 namespace MusicMachine.Scenes
@@ -40,7 +40,7 @@ public class Player : KinematicBody
         get => _gravity;
         set
         {
-            _up = -value.Normalized();
+            _up      = -value.Normalized();
             _gravity = value;
         }
     }
@@ -55,7 +55,7 @@ public class Player : KinematicBody
     {
         set
         {
-            _inFocus = value;
+            _inFocus         = value;
             EffectiveEnabled = _inFocus && _enabled;
         }
     }
@@ -65,7 +65,7 @@ public class Player : KinematicBody
         get => _enabled;
         set
         {
-            _enabled = value;
+            _enabled         = value;
             EffectiveEnabled = _inFocus && _enabled;
         }
     }
@@ -93,10 +93,10 @@ public class Player : KinematicBody
 
             //calculate movement component of target vel
             var camBasis = _roll.GetGlobalTransform().basis;
-            targetVel += camBasis.z.Normalized() * inputMove.y;
-            targetVel += -camBasis.x.Normalized() * inputMove.x;
-            targetVel.y = 0;
-            targetVel = targetVel.Normalized();
+            targetVel   += camBasis.z.Normalized() * inputMove.y;
+            targetVel   += -camBasis.x.Normalized() * inputMove.x;
+            targetVel.y =  0;
+            targetVel   =  targetVel.Normalized();
 
             var slowPressed    = Inputs.PlayerSlow.Pressed();
             var runningPressed = Inputs.PlayerRun.Pressed();
@@ -111,8 +111,8 @@ public class Player : KinematicBody
             //speed
             var slow = slowPressed && !_flying;
             _running = !slow && runningPressed && (_running || _flying || isOnFloor);
-            var speed = slow ? SlowSpeed :
-                _running     ? RunSpeed : WalkSpeed;
+            var speed = slow     ? SlowSpeed :
+                        _running ? RunSpeed : WalkSpeed;
 
             //Flying, jumping
 
@@ -122,7 +122,8 @@ public class Player : KinematicBody
                     targetVel.y += FlyVerticalSpeed / WalkSpeed;
                 else if (slowPressed)
                     targetVel.y -= FlyVerticalSpeed / WalkSpeed;
-            } else if (jumpPressed && isOnFloor)
+            }
+            else if (jumpPressed && isOnFloor)
                 _outputVel.y += JumpSpeed;
 
             targetVel *= speed;
@@ -131,9 +132,9 @@ public class Player : KinematicBody
         var actualVel = _outputVel;
         if (!_flying)
         {
-            _outputVel += Gravity * delta;
-            _outputVel = _outputVel.ClampY(-MaxGravityVelocity, float.MaxValue);
-            actualVel.y = 0;
+            _outputVel  += Gravity * delta;
+            _outputVel  =  _outputVel.ClampY(-MaxGravityVelocity, float.MaxValue);
+            actualVel.y =  0;
         }
 
         var accel = (targetVel - actualVel).Dot(actualVel) > 0 ? Acceleration : Deceleration;
@@ -167,8 +168,8 @@ public class Player : KinematicBody
 
     public override void _Ready()
     {
-        _pitch = GetNode<Spatial>("Pitch");
-        _roll = _pitch.GetNode<Spatial>("Roll");
+        _pitch  = GetNode<Spatial>("Pitch");
+        _roll   = _pitch.GetNode<Spatial>("Roll");
         _camera = _roll.GetNode<Camera>("Camera");
         _roll.GetNode<RayCast>("RayCast");
         if (SpawnPoint == Vector3.Inf)

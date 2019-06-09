@@ -1,13 +1,12 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://Test/TestScene.cs" type="Script" id=1]
 [ext_resource path="res://Test/Night.tres" type="Environment" id=2]
 [ext_resource path="res://Scenes/Player/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Objects/WorldObject.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Test/FloorMaterial.tres" type="Material" id=5]
-[ext_resource path="res://Scenes/Objects/Launchers/CollisionTimingLauncher.tscn" type="PackedScene" id=6]
-[ext_resource path="res://Scenes/Objects/LightBoard/LightBoard.tscn" type="PackedScene" id=7]
-[ext_resource path="res://Scenes/Objects/Launchers/MetalBall.tscn" type="PackedScene" id=8]
+[ext_resource path="res://Scenes/Mechanisms/LightBoard/LightBoard.tscn" type="PackedScene" id=6]
+[ext_resource path="res://Scenes/Mechanisms/Projectiles/MetalBall.tscn" type="PackedScene" id=7]
 
 [sub_resource type="PhysicsMaterial" id=1]
 friction = 0.4
@@ -81,10 +80,7 @@ shape = SubResource( 3 )
 
 [node name="Objects" type="Spatial" parent="."]
 
-[node name="Launcher" parent="Objects" instance=ExtResource( 6 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.39342, 0 )
-
-[node name="LightBoard" parent="Objects" instance=ExtResource( 7 )]
+[node name="LightBoard" parent="Objects" instance=ExtResource( 6 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.440331, 1.47504, -5.54744 )
 
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
@@ -123,25 +119,25 @@ input_ray_pickable = false
 [node name="CollisionShape" type="CollisionShape" parent="Targets/Boxm2/StaticBody"]
 shape = SubResource( 9 )
 
-[node name="MetalBall" parent="Targets" instance=ExtResource( 8 )]
+[node name="MetalBall" parent="Targets" instance=ExtResource( 7 )]
 transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, -1.07778, 1.16183, -22.6101 )
 collision_layer = 1025
 mode = 1
 LifeTime = 0.0
 
-[node name="MetalBall2" parent="Targets" instance=ExtResource( 8 )]
+[node name="MetalBall2" parent="Targets" instance=ExtResource( 7 )]
 transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 17.1384, 1.16183, -12.0367 )
 collision_layer = 1025
 mode = 1
 LifeTime = 0.0
 
-[node name="MetalBall3" parent="Targets" instance=ExtResource( 8 )]
+[node name="MetalBall3" parent="Targets" instance=ExtResource( 7 )]
 transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 15.2098, 1.16183, -0.503119 )
 collision_layer = 1025
 mode = 1
 LifeTime = 0.0
 
-[node name="MetalBall4" parent="Targets" instance=ExtResource( 8 )]
+[node name="MetalBall4" parent="Targets" instance=ExtResource( 7 )]
 transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 11.2933, 1.16183, 6.5869 )
 collision_layer = 1025
 mode = 1
@@ -149,5 +145,3 @@ LifeTime = 0.0
 [connection signal="body_exited" from="." to="." method="OnBodyExited"]
 
 [editable path="Floor"]
-
-[editable path="Objects/Launcher"]

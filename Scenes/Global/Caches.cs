@@ -3,9 +3,9 @@ using Godot;
 using Godot.Collections;
 using MusicMachine.Util;
 
-namespace MusicMachine.Scenes
+namespace MusicMachine.Scenes.Global
 {
-public class Caches : Node
+public sealed class Caches : Node
 {
     private static Caches _instance;
 
@@ -15,26 +15,25 @@ public class Caches : Node
 
     public static Caches Instance
     {
-        get
+        get => _instance ?? throw new InvalidOperationException($"No {nameof(Caches)} node instantiated");
+        private set
         {
-            if (_instance == null)
-                throw new InvalidOperationException("No Caches Singleton Instantiated!");
-            return _instance;
+            if (value != null && _instance != null)
+                throw new InvalidOperationException($"Two {nameof(Caches)} nodes instantiated!");
+            _instance = value;
         }
     }
 
     public override void _EnterTree()
     {
-        if (_instance != null)
-            throw new InvalidOperationException("Caches Singleton Created Twice!");
-        _instance = this;
+        Instance = this;
     }
 
     public override void _ExitTree()
     {
+        Instance = null;
         _convexShapeCaches.Clear();
         _trimeshShapeCache.Clear();
-        _instance = null;
     }
 
     public static Shape GetOrCreateShape(Mesh mesh, bool isTrimesh)

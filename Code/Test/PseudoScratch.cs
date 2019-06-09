@@ -15,12 +15,6 @@ public class PseudoScratch
             Console.WriteLine(random.NextEnum<E>().ToString());
     }
 
-    public static void DoesNullableSubtractionWork()
-    {
-        Console.WriteLine(3 - (long?) 4);
-        Console.WriteLine((null - (long?) 4).HasValue);
-    }
-
     private static IEnumerable<string> ForeverEnumerator()
     {
         try
@@ -49,8 +43,6 @@ public class PseudoScratch
         Dirt = 5,
         EEt = 6
     }
-
-
 
     [Test]
     public static void EnumFinallyTest()

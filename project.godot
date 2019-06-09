@@ -20,7 +20,8 @@ run/main_scene="res://Test/TestScene.tscn"
 
 [autoload]
 
-Global="*res://Scenes/Global/GlobalNode.cs"
+GlobalNode="*res://Scenes/Global/GlobalNode.cs"
+AudioProcess="*res://Scenes/Global/AudioProcess.cs"
 Caches="*res://Scenes/Global/Caches.cs"
 
 [debug]

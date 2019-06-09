@@ -1,7 +1,7 @@
 using Godot;
 using Godot.Collections;
 using Melanchall.DryWetMidi.Common;
-using MusicMachine.Tracks;
+using MusicMachine.Programs;
 using MusicMachine.Util.Maths;
 using GDObject = Godot.Object;
 
@@ -11,6 +11,9 @@ public class AdsrPlayer : AudioStreamPlayer
 {
 //    private bool _debug;
     private Instrument _instrument;
+    private bool _requestRelease;
+    public float AmpDb;
+    public float BaseVolumeDb;
 
     public Instrument Instrument
     {
@@ -19,14 +22,10 @@ public class AdsrPlayer : AudioStreamPlayer
         {
             if (_instrument == value && value == null)
                 return;
-            Stream = (AudioStreamSample) value.Stream.Duplicate();
+            Stream      = (AudioStreamSample) value.Stream.Duplicate();
             _instrument = value;
         }
     }
-
-    private bool _requestRelease;
-    public float AmpDb;
-    public float BaseVolumeDb;
 
     private new AudioStreamSample Stream
     {
@@ -59,14 +58,23 @@ public class AdsrPlayer : AudioStreamPlayer
 
     private State[] ReleaseState => Instrument.ReleaseState;
 
+    public float VolumeRange
+    {
+        set
+        {
+            var noteVol = value * Velocity / 127f;
+            MaximumVolumeDb = (noteVol - 1) * AmpDb + BaseVolumeDb;
+        }
+    }
+
     public new void Play(float fromPosition = 0)
     {
-        Releasing = false;
-        _requestRelease = false;
-        Timer = 0;
-        UsingTimer = 0;
+        Releasing          = false;
+        _requestRelease    = false;
+        Timer              = 0;
+        UsingTimer         = 0;
         CurrentVolumeRange = AdsState[0].Volume;
-        Stream.MixRate = MixRate.RoundToInt();
+        Stream.MixRate     = MixRate.RoundToInt();
         base.Play(fromPosition);
         UpdateVolume();
 //        _debug = false;
@@ -90,7 +98,7 @@ public class AdsrPlayer : AudioStreamPlayer
     {
         if (!Playing)
             return;
-        Timer += ticks / 10e6f;
+        Timer      += ticks / 10e6f;
         UsingTimer += ticks / 10e6f;
         var useState  = Releasing ? ReleaseState : AdsState;
         var allStates = useState.Length;
@@ -100,7 +108,8 @@ public class AdsrPlayer : AudioStreamPlayer
             CurrentVolumeRange = useState[lastState].Volume;
             if (Releasing)
                 Stop();
-        } else
+        }
+        else
         {
             for (var i = 1; i < allStates; i++)
             {
@@ -117,24 +126,15 @@ public class AdsrPlayer : AudioStreamPlayer
         UpdateVolume();
         if (_requestRelease && !Releasing)
         {
-            Releasing = true;
+            Releasing          = true;
             CurrentVolumeRange = ReleaseState[0].Volume;
-            Timer = 0;
+            Timer              = 0;
         }
     }
 
     private void UpdateVolume()
     {
         VolumeDb = Mathf.Lerp(MinimumVolumeDb, MaximumVolumeDb, CurrentVolumeRange);
-    }
-
-    public float VolumeRange
-    {
-        set
-        {
-            var noteVol = value * Velocity / 127f;
-            MaximumVolumeDb = (noteVol - 1) * AmpDb + BaseVolumeDb;
-        }
     }
 }
 

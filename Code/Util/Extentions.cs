@@ -80,16 +80,20 @@ public static class StructEx
     public static int IndexMatch<T>(this IList<T> list, Predicate<T> match)
     {
         for (var index = 0; index < list.Count; index++)
+        {
             if (match(list[index]))
                 return index;
+        }
         return -1;
     }
 
     public static int IndexMatch<T>(this IReadOnlyList<T> list, Predicate<T> match)
     {
         for (var index = 0; index < list.Count; index++)
+        {
             if (match(list[index]))
                 return index;
+        }
         return -1;
     }
 
@@ -104,7 +108,7 @@ public static class StructEx
     {
         if (dictionary.TryGetValue(key, out var value))
             return value;
-        value = new TValue();
+        value           = new TValue();
         dictionary[key] = value;
         return value;
     }
@@ -230,10 +234,7 @@ public static class GodotEx
 
     public static Vector3 GetGlobalTranslation(this Spatial spatial) => spatial.GetGlobalTransform().origin;
 
-    public static bool CollidableWith(this PhysicsBody a, PhysicsBody b)
-    {
-        return (a.CollisionMask & b.CollisionLayer) != 0
-            || (a.CollisionLayer & b.CollisionMask) != 0;
-    }
+    public static bool CollidableWith(this PhysicsBody a, PhysicsBody b) =>
+        (a.CollisionMask & b.CollisionLayer) != 0 || (a.CollisionLayer & b.CollisionMask) != 0;
 }
 }

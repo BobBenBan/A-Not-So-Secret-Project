@@ -1,4 +1,5 @@
 using Godot;
+using MusicMachine.Scenes.Global;
 using MusicMachine.Util;
 
 namespace MusicMachine.Scenes.Objects
@@ -12,7 +13,7 @@ public class WorldObject : RigidBody
     [Export(PropertyHint.Range, "0,300")] public float LifeTime { get; private set; } = 0;
 
     /// <summary>
-    /// Optional mesh instance to automatically generate collision shape from.
+    ///     Optional mesh instance to automatically generate collision shape from.
     /// </summary>
     [Export]
     public NodePath AutoShapeMesh { get; private set; }
@@ -42,7 +43,7 @@ public class WorldObject : RigidBody
 //        }
 
         colShape.Transform = _meshInstance.Transform;
-        colShape.Shape = _meshInstance.Mesh.GetCachedShape(IsTrimesh);
+        colShape.Shape     = _meshInstance.Mesh.GetCachedShape(IsTrimesh);
         if (LifeTime > 0)
             this.CreateAndConnectTimer(nameof(FreeSelf)).Start(LifeTime);
     }
