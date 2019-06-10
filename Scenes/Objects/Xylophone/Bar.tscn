@@ -33,8 +33,8 @@ material_override = SubResource( 2 )
 mesh = SubResource( 3 )
 material/0 = null
 Curve = 2.07053
-Energy = 1.0
 OffTime = 0.3
+Energy = 1.0
 
 [node name="OmniLight" parent="Bar" index="0"]
 light_color = Color( 1, 1, 1, 1 )

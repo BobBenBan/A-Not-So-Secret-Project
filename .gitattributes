@@ -1,5 +1,5 @@
 # Auto detect text files and perform LF normalization
-* text eol=LF
+#* text eol=LF
 
 # Explicitly declare text files you want to always be normalized and converted
 # to native line endings on checkout.
@@ -25,3 +25,5 @@
 *.exr binary
 *.mid binary
 *.midi binary
+*.exe binary
+*.pck binary

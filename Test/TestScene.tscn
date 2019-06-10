@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://Test/TestScene.cs" type="Script" id=1]
 [ext_resource path="res://Test/Night.tres" type="Environment" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://Scenes/Objects/Xylophone/Xylophone.tscn" type="PackedScene" id=10]
 [ext_resource path="res://Scenes/Mechanisms/MovingObject/MovingObject.tscn" type="PackedScene" id=11]
 [ext_resource path="res://Scenes/Objects/Pointer.tscn" type="PackedScene" id=12]
+[ext_resource path="res://Scenes/Objects/Drums/Drums.tscn" type="PackedScene" id=13]
 
 [sub_resource type="PhysicsMaterial" id=1]
 friction = 0.4
@@ -82,9 +83,12 @@ transform = Transform( 1.95, 0, 4.64916e-007, 0, 1.95, 0, -4.64916e-007, 0, 1.95
 
 [node name="MovingObject" parent="Objects" instance=ExtResource( 11 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9, 0.3, -5.6 )
+Scalar = 4.0
 _direction = Vector3( 0.1, 0, 0 )
 ObjectScene = ExtResource( 12 )
-Scalar = 4.0
+
+[node name="Drums" parent="Objects" instance=ExtResource( 13 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.70248, 0, -0.399456 )
 
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
 max_distance = 10.0

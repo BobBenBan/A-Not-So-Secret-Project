@@ -26,5 +26,14 @@ public class Program
     }
 
     public ProgramTrack GetMusicTrack(SBN program) => GetMusicTrack(program, 0);
+
+    public MusicTrack GetDrumTrack()
+    {
+        foreach (var track in Tracks)
+        {
+            if (track is MusicTrack musicTrack && musicTrack.IsDrumTrack) return musicTrack;
+        }
+        return null;
+    }
 }
 }

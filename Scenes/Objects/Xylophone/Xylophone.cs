@@ -1,7 +1,7 @@
 using System;
 using Godot;
+using MusicMachine.Mechanisms.Glowing;
 using MusicMachine.Programs;
-using MusicMachine.Scenes.Mechanisms.Glowing;
 using MusicMachine.Util;
 using MusicMachine.Util.Maths;
 
@@ -58,7 +58,7 @@ public class Xylophone : Spatial, IGlowingArray
         var instance = BarScene.Instance();
         if (!(instance is IContainsGlowing) || !(instance is Spatial cur))
         {
-            GD.PushWarning("Provided scene is not a glowing object.");
+            GD.PushWarning($"Xylophone: Provided scene at ({Name}) is not a glowing object.");
             return;
         }
 

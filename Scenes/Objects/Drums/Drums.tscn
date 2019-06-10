@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/Mechanisms/Glowing/SimpleGlowingArray.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Objects/Drums/Drums.cs" type="Script" id=2]
+[ext_resource path="res://Scenes/Objects/Drums/Drum.tscn" type="PackedScene" id=3]
+
+[node name="Drums" index="0" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+EndNum = 0
+StartNum = 5
+ObjScene = ExtResource( 3 )
+
+[node name="FirstObj" parent="." index="1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+
+[node name="NextObj" parent="." index="2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0, 0 )

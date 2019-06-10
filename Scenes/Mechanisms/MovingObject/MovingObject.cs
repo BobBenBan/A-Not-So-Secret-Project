@@ -12,7 +12,7 @@ public class MovingObject : Spatial
     [Export] private readonly Vector3 _direction = Vector3.Right;
     public readonly Spatial[] CurSpatials = new Spatial[128];
     private Spatial _objects;
-
+    private bool valid = false;
     [Export] private float Scalar { get; set; } = 1;
 
     [Export] private PackedScene ObjectScene { get; set; }
@@ -22,6 +22,7 @@ public class MovingObject : Spatial
     public override void _Ready()
     {
         base._Ready();
+        if (Engine.EditorHint) return;
         AddChild(_objects = new Spatial {Name = "Objects"});
         if (ObjectScene == null) return;
         var instance = ObjectScene.Instance();
@@ -33,21 +34,24 @@ public class MovingObject : Spatial
         spatial.Visible = false;
         _objects.AddChild(spatial);
         _cachedObjects.Enqueue(spatial);
+        valid = true;
     }
 
     public void AddObject(NoteOnEvent note)
     {
+        if (!valid) return;
         var spatial = GetOrCreate();
         var tf      = spatial.GlobalTransform;
-        tf.origin               = this.GetGlobalTranslation();
+        tf.origin = this.GetGlobalTranslation();
         spatial.GlobalTransform = tf;
-        spatial.Scale           = Vector3.One * (Scalar * note.Velocity / 127f);
+        spatial.Scale = Vector3.One * (Scalar * note.Velocity / 127f);
         spatial.GlobalTranslate(_direction * note.NoteNumber);
         CurSpatials[note.NoteNumber] = spatial;
     }
 
     public void RemoveObject(NoteOffEvent note)
     {
+        if (!valid) return;
         var spatial = CurSpatials[note.NoteNumber];
         if (spatial == null) return;
         CurSpatials[note.NoteNumber] = null;
@@ -67,8 +71,7 @@ public class MovingObject : Spatial
         {
             spatial = _cachedObjects.Dequeue();
             spatial.SetVisible(true);
-        }
-        else
+        } else
         {
             spatial = (Spatial) ObjectScene.Instance();
             _objects.AddChild(spatial);

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using MusicMachine.Scenes.Functional;
 
 namespace MusicMachine.Mechanisms.Timings
 {

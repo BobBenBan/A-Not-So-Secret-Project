@@ -1,3 +1,4 @@
+using MusicMachine.Mechanisms.Glowing;
 using MusicMachine.Scenes.Mechanisms.Glowing;
 
 namespace MusicMachine.Scenes.Objects.Xylophone

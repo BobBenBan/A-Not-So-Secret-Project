@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Melanchall.DryWetMidi.Smf;
+using MusicMachine.Mechanisms.Glowing;
+using MusicMachine.Mechanisms.MovingObject;
 using MusicMachine.Mechanisms.Projectiles;
 using MusicMachine.Mechanisms.Timings;
 using MusicMachine.Programs;
@@ -10,11 +12,10 @@ using MusicMachine.Programs.Mappers;
 using MusicMachine.Scenes.Functional;
 using MusicMachine.Scenes.Functional.Tracks;
 using MusicMachine.Scenes.Global;
-using MusicMachine.Scenes.Mechanisms.Glowing;
 using MusicMachine.Scenes.Mechanisms.MovingObject;
 using MusicMachine.Scenes.Mechanisms.Projectiles;
 using MusicMachine.Scenes.Mechanisms.Synth;
-using MusicMachine.Scenes.Objects.LightBoard;
+using MusicMachine.Scenes.Objects.Drums;
 using MusicMachine.Scenes.Objects.Xylophone;
 using MusicMachine.Scenes.Player;
 using MusicMachine.Util;
@@ -42,12 +43,12 @@ public class TestScene : Area
 
     public override void _Ready()
     {
-        _player   = GetNode<Player>("Player");
+        _player = GetNode<Player>("Player");
         _launcher = GetNode<Launcher>("Objects/Launcher");
         ProgramTheProgram();
 //        PrepareTargets();
 //        OnSecondary(0);
-        _player.Primary   = OnAction;
+        _player.Primary = OnAction;
         _player.Secondary = OnSecondary;
 
         OnSecondary(0);
@@ -109,8 +110,8 @@ public class TestScene : Area
                                 new ReadingSettings {NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore})
                            .ToProgram();
 
-        var lightBoard       = GetNode<LightBoard>("Objects/LightBoard");
-        var lightBoardMapper = new GlowingMapper(lightBoard);
+        var lightBoard       = GetNode<IGlowingArray>("Objects/LightBoard");
+        var lightBoardMapper = new PersistingGlowMapper(lightBoard);
         var lightBoardTrack1 = _program.GetMusicTrack((byte) InstrumentNames.ElectricBass_pick);
 //        var lightBoardTrack2 = _program.GetMusicTrack((byte) InstrumentNames.ElectricBass_finger);
 //        var lightBoardTrack3 = _program.GetMusicTrack((byte) InstrumentNames.AcousticGrandPiano);
@@ -125,15 +126,15 @@ public class TestScene : Area
             xylophoneMapper,
             new Targeting.Params
             {
-                StartPos          = launcher.GetGlobalTranslation(),
-                Gravity           = GravityVec * Gravity,
+                StartPos = launcher.GetGlobalTranslation(),
+                Gravity = GravityVec * Gravity,
                 MinLaunchVelocity = 5,
-                UseUpper          = true
+                UseUpper = true
             });
         var timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
         GlobalNode.Instance.AddChild(timingRecorder);
         _launchMapper = new CollisionTimingMapper(_launcher, timingRecorder, targetMapper);
-        var xyloGlowMapper = new GlowingMapper(xylophone);
+        var xyloGlowMapper = new PersistingGlowMapper(xylophone);
         var xyloTrack      = _program.GetMusicTrack((byte) InstrumentNames.MusicBox);
         xyloTrack?.Mappers.Add(_launchMapper);
         xyloTrack?.Mappers.Add(xyloGlowMapper);
@@ -143,16 +144,21 @@ public class TestScene : Area
         var movingObjectTrack  = _program.GetMusicTrack((byte) InstrumentNames.SynthVoice);
         movingObjectTrack?.Mappers.Add(movingObjectMapper);
 
-        _airLauncher   = GetNode<Launcher>("Objects/AirLauncher");
+        _airLauncher = GetNode<Launcher>("Objects/AirLauncher");
         timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
         GlobalNode.Instance.AddChild(timingRecorder);
         _airLaunchMapper = new CollisionTimingMapper(_airLauncher, timingRecorder, AirMapper);
         var airLaunchTrack = _program.GetMusicTrack((byte) InstrumentNames.AcousticGrandPiano);
         airLaunchTrack?.Mappers.Add(_airLaunchMapper);
 
+        var drums      = GetNode<Drums>("Objects/Drums");
+        var drumMapper = new PulsingGlowMapper(drums, 100_000);
+        var drumTrack  = _program.GetDrumTrack();
+        drumTrack?.Mappers.Add(drumMapper);
+
         var synth = new SortofVirtualSynth
         {
-            NumChannels   = _program.Tracks.Count,
+            NumChannels = _program.Tracks.Count,
             SoundFontFile = soundFontFile,
             UsedPresetNumbers =
                 _program.Tracks.OfType<MusicTrack>().Select(track => track.CombinedPresetNum).ToGdArray(),

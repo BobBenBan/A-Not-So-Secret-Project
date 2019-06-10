@@ -1,4 +1,5 @@
 using Godot;
+using MusicMachine.Mechanisms.Glowing;
 using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Mechanisms.Glowing
