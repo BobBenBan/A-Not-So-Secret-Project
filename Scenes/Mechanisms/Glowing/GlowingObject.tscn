@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scenes/Mechanisms/LightBoard/Bulb.cs" type="Script" id=1]
-
+[ext_resource path="res://Scenes/Mechanisms/Glowing/GlowingObject.cs" type="Script" id=1]
 
 [sub_resource type="SpatialMaterial" id=1]
 resource_local_to_scene = true
@@ -17,24 +16,16 @@ rim_enabled = true
 rim = 0.2
 rim_tint = 0.6
 
-[sub_resource type="SphereMesh" id=2]
-radius = 0.05
-height = 0.04
-is_hemisphere = true
-
-[node name="Bulb" type="MeshInstance"]
-transform = Transform( 1, 0, 0, 0, -4.37114e-008, -1, 0, 1, -4.37114e-008, 0, -1.85894e-010, 0.00425276 )
+[node name="GlowingObject" type="MeshInstance"]
 material_override = SubResource( 1 )
-mesh = SubResource( 2 )
-material/0 = null
 script = ExtResource( 1 )
-Curve = 1.46409
+Curve = 0.287175
 Energy = 3.0
 OnTime = 0.1
-OffTime = 0.1
+OffTime = 0.2
 
 [node name="OmniLight" type="OmniLight" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, -3.01148e-015 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -3.01148e-015 )
 visible = false
 light_color = Color( 0.545098, 1, 0.592157, 1 )
 light_energy = 0.1

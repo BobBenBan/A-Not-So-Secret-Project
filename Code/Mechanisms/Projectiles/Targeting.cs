@@ -6,7 +6,7 @@ namespace MusicMachine.Mechanisms.Projectiles
 {
 public static class Targeting
 {
-    public static Vector3 CalculateVelocity(TargetingParams i)
+    public static Vector3 CalculateVelocity(Params i)
     {
         var diff = i.EndPos - i.StartPos;
         if (i.Gravity.Length() < 1e-6)
@@ -18,7 +18,7 @@ public static class Targeting
         double g    = i.Gravity.Length();
         double v    = i.MinLaunchVelocity;
         var    vv   = (Vector2) CalcVelocity2d(x, y, g, v, i.UseUpper);
-        Console.WriteLine($"x: {x}, y: {y}, vx: {vv.x}, vy: {vv.y}, v: {v}");
+//        Console.WriteLine($"x: {x}, y: {y}, vx: {vv.x}, vy: {vv.y}, v: {v}");
 
         return run.Normalized() * vv.x + -i.Gravity.Normalized() * vv.y;
     }
@@ -36,10 +36,10 @@ public static class Targeting
         return new Vector2d(vx, vy);
     }
 
-    public static LaunchInfo ToLaunch(this ref TargetingParams @params) =>
+    public static LaunchInfo ToLaunch(this ref Params @params) =>
         new LaunchInfo(@params.StartPos, CalculateVelocity(@params));
 
-    public struct TargetingParams
+    public struct Params
     {
         public Vector3 StartPos;
         public Vector3 EndPos;
@@ -47,12 +47,7 @@ public static class Targeting
         public float MinLaunchVelocity;
         public bool UseUpper;
 
-        public TargetingParams(
-            Vector3 startPos,
-            Vector3 endPos,
-            Vector3 gravity,
-            float minLaunchVelocity,
-            bool useUpper)
+        public Params(Vector3 startPos, Vector3 endPos, Vector3 gravity, float minLaunchVelocity, bool useUpper)
         {
             StartPos          = startPos;
             EndPos            = endPos;

@@ -1,21 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using MusicMachine.Interaction;
+using Godot;
 using MusicMachine.Mechanisms.Timings;
 using MusicMachine.Programs;
 using MusicMachine.Programs.Mappers;
 using MusicMachine.Util;
+using Object = Godot.Object;
 
 namespace MusicMachine.Mechanisms.Projectiles
 {
 //TODO: Consider if timingRecorder belongs in global node stuffs.
-public class CollisionTimingMapper : BaseCompletionAwaiter, ITrackMapper
+public class CollisionTimingMapper : Object, ITrackMapper
 {
+    [Signal] public delegate void TimingReady();
+
     private readonly ILauncher _launcher;
+    private readonly HashSet<Pair<long, LaunchInfo>> _launches = new HashSet<Pair<long, LaunchInfo>>();
     private readonly TimingRecorder _timingRecorder;
     private readonly TrackToLaunchMapper _trackToLaunch;
-    private List<Pair<long, LaunchInfo>> _launches;
+    private bool _isReady;
     public long MicrosOffset = 0;
 
     public CollisionTimingMapper(ILauncher launcher, TimingRecorder timingRecorder, TrackToLaunchMapper trackToLaunch)
@@ -25,25 +28,23 @@ public class CollisionTimingMapper : BaseCompletionAwaiter, ITrackMapper
         _trackToLaunch  = trackToLaunch ?? throw new ArgumentNullException(nameof(trackToLaunch));
     }
 
-    public ICompletionAwaiter Prepare(AnyTrack track, MappingInfo info)
+    public bool IsReady
     {
-        _launches = _trackToLaunch(track, info).ToList();
-        foreach (var pair in _launches)
+        get => _isReady;
+        private set
         {
-            var key = pair.Second;
-            if (!_timingRecorder.TryGetValue(key, out _))
-                _timingRecorder[key] = new CollisionTiming(_launcher, key);
+            if (!_isReady && value) EmitSignal(nameof(TimingReady));
+            _isReady = value;
         }
-        return this;
     }
 
-    public IEnumerable<Pair<long, Action>> MapTrack(AnyTrack track, MappingInfo info)
+    IEnumerable<Pair<long, Action>> ITrackMapper.MapTrack(ProgramTrack track, MappingInfo info)
     {
         foreach (var launch in _launches)
         {
             var launchInfo = launch.Second;
-            var timing     = _timingRecorder[launchInfo];
-            var elapsed    = timing.ElapsedMicros;
+            if (!_timingRecorder.TryGetValue(launchInfo, out var timing)) continue;
+            var elapsed = timing.ElapsedMicros;
             if (elapsed == null) continue;
             yield return new Pair<long, Action>(
                 launch.First - elapsed.Value - MicrosOffset,
@@ -51,23 +52,29 @@ public class CollisionTimingMapper : BaseCompletionAwaiter, ITrackMapper
         }
     }
 
-    protected override void DoBegin()
+    void ITrackMapper.AnalyzeTrack(ProgramTrack track, MappingInfo info)
     {
+        foreach (var pair in _trackToLaunch(track, info))
+        {
+            _launches.Add(pair);
+            var launchInfo = pair.Second;
+            if (!_timingRecorder.ContainsKey(launchInfo))
+                _timingRecorder[launchInfo] = new CollisionTiming(_launcher, launchInfo);
+        }
+    }
+
+    public void TimeAll()
+    {
+        IsReady = false;
         if (!_timingRecorder.IsInsideTree())
             throw new InvalidOperationException("Timing recorder not inside tree."); //todo: rethink this
-        _timingRecorder.Connect(nameof(TimingRecorder.AllDone),   this, nameof(Complete));
-        _timingRecorder.Connect(nameof(TimingRecorder.AnyCancel), this, nameof(Fail));
+        _timingRecorder.EnsureConnect(nameof(TimingRecorder.AllDone), this, nameof(OnReady));
         _timingRecorder.StartAll(true, true);
     }
 
-    private void Fail()
+    private void OnReady()
     {
-        TryFail();
-    }
-
-    private void Complete()
-    {
-        TrySuccess();
+        IsReady = true;
     }
 }
 }

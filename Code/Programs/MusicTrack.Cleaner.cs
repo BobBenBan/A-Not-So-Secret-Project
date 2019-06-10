@@ -4,7 +4,7 @@ using MusicMachine.Util;
 
 namespace MusicMachine.Programs
 {
-public partial class MusicTrack : AnyTrack
+public partial class MusicTrack : ProgramTrack
 {
     /// <summary>
     ///     Removes redundant events from this track (events that have no effect on output).

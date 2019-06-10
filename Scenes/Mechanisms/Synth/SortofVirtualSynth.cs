@@ -4,14 +4,13 @@ using System.Linq;
 using Godot;
 using Godot.Collections;
 using Melanchall.DryWetMidi.Smf.Interaction;
-using MusicMachine.Interaction;
 using MusicMachine.Programs;
 using MusicMachine.Programs.Mappers;
 using MusicMachine.Scenes.Functional;
 using MusicMachine.ThirdParty.Midi;
 using MusicMachine.Util;
 
-namespace MusicMachine.Scenes.Mechanisms
+namespace MusicMachine.Scenes.Mechanisms.Synth
 {
 //this is more of a tester.
 
@@ -65,7 +64,6 @@ public partial class SortofVirtualSynth : ProcessNode
         InitChannels();
         CreatePlayers();
         PrepareBank();
-        SetProcess(false);
         _ready = true;
     }
 
@@ -239,28 +237,31 @@ public partial class SortofVirtualSynth : ProcessNode
             _synth = synth;
         }
 
-        public ICompletionAwaiter Prepare(AnyTrack track, MappingInfo info) => new AlreadyDoneCompletionAwaiter();
-
-        public IEnumerable<Pair<long, Action>> MapTrack(AnyTrack track, MappingInfo info)
+        public IEnumerable<Pair<long, Action>> MapTrack(ProgramTrack track, MappingInfo info)
         {
-            if (!(track is MusicTrack musicTrack)) return Enumerable.Empty<Pair<long, Action>>();
-            for (var index = 0; index < _synth._channelStates.Length; index++)
+            if (track is MusicTrack musicTrack)
             {
-                var channel = _synth._channelStates[index];
-                if (channel.Program == musicTrack.Program && channel.Bank == musicTrack.Bank)
-                    return DoMapTrack(musicTrack, index, info.TempoMap);
+                for (var index = 0; index < _synth._channelStates.Length; index++)
+                {
+                    var channel = _synth._channelStates[index];
+                    if (channel.Program == musicTrack.Program && channel.Bank == musicTrack.Bank)
+                        return DoMapTrack(musicTrack, index, info.TempoMap);
+                }
             }
             return Enumerable.Empty<Pair<long, Action>>();
+        }
+
+        public void AnalyzeTrack(ProgramTrack track, MappingInfo info)
+        {
+            //do nothing
         }
 
         private IEnumerable<Pair<long, Action>> DoMapTrack(MusicTrack track, int channelNum, TempoMap map)
         {
             foreach (var pair in track.Track.EventPairs)
             {
-                var @event = pair.Second;
-                if (!(@event is MusicEvent musicEvent)) continue;
                 var microTime = TimeConverter.ConvertTo<MetricTimeSpan>(pair.First, map).TotalMicroseconds;
-                yield return new Pair<long, Action>(microTime, () => _synth.SendEvent(channelNum, musicEvent));
+                yield return new Pair<long, Action>(microTime, () => _synth.SendEvent(channelNum, pair.Second));
             }
         }
     }

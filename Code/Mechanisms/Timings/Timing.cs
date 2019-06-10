@@ -67,7 +67,6 @@ public class Timing : Object
     public bool CancelTiming()
     {
         if (Status != TimingStatus.InProgress) return false;
-        const bool wasDone = false;
         _startTime = null;
         _endTime   = null;
         OnCancel();

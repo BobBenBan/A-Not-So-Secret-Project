@@ -75,8 +75,8 @@ public class TimingRecorder : Clock, IDictionary<object, Timing>
     {
         if (value == null)
             throw new ArgumentNullException(nameof(value));
-        value.TimingRecorder = this;
         _timings.Add(key, value);
+        value.TimingRecorder = this;
     }
 
     public bool Remove(object key)
@@ -119,7 +119,9 @@ public class TimingRecorder : Clock, IDictionary<object, Timing>
 
     public int StartAll(bool cancel, bool restart)
     {
-        return _timings.Values.Count(timing => timing.StartTiming(cancel, restart));
+        var count = _timings.Values.Count(timing => timing.StartTiming(cancel, restart));
+        if (count == 0) EmitSignal(nameof(AllDone));
+        return count;
     }
 
     public int CancelAll(bool evenIfDone)

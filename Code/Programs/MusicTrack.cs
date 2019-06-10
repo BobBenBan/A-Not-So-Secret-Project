@@ -27,7 +27,7 @@ public partial class MusicTrack
 
     public int CombinedPresetNum => (Bank << 7) | Program;
 
-    protected override IEnumerable<Pair<long, BaseEvent>> EventPairs =>
+    public override IEnumerable<Pair<long, BaseEvent>> EventPairs =>
         Track.EventPairs.Select(x => new Pair<long, BaseEvent>(x.First, x.Second));
 }
 }

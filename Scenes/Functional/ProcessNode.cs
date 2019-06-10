@@ -23,7 +23,7 @@ public abstract class ProcessNode : Node
     private bool _enabled = true;
     private Mode _mode = Mode.Manual;
 
-    public ProcessNode()
+    protected ProcessNode()
     {
         _doStepTicks = DoStepTicks;
     }
@@ -47,7 +47,7 @@ public abstract class ProcessNode : Node
         get => _enabled;
         set
         {
-            if (_enabled == value) return;
+//            if (_enabled == value) return;
             _enabled = value;
             SetProcess(_mode, _enabled);
         }

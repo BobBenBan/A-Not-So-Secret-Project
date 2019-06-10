@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Godot;
 using MusicMachine.Programs;
-using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Functional.Tracks
 {
@@ -45,12 +44,6 @@ public class ActionPlayer : ProcessNode
         private set => Enabled = value;
     }
 
-    protected override void Ready()
-    {
-        SetPhysicsProcess(false);
-        SetProcess(false);
-    }
-
     protected override void StepTicks(long ticks)
     {
         if (ticks < 0)
@@ -89,7 +82,5 @@ public class ActionPlayer : ProcessNode
         _stepper = null;
         Playing  = false;
     }
-
-    private void Step(float seconds) => StepTicks((seconds * 10e6).RoundToLong());
 }
 }

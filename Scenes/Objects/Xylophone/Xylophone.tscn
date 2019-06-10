@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scenes/Objects/Xylophone/Xylophone.cs" type="Script" id=1]
+[ext_resource path="res://Scenes/Objects/Xylophone/Bar.tscn" type="PackedScene" id=2]
+
+[node name="Xylophone" type="Spatial"]
+script = ExtResource( 1 )
+BarScene = ExtResource( 2 )
+
+[node name="FirstBar" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1.45, 0, 0, 0 )
+
+[node name="RaiseBar" type="Spatial" parent="FirstBar"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.075, 0.1, -0.620896 )
+
+[node name="NextBar" type="Spatial" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1.41, 0.15, 0, -0.01 )

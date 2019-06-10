@@ -86,8 +86,8 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
     /// </summary>
     /// <param name="time">The time to add at</param>
     /// <param name="events">The events</param>
-    public void AddRange<OEvent>(long time, IEnumerable<OEvent> events)
-        where OEvent : TEvent
+    public void AddRange<TOEvent>(long time, IEnumerable<TOEvent> events)
+        where TOEvent : TEvent
     {
         using (var enumerator = events.GetEnumerator())
         {
@@ -111,8 +111,8 @@ public class Track<TEvent> : IEnumerable<Pair<long, IEnumerable<TEvent>>>
     ///     Adds a range of events via a series of Pairs of (time, to, a list of events).
     /// </summary>
     /// <param name="events"> a series of Pairs of (time, to, a list of events).</param>
-    public void AddRange<OEvent>(IEnumerable<Pair<long, IEnumerable<OEvent>>> events)
-        where OEvent : TEvent
+    public void AddRange<TOEvent>(IEnumerable<Pair<long, IEnumerable<TOEvent>>> events)
+        where TOEvent : TEvent
     {
         foreach (var pair in events)
             AddRange(pair.First, pair.Second);

@@ -27,6 +27,7 @@ Caches="*res://Scenes/Global/Caches.cs"
 [debug]
 
 settings/fps/force_fps=30
+gdscript/warnings/unused_variable=false
 
 [input]
 
@@ -98,6 +99,7 @@ action_secondary={
 
 [mono]
 
+debugger_agent/wait_for_debugger=true
 debugger_agent/wait_timeout=15000
 export/include_scripts_content=true
 

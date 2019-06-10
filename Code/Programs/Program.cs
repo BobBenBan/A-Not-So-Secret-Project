@@ -8,7 +8,7 @@ public class Program
 {
     public const float MaxSemitonesPitchBend = 12;
     private readonly TempoMapManager _tempoMapManager = new TempoMapManager();
-    public readonly List<AnyTrack> Tracks = new List<AnyTrack>();
+    public readonly List<ProgramTrack> Tracks = new List<ProgramTrack>();
 
     public TempoMap TempoMap => _tempoMapManager.TempoMap;
 
@@ -25,6 +25,6 @@ public class Program
         return null;
     }
 
-    public AnyTrack GetMusicTrack(SBN program) => GetMusicTrack(program, 0);
+    public ProgramTrack GetMusicTrack(SBN program) => GetMusicTrack(program, 0);
 }
 }

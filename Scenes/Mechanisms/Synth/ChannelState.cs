@@ -1,9 +1,10 @@
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using MusicMachine.Programs;
 using MusicMachine.ThirdParty.Midi;
 using MusicMachine.Util.Maths;
 
-namespace MusicMachine.Scenes.Mechanisms
+namespace MusicMachine.Scenes.Mechanisms.Synth
 {
 public partial class SortofVirtualSynth
 {
@@ -12,7 +13,7 @@ public partial class SortofVirtualSynth
         //pan
         private readonly List<SBN> _cachedList = new List<SBN>();
         public readonly float AmpDb;
-        public readonly Dictionary<SBN, AdsrPlayer> NotesOn = new Dictionary<SBN, AdsrPlayer>();
+        public readonly ConcurrentDictionary<SBN, AdsrPlayer> NotesOn = new ConcurrentDictionary<SBN, AdsrPlayer>();
         public readonly float VolumeDb;
         public PlayingState PlayingState = PlayingState.Default;
 
@@ -89,7 +90,7 @@ public partial class SortofVirtualSynth
                 if (!pair.Value.Playing)
                     toRemove.Add(pair.Key);
             foreach (var i in toRemove)
-                NotesOn.Remove(i);
+                NotesOn.TryRemove(i, out _);
         }
 
         public void ResetState()

@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Threading;
 using Godot;
-using MusicMachine.Interaction;
 using MusicMachine.Programs;
 using MusicMachine.Programs.Mappers;
 
@@ -11,15 +8,9 @@ namespace MusicMachine.Scenes.Functional.Tracks
 //TODO: move most implementation to Program, not Program Player.
 public class ProgramPlayer : Node
 {
-    [Signal] public delegate void CompletedPrep();
-
-    private const int Unprepared = 0;
-    private const int Preparing = 1;
-    private const int Prepared = 2;
     private readonly ActionPlayer _actionPlayer;
+    private readonly Track<Action> _actionTrack = new Track<Action>();
     public readonly Program Program;
-    private CombinedCompletionAwaiter _combinedCompletionAwaiter;
-    private int _preparedState = Unprepared;
 
     public ProgramPlayer(Program program, ProcessNode.Mode mode = ProcessNode.Mode.Physics)
     {
@@ -28,44 +19,28 @@ public class ProgramPlayer : Node
         AddChild(_actionPlayer);
     }
 
-    //completion awaiters must always be concurrent.
-    /// <summary>
-    ///     Trys to begin preparing if the state of this ProgramPlayer is in the "Unprepared" state.
-    ///     Will return null if not.
-    /// </summary>
-    /// <returns>If preparing was successfully stared.</returns>
-    public bool TryBeginPrepare()
+    public bool Playing => _actionPlayer.Playing;
+
+    public void AnalyzeTracks()
     {
-        if (Interlocked.CompareExchange(ref _preparedState, Preparing, Unprepared) != Unprepared) return false;
-        var list        = new List<ICompletionAwaiter>();
-        var mappingInfo = new MappingInfo(Program.TempoMap);
+        var info = new MappingInfo(Program.TempoMap);
         foreach (var track in Program.Tracks)
-        foreach (var mapper in track.Mappers)
-            list.Add(mapper.Prepare(track, mappingInfo));
-        _combinedCompletionAwaiter = new CombinedCompletionAwaiter
-        {
-            Awaiters = list,
-            CompletionCallback = () =>
-            {
-                if (Interlocked.CompareExchange(ref _preparedState, Prepared, Preparing) == Preparing)
-                    EmitSignal(nameof(CompletedPrep));
-            }
-        };
-        _combinedCompletionAwaiter.Begin();
-        return true;
+            track.AnalyzeThis(info);
     }
 
-    public void TryPlay()
+    public void CreateTrack()
     {
-        if (_preparedState != Prepared) return;
-        var mappingInfo = new MappingInfo(Program.TempoMap);
-        var actionTrack = new Track<Action>();
+        //Todo: In the future, this will be async.
+        _actionTrack.Clear();
+        var info = new MappingInfo(Program.TempoMap);
         foreach (var track in Program.Tracks)
-        foreach (var mapper in track.Mappers)
-            actionTrack.AddRange(mapper.MapTrack(track, mappingInfo));
-        _actionPlayer.Track = actionTrack;
+            _actionTrack.AddRange(track.MapThis(info));
+        _actionPlayer.Track = _actionTrack;
+    }
 
-        Stop();
+    public void Play()
+    {
+        _actionPlayer.Play();
     }
 
     public void Stop()

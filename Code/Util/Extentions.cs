@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using Godot.Collections;
+using Array = Godot.Collections.Array;
 using Object = Godot.Object;
 
 namespace MusicMachine.Util
@@ -236,5 +237,14 @@ public static class GodotEx
 
     public static bool CollidableWith(this PhysicsBody a, PhysicsBody b) =>
         (a.CollisionMask & b.CollisionLayer) != 0 || (a.CollisionLayer & b.CollisionMask) != 0;
+
+    public static Error EnsureConnect(
+        this Object o,
+        string signal,
+        Object target,
+        string method,
+        Array binds = null,
+        int flags = 0) =>
+        !o.IsConnected(signal, target, method) ? o.Connect(signal, target, method, binds, flags) : Error.AlreadyExists;
 }
 }

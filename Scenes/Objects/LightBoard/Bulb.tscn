@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/Mechanisms/Glowing/GlowingObject.tscn" type="PackedScene" id=1]
+
+[sub_resource type="SpatialMaterial" id=1]
+resource_local_to_scene = true
+albedo_color = Color( 0.847059, 1, 0.792157, 1 )
+metallic = 0.1
+roughness = 0.37
+emission_enabled = true
+emission = Color( 0.498039, 1, 0.356863, 1 )
+emission_energy = 0.0
+emission_operator = 0
+emission_on_uv2 = false
+rim_enabled = true
+rim = 0.2
+rim_tint = 0.6
+
+[sub_resource type="SphereMesh" id=2]
+radius = 0.05
+height = 0.04
+is_hemisphere = true
+
+[node name="Bulb" index="0" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, -4.37114e-008, -1, 0, 1, -4.37114e-008, 0, 0, 0 )
+material_override = SubResource( 1 )
+mesh = SubResource( 2 )
+material/0 = null
+OffTime = 0.05

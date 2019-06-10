@@ -2,13 +2,12 @@ using Godot;
 using MusicMachine.Game.Constants;
 using MusicMachine.Util;
 
-namespace MusicMachine.Scenes
+namespace MusicMachine.Scenes.Player
 {
 public class Player : KinematicBody
 {
     private Camera _camera;
     private bool _enabled = true;
-    private bool _flying;
     private Vector3 _gravity = new Vector3(0, -12f, 0);
     private bool _inFocus = true;
     private Vector3 _outputVel;
@@ -20,6 +19,7 @@ public class Player : KinematicBody
     [Export] public bool CanFly = true;
     [Export(PropertyHint.Range, "0,30")] public float Deceleration = 16f;
     [Export(PropertyHint.Range, "0,5")] public float DoubleTapTime = 0.3f;
+    [Export] public bool Flying;
     [Export(PropertyHint.Range, "0,30")] public float FlyVerticalSpeed = 6;
     [Export(PropertyHint.Range, "0,30")] public float JumpSpeed = 5;
     [Export(PropertyHint.Range, "0,30")] public float MaxGravityVelocity = 20;
@@ -104,19 +104,19 @@ public class Player : KinematicBody
             var isOnFloor      = IsOnFloor();
 
             if (CanFly && Inputs.PlayerDoubleJump.DoubleTapped(DoubleTapTime, delta))
-                _flying = !_flying;
+                Flying = !Flying;
 
             if (isOnFloor)
-                _flying = false;
+                Flying = false;
             //speed
-            var slow = slowPressed && !_flying;
-            _running = !slow && runningPressed && (_running || _flying || isOnFloor);
+            var slow = slowPressed && !Flying;
+            _running = !slow && runningPressed && (_running || Flying || isOnFloor);
             var speed = slow     ? SlowSpeed :
                         _running ? RunSpeed : WalkSpeed;
 
             //Flying, jumping
 
-            if (_flying)
+            if (Flying)
             {
                 if (jumpPressed)
                     targetVel.y += FlyVerticalSpeed / WalkSpeed;
@@ -130,7 +130,7 @@ public class Player : KinematicBody
         }
 
         var actualVel = _outputVel;
-        if (!_flying)
+        if (!Flying)
         {
             _outputVel  += Gravity * delta;
             _outputVel  =  _outputVel.ClampY(-MaxGravityVelocity, float.MaxValue);
@@ -139,7 +139,7 @@ public class Player : KinematicBody
 
         var accel = (targetVel - actualVel).Dot(actualVel) > 0 ? Acceleration : Deceleration;
         actualVel = actualVel.LinearInterpolate(targetVel, accel * delta);
-        if (!_flying)
+        if (!Flying)
             actualVel.y = _outputVel.y;
 
         _outputVel = MoveAndSlide(actualVel, _up, true, 2, Mathf.Deg2Rad(MaxSlopeDegrees));

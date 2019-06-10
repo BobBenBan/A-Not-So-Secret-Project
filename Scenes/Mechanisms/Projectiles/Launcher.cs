@@ -1,19 +1,17 @@
-using System;
 using Godot;
 using MusicMachine.Mechanisms.Projectiles;
 
 namespace MusicMachine.Scenes.Mechanisms.Projectiles
 {
+[Tool]
 public class Launcher : Spatial, ILauncher
 {
-    //todo: pooling?
-    public const string Dir = "res://Scenes/Objects/Launchers/" + nameof(Launcher) + ".cs";
-    public const string DefaultProjectileDir = "res://Scenes/Objects/Launchers/MetalBall.tscn";
     private Spatial _projectileHolder;
-    private PackedScene _projectileScene;
 
 //    [Export] public bool PoolProjectiles = false;
-    [Export(PropertyHint.Dir)] public string ProjectileScene = DefaultProjectileDir;
+#pragma warning disable 649
+    [Export] private PackedScene _projectileScene;
+#pragma warning restore 649
 
     private RigidBody NextToLaunch { get; set; }
 
@@ -21,21 +19,27 @@ public class Launcher : Spatial, ILauncher
 
     public void Launch(LaunchInfo launchInfo)
     {
-        var pair = launchInfo;
+        if (NextToLaunch == null) return;
         _projectileHolder.AddChild(NextToLaunch);
-        var toTranslate = pair.Location - NextToLaunch.GlobalTransform.origin;
+        var toTranslate = launchInfo.Location - NextToLaunch.GlobalTransform.origin;
         NextToLaunch.GlobalTranslate(toTranslate);
-        NextToLaunch.LinearVelocity = pair.Velocity;
+        NextToLaunch.LinearVelocity = launchInfo.Velocity;
         NextToLaunch                = (RigidBody) _projectileScene.Instance();
     }
 
+    public override string _GetConfigurationWarning() => _projectileScene == null ? "Projectile Scene not set" : "";
+
     public override void _Ready()
     {
-        _projectileScene = GD.Load(ProjectileScene) as PackedScene
-                        ?? throw new InvalidOperationException("Provided resource not a scene");
-        NextToLaunch = _projectileScene.Instance() as RigidBody
-                    ?? throw new InvalidOperationException("Provided scene is not a rigid body.");
-        AddChild(_projectileHolder = new Spatial {Name = "Projectiles"});
+        if (_projectileScene == null) return;
+        NextToLaunch = _projectileScene.Instance() as RigidBody;
+        if (NextToLaunch == null)
+        {
+            GD.PushWarning("Provided scene is not a rigid body.");
+            return;
+        }
+        if (!Engine.EditorHint)
+            AddChild(_projectileHolder = new Spatial {Name = "Projectiles"});
     }
 }
 }

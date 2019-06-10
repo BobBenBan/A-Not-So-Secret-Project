@@ -8,7 +8,7 @@ using Array = Godot.Collections.Array;
 
 namespace MusicMachine.Mechanisms.Projectiles
 {
-public class CollisionTiming : Timing
+internal class CollisionTiming : Timing
 {
     private readonly ILauncher _launcher;
     private readonly LaunchInfo _launchInfo;
@@ -32,6 +32,7 @@ public class CollisionTiming : Timing
 
     private void OnBodyEntered(Node node)
     {
+        if (_projectile == null) return;
         var proj = _projectile;
         if (!proj.IsInsideTree())
         {
