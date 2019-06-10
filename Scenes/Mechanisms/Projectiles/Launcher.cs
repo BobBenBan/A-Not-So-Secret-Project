@@ -9,9 +9,7 @@ public class Launcher : Spatial, ILauncher
     private Spatial _projectileHolder;
 
 //    [Export] public bool PoolProjectiles = false;
-#pragma warning disable 649
-    [Export] private PackedScene _projectileScene;
-#pragma warning restore 649
+    [Export] private PackedScene ProjectileScene { get; set; }
 
     private RigidBody NextToLaunch { get; set; }
 
@@ -24,15 +22,15 @@ public class Launcher : Spatial, ILauncher
         var toTranslate = launchInfo.Location - NextToLaunch.GlobalTransform.origin;
         NextToLaunch.GlobalTranslate(toTranslate);
         NextToLaunch.LinearVelocity = launchInfo.Velocity;
-        NextToLaunch                = (RigidBody) _projectileScene.Instance();
+        NextToLaunch                = (RigidBody) ProjectileScene.Instance();
     }
 
-    public override string _GetConfigurationWarning() => _projectileScene == null ? "Projectile Scene not set" : "";
+    public override string _GetConfigurationWarning() => ProjectileScene == null ? "Projectile Scene not set" : "";
 
     public override void _Ready()
     {
-        if (_projectileScene == null) return;
-        NextToLaunch = _projectileScene.Instance() as RigidBody;
+        if (ProjectileScene == null) return;
+        NextToLaunch = ProjectileScene.Instance() as RigidBody;
         if (NextToLaunch == null)
         {
             GD.PushWarning("Provided scene is not a rigid body.");

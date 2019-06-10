@@ -99,8 +99,8 @@ public class MidiConverter
             {
             case ControlNumbers.BankSelect:                      return new BankMsbSelectEvent(cce.ControlValue);
             case ControlNumbers.BankSelectLsb:                   return new BankLsbSelectEvent(cce.ControlValue);
-            case ControlNumbers.Volume:                          return new VolumeEventEvent(cce.ControlValue);
-            case ControlNumbers.Expression:                      return new ExpressionEventEvent(cce.ControlValue);
+            case ControlNumbers.Volume:                          return new VolumeChangeEvent(cce.ControlValue);
+            case ControlNumbers.Expression:                      return new ExpressionChangeEvent(cce.ControlValue);
             case ControlNumbers.Modulation:                      break;
             case ControlNumbers.BreathController:                break;
             case ControlNumbers.FootController:                  break;

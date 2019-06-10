@@ -11,12 +11,14 @@ using MusicMachine.Scenes.Functional;
 using MusicMachine.Scenes.Functional.Tracks;
 using MusicMachine.Scenes.Global;
 using MusicMachine.Scenes.Mechanisms.Glowing;
+using MusicMachine.Scenes.Mechanisms.MovingObject;
 using MusicMachine.Scenes.Mechanisms.Projectiles;
 using MusicMachine.Scenes.Mechanisms.Synth;
 using MusicMachine.Scenes.Objects.LightBoard;
 using MusicMachine.Scenes.Objects.Xylophone;
 using MusicMachine.Scenes.Player;
 using MusicMachine.Util;
+using NoteOnEvent = MusicMachine.Programs.NoteOnEvent;
 
 namespace MusicMachine.Test
 {
@@ -25,6 +27,8 @@ public class TestScene : Area
     private readonly List<LaunchInfo> _launches = new List<LaunchInfo>();
     private readonly Program _launchProgram = new Program();
     private readonly List<Timing> _launchTimings = new List<Timing>();
+    private Launcher _airLauncher;
+    private CollisionTimingMapper _airLaunchMapper;
     private Launcher _launcher;
     private CollisionTimingMapper _launchMapper;
 
@@ -46,8 +50,7 @@ public class TestScene : Area
         _player.Primary   = OnAction;
         _player.Secondary = OnSecondary;
 
-        _programPlayer.AnalyzeTracks();
-        _launchMapper.TimeAll();
+        OnSecondary(0);
     }
 
     private void PrepareTargets()
@@ -124,7 +127,7 @@ public class TestScene : Area
             {
                 StartPos          = launcher.GetGlobalTranslation(),
                 Gravity           = GravityVec * Gravity,
-                MinLaunchVelocity = 6,
+                MinLaunchVelocity = 5,
                 UseUpper          = true
             });
         var timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
@@ -134,6 +137,18 @@ public class TestScene : Area
         var xyloTrack      = _program.GetMusicTrack((byte) InstrumentNames.MusicBox);
         xyloTrack?.Mappers.Add(_launchMapper);
         xyloTrack?.Mappers.Add(xyloGlowMapper);
+
+        var movingObject       = GetNode<MovingObject>("Objects/MovingObject");
+        var movingObjectMapper = new MovingObjectMapper(movingObject);
+        var movingObjectTrack  = _program.GetMusicTrack((byte) InstrumentNames.SynthVoice);
+        movingObjectTrack?.Mappers.Add(movingObjectMapper);
+
+        _airLauncher   = GetNode<Launcher>("Objects/AirLauncher");
+        timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
+        GlobalNode.Instance.AddChild(timingRecorder);
+        _airLaunchMapper = new CollisionTimingMapper(_airLauncher, timingRecorder, AirMapper);
+        var airLaunchTrack = _program.GetMusicTrack((byte) InstrumentNames.AcousticGrandPiano);
+        airLaunchTrack?.Mappers.Add(_airLaunchMapper);
 
         var synth = new SortofVirtualSynth
         {
@@ -154,6 +169,19 @@ public class TestScene : Area
 
         foreach (var track in _program.Tracks)
             Console.WriteLine(track);
+    }
+
+    private IEnumerable<Pair<long, LaunchInfo>> AirMapper(ProgramTrack track, MappingInfo info)
+    {
+        foreach (var pair in track.EventPairs)
+            if (pair.Second is NoteOnEvent noe)
+            {
+                yield return new Pair<long, LaunchInfo>(
+                    info.GetMicros(pair.First),
+                    new LaunchInfo(
+                        _airLauncher.GetGlobalTranslation() + Vector3.Right * (0.2f * noe.NoteNumber),
+                        Vector3.Back * 2 + Vector3.Down));
+            }
     }
 
     private void OnAction(float delta)
@@ -177,6 +205,7 @@ public class TestScene : Area
     {
         _programPlayer.AnalyzeTracks();
         _launchMapper.TimeAll();
+        _airLaunchMapper.TimeAll();
     }
 
     private void OnBodyExited(Node body)

@@ -7,7 +7,7 @@ using MusicMachine.Util.Maths;
 
 namespace MusicMachine.Scenes.Objects.Xylophone
 {
-//[Tool]
+[Tool]
 public class Xylophone : Spatial, IGlowingArray
 {
     private static readonly byte[] ShiftPos = {0, 0, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6};
@@ -105,7 +105,7 @@ public class Xylophone : Spatial, IGlowingArray
         {
             if (!(@event is NoteOnEvent noteOnEvent)) return null;
             var noteNumber = (int) noteOnEvent.NoteNumber;
-            if (!noteNumber.InRange(_startNum, _endNum)) return null;
+            if (!noteNumber.InRange(_startNum, _endNum + 1)) return null;
             return ((Spatial) _theGlows[noteNumber - _startNum]).GetGlobalTranslation();
         };
     }

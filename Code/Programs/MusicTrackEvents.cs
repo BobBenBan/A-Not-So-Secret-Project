@@ -155,9 +155,9 @@ public abstract class ControlEvent : MusicStateEvent
 //    public override string ToString() => $"Bank Select ({Bank})";
 //}
 
-public sealed class VolumeEventEvent : ControlEvent
+public sealed class VolumeChangeEvent : ControlEvent
 {
-    public VolumeEventEvent(SBN volume)
+    public VolumeChangeEvent(SBN volume)
     {
         Volume = volume;
     }
@@ -168,10 +168,10 @@ public sealed class VolumeEventEvent : ControlEvent
 
     public override SBN? ControlNumberLsb { get; } = null;
 
-    private bool Equals(VolumeEventEvent other) => Volume.Equals(other.Volume);
+    private bool Equals(VolumeChangeEvent other) => Volume.Equals(other.Volume);
 
     public override bool Equals(object obj) =>
-        ReferenceEquals(this, obj) || obj is VolumeEventEvent other && Equals(other);
+        ReferenceEquals(this, obj) || obj is VolumeChangeEvent other && Equals(other);
 
     public override int GetHashCode() => Volume.GetHashCode();
 
@@ -183,9 +183,9 @@ public sealed class VolumeEventEvent : ControlEvent
     public override string ToString() => $"Volume Change ({Volume})";
 }
 
-public sealed class ExpressionEventEvent : ControlEvent
+public sealed class ExpressionChangeEvent : ControlEvent
 {
-    public ExpressionEventEvent(SBN expression)
+    public ExpressionChangeEvent(SBN expression)
     {
         Expression = expression;
     }
@@ -196,10 +196,10 @@ public sealed class ExpressionEventEvent : ControlEvent
 
     public override SBN? ControlNumberLsb { get; } = null;
 
-    private bool Equals(ExpressionEventEvent other) => Expression.Equals(other.Expression);
+    private bool Equals(ExpressionChangeEvent other) => Expression.Equals(other.Expression);
 
     public override bool Equals(object obj) =>
-        ReferenceEquals(this, obj) || obj is ExpressionEventEvent other && Equals(other);
+        ReferenceEquals(this, obj) || obj is ExpressionChangeEvent other && Equals(other);
 
     public override int GetHashCode() => Expression.GetHashCode();
 

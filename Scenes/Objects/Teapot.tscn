@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Scenes/Objects/WorldObject.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Objects/teapot.obj" type="ArrayMesh" id=2]
+
+[sub_resource type="PhysicsMaterial" id=1]
+bounce = 2.0
+
+[sub_resource type="SpatialMaterial" id=2]
+flags_transparent = true
+albedo_color = Color( 0.980392, 0.694118, 0.0823529, 0.639216 )
+metallic = 0.8
+roughness = 0.24
+refraction_enabled = true
+refraction_scale = 0.05
+refraction_texture_channel = 0
+
+[node name="Teapot" index="0" instance=ExtResource( 1 )]
+physics_material_override = SubResource( 1 )
+angular_velocity = Vector3( 4, 1, 2 )
+LifeTime = 1.5
+AutoShapeMesh = NodePath("MeshInstance")
+
+[node name="MeshInstance" type="MeshInstance" parent="." index="1"]
+transform = Transform( 0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0, 0 )
+material_override = SubResource( 2 )
+mesh = ExtResource( 2 )
+material/0 = null

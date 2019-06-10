@@ -107,6 +107,7 @@
     <Compile Include="Scenes\Mechanisms\Glowing\IGlowingArray.cs" />
     <Compile Include="Scenes\Mechanisms\Glowing\GlowingMapper.cs" />
     <Compile Include="Scenes\Mechanisms\MovingObject\MovingObject.cs" />
+    <Compile Include="Scenes\Mechanisms\MovingObject\MovingObjectMapper.cs" />
     <Compile Include="Scenes\Mechanisms\Synth\ChannelState.cs">
       <DependentUpon>SortofVirtualSynth.cs</DependentUpon>
     </Compile>

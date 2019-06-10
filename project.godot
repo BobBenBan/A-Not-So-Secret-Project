@@ -31,8 +31,6 @@ gdscript/warnings/unused_variable=false
 
 [display]
 
-window/size/width=2058
-window/size/height=1000
 window/vsync/use_vsync=false
 
 [input]
