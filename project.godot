@@ -29,6 +29,12 @@ Caches="*res://Scenes/Global/Caches.cs"
 settings/fps/force_fps=30
 gdscript/warnings/unused_variable=false
 
+[display]
+
+window/size/width=2058
+window/size/height=1000
+window/vsync/use_vsync=false
+
 [input]
 
 player_move_forward={
@@ -99,7 +105,6 @@ action_secondary={
 
 [mono]
 
-debugger_agent/wait_for_debugger=true
 debugger_agent/wait_timeout=15000
 export/include_scripts_content=true
 
@@ -116,3 +121,4 @@ common/enable_object_picking=false
 threads/thread_model=2
 quality/filters/msaa=3
 environment/default_environment="res://Test/DefaultEnv.tres"
+quality/dynamic_fonts/use_oversampling=false

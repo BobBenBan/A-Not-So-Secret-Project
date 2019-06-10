@@ -45,6 +45,9 @@ public class TestScene : Area
 //        OnSecondary(0);
         _player.Primary   = OnAction;
         _player.Secondary = OnSecondary;
+
+        _programPlayer.AnalyzeTracks();
+        _launchMapper.TimeAll();
     }
 
     private void PrepareTargets()
@@ -127,8 +130,10 @@ public class TestScene : Area
         var timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
         GlobalNode.Instance.AddChild(timingRecorder);
         _launchMapper = new CollisionTimingMapper(_launcher, timingRecorder, targetMapper);
-        var xyloTrack = _program.GetMusicTrack((byte) InstrumentNames.MusicBox);
+        var xyloGlowMapper = new GlowingMapper(xylophone);
+        var xyloTrack      = _program.GetMusicTrack((byte) InstrumentNames.MusicBox);
         xyloTrack?.Mappers.Add(_launchMapper);
+        xyloTrack?.Mappers.Add(xyloGlowMapper);
 
         var synth = new SortofVirtualSynth
         {

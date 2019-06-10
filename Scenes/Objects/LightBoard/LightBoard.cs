@@ -9,7 +9,6 @@ public class LightBoard : WorldObject, IGlowingArray
 {
     private Spatial _bulbs;
     [Export(PropertyHint.Range, "0,127")] private byte _endNum = 99;
-    private int[] _onCount;
     [Export(PropertyHint.Range, "0,127")] private byte _startNum = 20;
     private IContainsGlowing[] _theGlows;
     private Transform _transform1;
@@ -62,7 +61,6 @@ public class LightBoard : WorldObject, IGlowingArray
             _bulbs.AddChild(cur);
             _theGlows[i] = (IContainsGlowing) cur;
         }
-        _onCount = new int[NumBulbs];
     }
 
     private void OnWorldExit()
