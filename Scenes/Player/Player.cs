@@ -111,8 +111,8 @@ public class Player : KinematicBody
             //speed
             var slow = slowPressed && !Flying;
             _running = !slow && runningPressed && (_running || Flying || isOnFloor);
-            var speed = slow     ? SlowSpeed :
-                        _running ? RunSpeed : WalkSpeed;
+            var speed = slow ? SlowSpeed :
+                _running     ? RunSpeed : WalkSpeed;
 
             //Flying, jumping
 

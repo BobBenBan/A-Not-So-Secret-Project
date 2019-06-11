@@ -43,67 +43,21 @@ public class TestScene : Area
 
     public override void _Ready()
     {
-        _player = GetNode<Player>("Player");
+        _player   = GetNode<Player>("Player");
         _launcher = GetNode<Launcher>("Objects/Launcher");
         ProgramTheProgram();
 //        PrepareTargets();
 //        OnSecondary(0);
-        _player.Primary = OnAction;
+        _player.Primary   = OnAction;
         _player.Secondary = OnSecondary;
 
         OnSecondary(0);
     }
 
-    private void PrepareTargets()
-    {
-        var timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
-        GlobalNode.Instance.AddChild(timingRecorder);
-        var targets = GetNode<Spatial>("Targets");
-        foreach (Spatial child in targets.GetChildren())
-        {
-            var t1 = GetLaunch1(child);
-            var t2 = GetLaunch2(child);
-            _launches.Add(t1);
-            _launches.Add(t2);
-        }
-
-        IEnumerable<Pair<long, LaunchInfo>> TrackToLaunch(ProgramTrack track, MappingInfo info)
-        {
-            foreach (var launch in _launches) yield return new Pair<long, LaunchInfo>(4_000_000, launch);
-        }
-
-        _launchMapper = new CollisionTimingMapper(_launcher, timingRecorder, TrackToLaunch);
-        var emptyTestTrack = new EmptyTestTrack();
-        _launchProgram.Tracks.Add(emptyTestTrack);
-        emptyTestTrack.Mappers.Add(_launchMapper);
-        _launchPlayer = new ProgramPlayer(_launchProgram);
-        AddChild(_launchPlayer);
-    }
-
-    private LaunchInfo GetLaunch1(Spatial child)
-    {
-        var startLoc      = LaunchLoc;
-        var endLoc        = child.GetGlobalTranslation();
-        var gravity       = GravityVec * Gravity;
-        var targetingInfo = new Targeting.Params(startLoc, endLoc, gravity, 2, false);
-        var @params       = targetingInfo;
-        return @params.ToLaunch();
-    }
-
-    private LaunchInfo GetLaunch2(Spatial child)
-    {
-        var startLoc      = LaunchLoc;
-        var endLoc        = child.GetGlobalTranslation();
-        var gravity       = GravityVec * Gravity;
-        var targetingInfo = new Targeting.Params(startLoc, endLoc, gravity, 16, true);
-        var @params       = targetingInfo;
-        return @params.ToLaunch();
-    }
-
     private void ProgramTheProgram()
     {
         const string midiFile      = "res://Resources/Midi/Fireflies.mid";
-        const string soundFontFile = "res://Resources/Midi/sf.sf2";
+        const string soundFontFile = "res://Resources/Midi/toh.sf2";
 
         _program = MidiFile.Read(
                                 ProjectSettings.GlobalizePath(midiFile),
@@ -126,10 +80,10 @@ public class TestScene : Area
             xylophoneMapper,
             new Targeting.Params
             {
-                StartPos = launcher.GetGlobalTranslation(),
-                Gravity = GravityVec * Gravity,
+                StartPos          = launcher.GetGlobalTranslation(),
+                Gravity           = GravityVec * Gravity,
                 MinLaunchVelocity = 5,
-                UseUpper = true
+                UseUpper          = true
             });
         var timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
         GlobalNode.Instance.AddChild(timingRecorder);
@@ -144,7 +98,7 @@ public class TestScene : Area
         var movingObjectTrack  = _program.GetMusicTrack((byte) InstrumentNames.SynthVoice);
         movingObjectTrack?.Mappers.Add(movingObjectMapper);
 
-        _airLauncher = GetNode<Launcher>("Objects/AirLauncher");
+        _airLauncher   = GetNode<Launcher>("Objects/AirLauncher");
         timingRecorder = new TimingRecorder {ProcessMode = ProcessNode.Mode.Physics};
         GlobalNode.Instance.AddChild(timingRecorder);
         _airLaunchMapper = new CollisionTimingMapper(_airLauncher, timingRecorder, AirMapper);
@@ -158,7 +112,7 @@ public class TestScene : Area
 
         var synth = new SortofVirtualSynth
         {
-            NumChannels = _program.Tracks.Count,
+            NumChannels   = _program.Tracks.Count,
             SoundFontFile = soundFontFile,
             UsedPresetNumbers =
                 _program.Tracks.OfType<MusicTrack>().Select(track => track.CombinedPresetNum).ToGdArray(),

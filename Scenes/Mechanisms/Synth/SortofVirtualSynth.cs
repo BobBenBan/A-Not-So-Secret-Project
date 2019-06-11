@@ -27,7 +27,7 @@ public partial class SortofVirtualSynth : ProcessNode
 
     public SortofVirtualSynth(Mode mode = Mode.Audio)
     {
-        Enabled = true;
+        Enabled     = true;
         ProcessMode = mode;
     }
 
@@ -84,8 +84,8 @@ public partial class SortofVirtualSynth : ProcessNode
         {
             var track = program.Tracks[index] as MusicTrack;
             if (track == null) continue;
-            _channelStates[index].Bank = track.Bank;
-            _channelStates[index].Program = track.Program;
+            _channelStates[index].Bank        = track.Bank;
+            _channelStates[index].Program     = track.Program;
             _channelStates[index].IsDrumTrack = track.IsDrumTrack;
         }
     }
@@ -100,9 +100,9 @@ public partial class SortofVirtualSynth : ProcessNode
             var player = new AdsrPlayer
             {
                 MixTarget = MixTarget,
-                Bus = Bus,
-                AmpDb = AmpDb,
-                VolumeDb = VolumeDb
+                Bus       = Bus,
+                AmpDb     = AmpDb,
+                VolumeDb  = VolumeDb
             };
             AddChild(player, true);
             _players[index] = player;
@@ -193,10 +193,10 @@ public partial class SortofVirtualSynth : ProcessNode
         var player = GetIdlePlayer();
         if (player == null)
             return;
-        player.Instrument = instrument;
-        player.Velocity = noteOnEvent.Velocity;
+        player.Instrument  = instrument;
+        player.Velocity    = noteOnEvent.Velocity;
         player.VolumeRange = channel.VolumeRange * channel.ExpressionRange;
-        player.PitchBend = channel.PitchBendRange;
+        player.PitchBend   = channel.PitchBendRange;
         player.Play();
 //            if (!track.IsDrumTrack)
         channel.NotesOn[keyNum] = player;
@@ -215,12 +215,12 @@ public partial class SortofVirtualSynth : ProcessNode
             if (player.Releasing && player.CurrentVolumeRange < minVol)
             {
                 stoppedPlayer = player;
-                minVol = player.CurrentVolumeRange;
+                minVol        = player.CurrentVolumeRange;
             }
             if (player.UsingTimer > oldestTime)
             {
                 oldestPlayer = player;
-                oldestTime = player.UsingTimer;
+                oldestTime   = player.UsingTimer;
             }
         }
         return stoppedPlayer ?? oldestPlayer;

@@ -13,6 +13,7 @@ public class MovingObject : Spatial
     public readonly Spatial[] CurSpatials = new Spatial[128];
     private Spatial _objects;
     private bool valid = false;
+
     [Export] private float Scalar { get; set; } = 1;
 
     [Export] private PackedScene ObjectScene { get; set; }
@@ -42,9 +43,9 @@ public class MovingObject : Spatial
         if (!valid) return;
         var spatial = GetOrCreate();
         var tf      = spatial.GlobalTransform;
-        tf.origin = this.GetGlobalTranslation();
+        tf.origin               = this.GetGlobalTranslation();
         spatial.GlobalTransform = tf;
-        spatial.Scale = Vector3.One * (Scalar * note.Velocity / 127f);
+        spatial.Scale           = Vector3.One * (Scalar * note.Velocity / 127f);
         spatial.GlobalTranslate(_direction * note.NoteNumber);
         CurSpatials[note.NoteNumber] = spatial;
     }
@@ -71,7 +72,8 @@ public class MovingObject : Spatial
         {
             spatial = _cachedObjects.Dequeue();
             spatial.SetVisible(true);
-        } else
+        }
+        else
         {
             spatial = (Spatial) ObjectScene.Instance();
             _objects.AddChild(spatial);

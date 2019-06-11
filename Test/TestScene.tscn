@@ -35,7 +35,7 @@ __meta__ = {
 environment = ExtResource( 2 )
 
 [node name="Player" parent="." instance=ExtResource( 3 )]
-transform = Transform( -1, 0, -8.74227e-008, 0, 1, 0, 8.74227e-008, 0, -1, -4.8, 1.54089, 3.1 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -4.8, 1.54089, 3.1 )
 
 [node name="DirectionalLight" type="DirectionalLight" parent="."]
 transform = Transform( 0.148197, 0.639691, -0.75421, -0.0263838, 0.764917, 0.643588, 0.988606, -0.0754791, 0.130236, -27.8476, 17.8084, -3.8644 )
@@ -84,8 +84,8 @@ transform = Transform( 1.95, 0, 4.64916e-007, 0, 1.95, 0, -4.64916e-007, 0, 1.95
 [node name="MovingObject" parent="Objects" instance=ExtResource( 11 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9, 0.3, -5.6 )
 Scalar = 4.0
-_direction = Vector3( 0.1, 0, 0 )
 ObjectScene = ExtResource( 12 )
+_direction = Vector3( 0.1, 0, 0 )
 
 [node name="Drums" parent="Objects" instance=ExtResource( 13 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -6.70248, 0, -0.399456 )

@@ -1,157 +1,160 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.12.0\build\NUnit.props')" />
-  <ItemGroup>
-    <Reference Include="GodotSharp">
-      <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GodotSharpEditor" Condition=" '$(Configuration)' == 'Tools' ">
-      <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharpEditor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GodotSharpEditor, Version=1.0.7055.41580, Culture=neutral, PublicKeyToken=null">
-      <HintPath>.mono\assemblies\GodotSharpEditor.dll</HintPath>
-    </Reference>
-    <Reference Include="Melanchall.DryWetMidi, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>packages\Melanchall.DryWetMidi.4.1.0\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
-      <HintPath>packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Tools|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TOOLS;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="addons\MusicMachine\Plugin.cs" />
-    <Compile Include="Code\Mechanisms\Glowing\PersistingGlowMapper.cs" />
-    <Compile Include="Code\Mechanisms\Glowing\IContainsGlowing.cs" />
-    <Compile Include="Code\Mechanisms\Glowing\IGlowingArray.cs" />
-    <Compile Include="Code\Mechanisms\Glowing\PulsingGlowMapper.cs" />
-    <Compile Include="Code\Mechanisms\MovingObject\MovingObjectMapper.cs" />
-    <Compile Include="Code\Mechanisms\Projectiles\CollisionTiming.cs" />
-    <Compile Include="Code\Mechanisms\Projectiles\CollisionTimingMapper.cs" />
-    <Compile Include="Code\Mechanisms\Projectiles\ITrackToLaunchMapper.cs" />
-    <Compile Include="Code\Mechanisms\Projectiles\ILauncher.cs" />
-    <Compile Include="Code\Mechanisms\Projectiles\LaunchInfo.cs" />
-    <Compile Include="Code\Mechanisms\Projectiles\Targeting.cs" />
-    <Compile Include="Code\Mechanisms\Timings\Timing.cs" />
-    <Compile Include="Code\Mechanisms\Timings\TimingRecorder.cs" />
-    <Compile Include="Code\Game\Constants\Inputs.cs" />
-    <Compile Include="Code\Game\Constants\SignalNames.cs" />
-    <Compile Include="Code\Game\DoubleTapDetector.cs" />
-    <Compile Include="Code\Game\InputAction.cs" />
-    <Compile Include="Code\Programs\BaseEvent.cs" />
-    <Compile Include="Code\Programs\ProgramTrack.cs" />
-    <Compile Include="Code\Programs\Mappers\ITrackMapper.cs" />
-    <Compile Include="Code\Programs\Mappers\RunningInfo.cs" />
-    <Compile Include="Code\Programs\MusicTrack.cs" />
-    <Compile Include="Code\Programs\MusicTrack.Cleaner.cs">
-      <DependentUpon>MusicTrack.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Code\Programs\MusicTrackEvents.cs">
-      <DependentUpon>MusicTrack.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Code\Programs\MidiConstants.cs">
-      <DependentUpon>MidiConverter.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Code\Programs\MidiConverter.cs" />
-    <Compile Include="Code\Programs\PlayingState.cs" />
-    <Compile Include="Code\Programs\Program.cs" />
-    <Compile Include="Code\Programs\Track.cs" />
-    <Compile Include="Code\Test\PseudoScratch.cs" />
-    <Compile Include="Code\Test\TrackTest.cs" />
-    <Compile Include="Code\ThirdParty\GDLocations.cs" />
-    <Compile Include="Code\ThirdParty\Midi\ADSRPlayer.cs" />
-    <Compile Include="Code\ThirdParty\Midi\Bank.cs" />
-    <Compile Include="Code\Util\Delegates.cs" />
-    <Compile Include="Code\Util\Dirs.cs" />
-    <Compile Include="Code\Util\Extentions.cs" />
-    <Compile Include="Code\Util\Holder.cs" />
-    <Compile Include="Code\Util\Maths\Mathm.cs" />
-    <Compile Include="Code\Util\Maths\Numbers.cs" />
-    <Compile Include="Code\Util\Maths\Vector2d.cs" />
-    <Compile Include="Code\Util\Pair.cs" />
-    <Compile Include="Code\Util\Wrapper.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scenes\Functional\Clock.cs" />
-    <Compile Include="Scenes\Functional\ProcessNode.cs" />
-    <Compile Include="Scenes\Functional\Tracks\ActionPlayer.cs" />
-    <Compile Include="Scenes\Functional\Tracks\ProgramPlayer.cs" />
-    <Compile Include="Scenes\Global\AudioProcess.cs" />
-    <Compile Include="Scenes\Global\Caches.cs" />
-    <Compile Include="Scenes\Global\GlobalNode.cs" />
-    <Compile Include="Scenes\Mechanisms\Glowing\GlowingObject.cs" />
-    <Compile Include="Scenes\Mechanisms\Glowing\SimpleGlowingArray.cs" />
-    <Compile Include="Scenes\Mechanisms\MovingObject\MovingObject.cs" />
-    <Compile Include="Scenes\Mechanisms\Synth\ChannelState.cs">
-      <DependentUpon>SortofVirtualSynth.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Scenes\Mechanisms\Synth\SortofVirtualSynth.cs" />
-    <Compile Include="Scenes\Mechanisms\Projectiles\Launcher.cs" />
-    <Compile Include="Scenes\Objects\Drums\Drum.cs" />
-    <Compile Include="Scenes\Objects\Drums\Drums.cs" />
-    <Compile Include="Scenes\Objects\WorldObject.cs" />
-    <Compile Include="Scenes\Objects\Xylophone\Bar.cs" />
-    <Compile Include="Scenes\Objects\Xylophone\Xylophone.cs" />
-    <Compile Include="Scenes\Player\Player.cs" />
-    <Compile Include="Test\TestOnly.cs" />
-    <Compile Include="Test\TestScene.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Code\Game\Nodes" />
-    <Folder Include="Scenes\Objects\Drums" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scenes\Mechanisms\Glowing\SimpleGlowingArray.tscn" />
-  </ItemGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A8A8E5BB-13ED-408B-BC36-DCE720D3E1D3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <OutputPath>.mono\temp\bin\$(Configuration)</OutputPath>
-    <RootNamespace>MusicMachine</RootNamespace>
-    <AssemblyName>MusicMachine</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <BaseIntermediateOutputPath>.mono\temp\obj</BaseIntermediateOutputPath>
-    <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
-    <LangVersion>7.3</LangVersion>
-  </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <Error Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.12.0\build\NUnit.props'))" Condition="!Exists('packages\NUnit.3.12.0\build\NUnit.props')" />
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+    <Import Project="packages\NUnit.3.12.0\build\NUnit.props"
+            Condition="Exists('packages\NUnit.3.12.0\build\NUnit.props')" />
+    <ItemGroup>
+        <Reference Include="GodotSharp">
+            <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharp.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GodotSharpEditor" Condition=" '$(Configuration)' == 'Tools' ">
+            <HintPath>$(ProjectDir)\.mono\assemblies\GodotSharpEditor.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
+        <Reference Include="GodotSharpEditor, Version=1.0.7055.41580, Culture=neutral, PublicKeyToken=null">
+            <HintPath>.mono\assemblies\GodotSharpEditor.dll</HintPath>
+        </Reference>
+        <Reference Include="Melanchall.DryWetMidi, Version=4.1.0.0, Culture=neutral, PublicKeyToken=null">
+            <HintPath>packages\Melanchall.DryWetMidi.4.1.0\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
+            <Private>True</Private>
+        </Reference>
+        <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+            <HintPath>packages\NUnit.3.12.0\lib\net45\nunit.framework.dll</HintPath>
+            <Private>True</Private>
+        </Reference>
+        <Reference Include="System" />
+    </ItemGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <Optimize>false</Optimize>
+        <DefineConstants>DEBUG;</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
     </PropertyGroup>
-  </Target>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugType>portable</DebugType>
+        <Optimize>true</Optimize>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Tools|AnyCPU' ">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
+        <Optimize>false</Optimize>
+        <DefineConstants>DEBUG;TOOLS;</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <ConsolePause>false</ConsolePause>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="addons\MusicMachine\Plugin.cs" />
+        <Compile Include="Code\Mechanisms\Glowing\PersistingGlowMapper.cs" />
+        <Compile Include="Code\Mechanisms\Glowing\IContainsGlowing.cs" />
+        <Compile Include="Code\Mechanisms\Glowing\IGlowingArray.cs" />
+        <Compile Include="Code\Mechanisms\Glowing\PulsingGlowMapper.cs" />
+        <Compile Include="Code\Mechanisms\MovingObject\MovingObjectMapper.cs" />
+        <Compile Include="Code\Mechanisms\Projectiles\CollisionTiming.cs" />
+        <Compile Include="Code\Mechanisms\Projectiles\CollisionTimingMapper.cs" />
+        <Compile Include="Code\Mechanisms\Projectiles\ITrackToLaunchMapper.cs" />
+        <Compile Include="Code\Mechanisms\Projectiles\ILauncher.cs" />
+        <Compile Include="Code\Mechanisms\Projectiles\LaunchInfo.cs" />
+        <Compile Include="Code\Mechanisms\Projectiles\Targeting.cs" />
+        <Compile Include="Code\Mechanisms\Timings\Timing.cs" />
+        <Compile Include="Code\Mechanisms\Timings\TimingRecorder.cs" />
+        <Compile Include="Code\Game\Constants\Inputs.cs" />
+        <Compile Include="Code\Game\Constants\SignalNames.cs" />
+        <Compile Include="Code\Game\DoubleTapDetector.cs" />
+        <Compile Include="Code\Game\InputAction.cs" />
+        <Compile Include="Code\Programs\BaseEvent.cs" />
+        <Compile Include="Code\Programs\ProgramTrack.cs" />
+        <Compile Include="Code\Programs\Mappers\ITrackMapper.cs" />
+        <Compile Include="Code\Programs\Mappers\RunningInfo.cs" />
+        <Compile Include="Code\Programs\MusicTrack.cs" />
+        <Compile Include="Code\Programs\MusicTrack.Cleaner.cs">
+            <DependentUpon>MusicTrack.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Code\Programs\MusicTrackEvents.cs">
+            <DependentUpon>MusicTrack.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Code\Programs\MidiConstants.cs">
+            <DependentUpon>MidiConverter.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Code\Programs\MidiConverter.cs" />
+        <Compile Include="Code\Programs\PlayingState.cs" />
+        <Compile Include="Code\Programs\Program.cs" />
+        <Compile Include="Code\Programs\Track.cs" />
+        <Compile Include="Code\Test\PseudoScratch.cs" />
+        <Compile Include="Code\Test\TrackTest.cs" />
+        <Compile Include="Code\ThirdParty\GDLocations.cs" />
+        <Compile Include="Code\ThirdParty\Midi\ADSRPlayer.cs" />
+        <Compile Include="Code\ThirdParty\Midi\Bank.cs" />
+        <Compile Include="Code\Util\Delegates.cs" />
+        <Compile Include="Code\Util\Dirs.cs" />
+        <Compile Include="Code\Util\Extentions.cs" />
+        <Compile Include="Code\Util\Holder.cs" />
+        <Compile Include="Code\Util\Maths\Mathm.cs" />
+        <Compile Include="Code\Util\Maths\Numbers.cs" />
+        <Compile Include="Code\Util\Maths\Vector2d.cs" />
+        <Compile Include="Code\Util\Pair.cs" />
+        <Compile Include="Code\Util\Wrapper.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Scenes\Functional\Clock.cs" />
+        <Compile Include="Scenes\Functional\ProcessNode.cs" />
+        <Compile Include="Scenes\Functional\Tracks\ActionPlayer.cs" />
+        <Compile Include="Scenes\Functional\Tracks\ProgramPlayer.cs" />
+        <Compile Include="Scenes\Global\AudioProcess.cs" />
+        <Compile Include="Scenes\Global\Caches.cs" />
+        <Compile Include="Scenes\Global\GlobalNode.cs" />
+        <Compile Include="Scenes\Mechanisms\Glowing\GlowingObject.cs" />
+        <Compile Include="Scenes\Mechanisms\Glowing\SimpleGlowingArray.cs" />
+        <Compile Include="Scenes\Mechanisms\MovingObject\MovingObject.cs" />
+        <Compile Include="Scenes\Mechanisms\Synth\ChannelState.cs">
+            <DependentUpon>SortofVirtualSynth.cs</DependentUpon>
+        </Compile>
+        <Compile Include="Scenes\Mechanisms\Synth\SortofVirtualSynth.cs" />
+        <Compile Include="Scenes\Mechanisms\Projectiles\Launcher.cs" />
+        <Compile Include="Scenes\Objects\Drums\Drum.cs" />
+        <Compile Include="Scenes\Objects\Drums\Drums.cs" />
+        <Compile Include="Scenes\Objects\WorldObject.cs" />
+        <Compile Include="Scenes\Objects\Xylophone\Bar.cs" />
+        <Compile Include="Scenes\Objects\Xylophone\Xylophone.cs" />
+        <Compile Include="Scenes\Player\Player.cs" />
+        <Compile Include="Test\TestOnly.cs" />
+        <Compile Include="Test\TestScene.cs" />
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Code\Game\Nodes" />
+        <Folder Include="Scenes\Objects\Drums" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="Scenes\Mechanisms\Glowing\SimpleGlowingArray.tscn" />
+    </ItemGroup>
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{A8A8E5BB-13ED-408B-BC36-DCE720D3E1D3}</ProjectGuid>
+        <OutputType>Library</OutputType>
+        <OutputPath>.mono\temp\bin\$(Configuration)</OutputPath>
+        <RootNamespace>MusicMachine</RootNamespace>
+        <AssemblyName>MusicMachine</AssemblyName>
+        <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+        <BaseIntermediateOutputPath>.mono\temp\obj</BaseIntermediateOutputPath>
+        <IntermediateOutputPath>$(BaseIntermediateOutputPath)\$(Configuration)</IntermediateOutputPath>
+        <LangVersion>7.3</LangVersion>
+    </PropertyGroup>
+    <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+        <Error Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.12.0\build\NUnit.props'))"
+               Condition="!Exists('packages\NUnit.3.12.0\build\NUnit.props')" />
+        <PropertyGroup>
+            <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them. For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+        </PropertyGroup>
+    </Target>
 </Project>

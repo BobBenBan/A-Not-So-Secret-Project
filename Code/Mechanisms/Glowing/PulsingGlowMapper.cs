@@ -15,7 +15,7 @@ public sealed class PulsingGlowMapper : ITrackMapper
     public PulsingGlowMapper(IGlowingArray glowingArray, long pulseMicros)
     {
         if (pulseMicros <= 0) throw new ArgumentException(nameof(pulseMicros));
-        _pulseMicros = pulseMicros;
+        _pulseMicros  = pulseMicros;
         _glowingArray = glowingArray;
     }
 

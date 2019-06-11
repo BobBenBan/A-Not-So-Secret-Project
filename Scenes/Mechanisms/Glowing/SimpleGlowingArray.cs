@@ -42,7 +42,7 @@ public class SimpleGlowingArray : Spatial, IGlowingArray
         if (EndNum < StartNum)
         {
             var t = EndNum;
-            EndNum = StartNum;
+            EndNum   = StartNum;
             StartNum = t;
         }
         _objects = new Spatial {Name = "Objects"};
@@ -59,7 +59,7 @@ public class SimpleGlowingArray : Spatial, IGlowingArray
 
         for (var i = 0; i < NumObjects; i++)
         {
-            cur = (Spatial) ObjScene.Instance();
+            cur           = (Spatial) ObjScene.Instance();
             cur.Transform = _transform1.InterpolateWith(_transform2, i);
             _objects.AddChild(cur);
             if (!Engine.EditorHint)

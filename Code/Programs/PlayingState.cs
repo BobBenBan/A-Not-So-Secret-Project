@@ -6,17 +6,12 @@ public struct PlayingState
 {
     public static PlayingState Default => new PlayingState {Expression = 127, PitchBend = 8192, Volume = 127};
 
-    public FTBN PitchBend { get; set; }
-
-    public SBN Volume { get; set; }
-
-    public SBN Expression { get; set; }
-
-    public FTBN Bank { get; set; }
-
-    public SBN Program { get; set; }
-
-    public bool IsDrumTrack { get; set; }
+    public FTBN PitchBend;
+    public SBN Volume;
+    public SBN Expression;
+    public FTBN Bank;
+    public SBN Program;
+    public bool IsDrumTrack;
 
     public float PitchBendRange => PitchBend / 8192f - 1;
 

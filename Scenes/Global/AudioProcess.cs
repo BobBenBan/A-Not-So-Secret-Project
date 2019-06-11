@@ -65,13 +65,15 @@ public sealed class AudioProcess : Node
                 {
                     var processes = Processes;
                     processes?.Invoke(elapsedTicks);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     GD.PrintErr(e);
                     throw;
                 }
             }
-        } catch (ThreadInterruptedException)
+        }
+        catch (ThreadInterruptedException)
         {
         }
     }
