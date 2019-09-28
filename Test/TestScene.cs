@@ -57,7 +57,7 @@ public class TestScene : Area
     private void ProgramTheProgram()
     {
         const string midiFile      = "res://Resources/Midi/Fireflies.mid";
-        const string soundFontFile = "res://Resources/Midi/toh.sf2";
+        const string soundFontFile = "res://Resources/Midi/choriumreva.sf2";
 
         _program = MidiFile.Read(
                                 ProjectSettings.GlobalizePath(midiFile),
